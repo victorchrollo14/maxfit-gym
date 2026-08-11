@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  trigger: {}
+
+  web:
     dependencies:
       '@heroui/react':
         specifier: ^3.2.3

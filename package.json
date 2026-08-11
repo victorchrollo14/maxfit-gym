@@ -1,0 +1,12 @@
+{
+  "name": "maxfit",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "lint": "pnpm -r lint"
+  },
+  "packageManager": "pnpm@10.6.3"
+}

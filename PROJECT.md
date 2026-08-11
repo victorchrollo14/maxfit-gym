@@ -87,7 +87,8 @@ This file stays the **reference**: decisions and their rationale, design directi
 | Frontend | React 19 + TanStack Router + Vite |
 | UI | HeroUI v3 + Tailwind v4, dark-first |
 | Type | Archivo (variable — real italic + width axis) for display, Inter for body, via Google Fonts |
-| Backend | Vercel Functions, in the same project as the frontend (`web/api/`). Express-compatible if a full app is ever warranted |
+| Repo | pnpm workspace monorepo — `web/` (site + API) and `trigger/` (scheduled jobs) |
+| Backend | Vercel Functions in `web/api/`, **or Supabase Edge Functions** — undecided, see below. Express-compatible either way if a full app is ever warranted |
 | Scheduling | Trigger.dev |
 | DB / Auth | Supabase |
 | Media | Cloudinary |
@@ -95,6 +96,20 @@ This file stays the **reference**: decisions and their rationale, design directi
 | Payments | UPI via gateway — Razorpay or PhonePe PG (TBD) |
 
 Fine for a small gym. Open questions in [Open Questions](#open-questions).
+
+### Vercel Functions vs Supabase Edge Functions
+
+Not decided, and it doesn't need to be until the first endpoint is written — both are a handler that reads a request and talks to Postgres, so the port is small either way.
+
+| | Vercel Functions | Supabase Edge Functions |
+|---|---|---|
+| Runtime | Node, same npm deps as the app | Deno — separate dependency world |
+| Origin | Same as the site, no CORS | `*.supabase.co`, CORS headers required |
+| Timeout | **10s on Hobby** | 150s wall clock, generous by comparison |
+| Deploy | Already wired to the repo | Separate CLI step |
+| Proximity | Network hop to Supabase | Runs next to the database |
+
+**Lean Vercel for v1** — one deploy pipeline, one language, and the endpoints we actually need (`POST /api/leads`, WhatsApp OTP send) are far inside 10s. Edge Functions become the better answer for anything slow, anything chatty with Postgres, or if Vercel's commercial-use terms push the API off Hobby. Worth knowing the choice is per-endpoint, not global: they can coexist.
 
 ## Free-tier fit
 

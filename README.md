@@ -16,8 +16,8 @@ pnpm workspace, two packages:
 
 | Package | What it is | Deploys to |
 |---|---|---|
-| `web/` | Landing page, member portal, CRM, API | Vercel → maxfitbangalore.in |
-| `trigger/` | Scheduled jobs (expiry reminders) | Trigger.dev — empty placeholder for now |
+| `apps/web` | Landing page, member portal, CRM, API | Vercel → maxfitbangalore.in |
+| `apps/trigger` | Scheduled jobs (expiry reminders) | Trigger.dev — empty placeholder for now |
 
 ## Running
 
@@ -26,9 +26,9 @@ pnpm install
 pnpm dev
 ```
 
-From the root. `pnpm build` type-checks and builds the site; `pnpm lint` runs oxlint across the workspace. Both delegate to `web/`, which is the only package with anything in it today.
+From the root. `pnpm build` type-checks and builds the site; `pnpm lint` runs oxlint across the workspace. Both delegate to `apps/web`, which is the only package with anything in it today.
 
-All landing-page copy, plans and gym details live in a single file — [`web/src/content.ts`](web/src/content.ts). Most content changes need nothing else touched.
+All landing-page copy, plans and gym details live in a single file — [`apps/web/src/content.ts`](apps/web/src/content.ts). Most content changes need nothing else touched.
 
 ## Stack
 

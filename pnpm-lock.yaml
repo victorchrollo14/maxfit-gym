@@ -8,9 +8,9 @@ importers:
 
   .: {}
 
-  trigger: {}
+  apps/trigger: {}
 
-  web:
+  apps/web:
     dependencies:
       '@heroui/react':
         specifier: ^3.2.3

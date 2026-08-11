@@ -28,7 +28,7 @@ Gym name: **MaxFit**.
 
 - Early bird is a **limited-seat launch discount**, not an off-peak tier — so the landing page sells it with scarcity (struck-through ₹10,000, seats-claimed bar).
 - Annual vs monthly: early bird is **67% off** the monthly rate, standard is **58% off**. That gap is the main pricing argument on the page.
-- Seat counter lives in `earlyBird.seatsTaken` in `web/src/content.ts` — needs updating manually until the admin panel owns it.
+- Seat counter lives in `earlyBird.seatsTaken` in `apps/web/src/content.ts` — needs updating manually until the admin panel owns it.
 - Annual-heavy pricing makes UPI AutoPay much less relevant (see [Payments](#payments--upi)).
 
 ## Landing page sections
@@ -36,13 +36,13 @@ Gym name: **MaxFit**.
 Confirmed by Max:
 - Equipment
 - Personal trainers
-- Video recordings from the gym's own trainers — served as static files from `web/public/videos/`, not Cloudinary
+- Video recordings from the gym's own trainers — served as static files from `apps/web/public/videos/`, not Cloudinary
 - Customer reviews
 - Pricing (the three plans above)
 
 ### Design direction
 
-Modelled on the Phoenix Fitness offers page (`web/inspirations/`), applied to our own content:
+Modelled on the Phoenix Fitness offers page (`apps/web/inspirations/`), applied to our own content:
 
 - Near-black surfaces, vivid red accent, full-bleed red band.
 - **No social proof anywhere** — MaxFit is a new gym, so there are no ratings, member counts, reviews or transformations to show. The reference's ratings strip is a call-us band instead (`CallBand.tsx`). Emptying `reviews` / `transformations` in content.ts drops those blocks; emptying both removes the Results section entirely.
@@ -55,7 +55,7 @@ Modelled on the Phoenix Fitness offers page (`web/inspirations/`), applied to ou
 - Headings: heavy oblique uppercase, last word in red italic, over a letterspaced subtitle and a short red rule.
 - Display face is **Archivo** — it carries a genuine italic and a width axis, so the oblique is real type rather than a skewed upright. Set at weight 900 / width 92%.
 - Lead-capture form sits inside the hero, as on the reference.
-- Accent hue is one variable: `--accent` in `web/src/theme.css`, hue 27.50. Change to 52.76 for the original orange.
+- Accent hue is one variable: `--accent` in `apps/web/src/theme.css`, hue 27.50. Change to 52.76 for the original orange.
 - Fonts load from the Google Fonts CDN. Self-host them before the PWA offline shell lands, or the shell won't be truly offline.
 - **Logo**: `public/logo.jpeg` is the supplied square lockup. It goes illegible at nav height, so `public/logo-wordmark.jpg` is a cropped horizontal MAX FIT GYM lockup derived from it (`magick logo.jpeg -crop 1105x486+59+412 +repage -resize x220`). Nav uses the wordmark, footer the full lockup. Both are black-field JPEGs shown with `mix-blend-lighten`, which needs a **dark** backdrop — they'll break on the red band or any light surface. A transparent PNG/SVG from the designer would remove that constraint.
 - **Hero deliberately carries no pricing** — it sells the gym (rating, members, coaches, hours) and the free trial. Plans are the pricing section's job.
@@ -87,8 +87,8 @@ This file stays the **reference**: decisions and their rationale, design directi
 | Frontend | React 19 + TanStack Router + Vite |
 | UI | HeroUI v3 + Tailwind v4, dark-first |
 | Type | Archivo (variable — real italic + width axis) for display, Inter for body, via Google Fonts |
-| Repo | pnpm workspace monorepo — `web/` (site + API) and `trigger/` (scheduled jobs) |
-| Backend | Vercel Functions in `web/api/`, **or Supabase Edge Functions** — undecided, see below. Express-compatible either way if a full app is ever warranted |
+| Repo | pnpm workspace monorepo — `apps/web` (site + API) and `apps/trigger` (scheduled jobs) |
+| Backend | Vercel Functions in `apps/web/api/`, **or Supabase Edge Functions** — undecided, see below. Express-compatible either way if a full app is ever warranted |
 | Scheduling | Trigger.dev |
 | DB / Auth | Supabase |
 | Media | Cloudinary |
@@ -225,7 +225,7 @@ Supabase custom claims via a **custom access token hook** (Postgres function tha
 - Cloudinary free tier is credit-based; gym media (photos, PDFs) won't come close.
 - **Vercel Hobby: 10s max function duration.** Fine for leads and OTP sends, not for PDF generation or anything calling a slow third party. Pro raises it; Trigger.dev has no timeout at all.
 - **Vercel Hobby is non-commercial.** A revenue-generating gym site is outside the terms, and consolidating the API into the same project puts more on that footing. Pro is $20/mo.
-- **The SPA rewrite must exclude the API.** `web/vercel.json` rewrites `/(.*)` → `/index.html`. Vercel checks the filesystem before applying rewrites so functions should win, but make it explicit when `api/` lands: `"source": "/((?!api/).*)"`.
+- **The SPA rewrite must exclude the API.** `apps/web/vercel.json` rewrites `/(.*)` → `/index.html`. Vercel checks the filesystem before applying rewrites so functions should win, but make it explicit when `api/` lands: `"source": "/((?!api/).*)"`.
 - **Trigger.dev keeps 1 day of logs on free.** Reminder sends need to be logged to our own tables regardless — idempotency requires it — but that also becomes the only durable record of what went out.
 
 ## Open questions
@@ -233,7 +233,7 @@ Supabase custom claims via a **custom access token hook** (Postgres function tha
 **Blocking the landing page going live:**
 - ⚠️ **The hero form promises a callback "within a few minutes" but does not send anywhere yet** — it only `console.info`s. Wiring `/api/leads` (or, as a stopgap, a WhatsApp/email handoff) is now a prerequisite for publishing, not a nice-to-have. The promise also commits someone to actually answering the phone during opening hours.
 
-(All the below are placeholder values in `web/src/content.ts`.)
+(All the below are placeholder values in `apps/web/src/content.ts`.)
 - Address, phone, email, opening hours, Google Maps embed URL.
 - Real photos: **the hero is a Pexels stock shot of another gym** (ID 29392546) and must be swapped for a real MaxFit interior. Trainers and transformations still have no photos at all.
 - **Reviews and transformations are still placeholder content** and must not ship as-is. For a brand-new gym the honest move is to empty both arrays until real ones exist — the section then disappears on its own.

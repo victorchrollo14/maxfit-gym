@@ -1,0 +1,245 @@
+# Max — Gym Website & Admin
+
+Living doc. Ideas get appended as they come in; requirements + plan get refined later.
+
+Last updated: 2026-08-11
+
+## Decisions so far
+
+- **Plans are bought in person at the gym**, not self-serve online. OTP fires at purchase, at the front desk. This is the decision that drives most of the ones below.
+- **OTP over WhatsApp** (decided 2026-08-11). ~2,500 OTPs/yr = **₹339/yr all-in**. Skips DLT registration entirely, and the verified phone number unlocks renewal reminders on the same rails. Email OTP stays as the fallback/recovery path — it's ₹0 and already planned.
+- ~~OTP over email, not SMS~~ — superseded. SMS stays dead either way: DLT is ₹6–12k upfront for a worse channel.
+- **UPI is the primary payment method**, via a gateway.
+- **Invoices**: generate PDF, store in Cloudinary.
+- **Roles**: multiple roles, managed via Supabase custom JWT claims.
+- **Attendance / check-in tracking**: out of scope for v1.
+
+## Plans
+
+Gym name: **MaxFit**.
+
+| Plan | Price | Notes |
+|---|---|---|
+| Monthly | ₹2,000 / month | ₹24,000/yr — the anchor the annual plans are sold against |
+| Early bird | ₹8,000 / year | Founding-member launch discount, capped at the first 200 members |
+| Standard | ₹10,000 / year | The regular annual rate once early bird sells out |
+
+- Early bird is a **limited-seat launch discount**, not an off-peak tier — so the landing page sells it with scarcity (struck-through ₹10,000, seats-claimed bar).
+- Annual vs monthly: early bird is **67% off** the monthly rate, standard is **58% off**. That gap is the main pricing argument on the page.
+- Seat counter lives in `earlyBird.seatsTaken` in `web/src/content.ts` — needs updating manually until the admin panel owns it.
+- Annual-heavy pricing makes UPI AutoPay much less relevant (see [Payments](#payments--upi)).
+
+## Landing page sections
+
+Confirmed by Max:
+- Equipment
+- Personal trainers
+- Video recordings from the gym's own trainers — served as static files from `web/public/videos/`, not Cloudinary
+- Customer reviews
+- Pricing (the three plans above)
+
+### Design direction
+
+Modelled on the Phoenix Fitness offers page (`web/inspirations/`), applied to our own content:
+
+- Near-black surfaces, vivid red accent, full-bleed red band.
+- **No social proof anywhere** — MaxFit is a new gym, so there are no ratings, member counts, reviews or transformations to show. The reference's ratings strip is a call-us band instead (`CallBand.tsx`). Emptying `reviews` / `transformations` in content.ts drops those blocks; emptying both removes the Results section entirely.
+- Hero perks run as an infinite left-scrolling marquee, paused for `prefers-reduced-motion`.
+- Hero backdrop (`HeroBackdrop.tsx`) is layered CSS — accent glows, angled slashes, diagonal hatch, SVG grain, vignette — with the photo as an optional top layer. It holds up with no photo at all, so the hero never depends on having artwork.
+- **Mobile header is logo + hamburger only.** Both CTAs live in the floating bottom bar so they aren't duplicated; the desktop header keeps Call now + Free trial.
+- **Header stays solid and sticky, never transparent over the hero.** Tried it; the photo shows through the logo's black field because `mix-blend-lighten` needs an opaque dark surface behind it. Don't re-attempt without a transparent-background logo.
+- Icons come from **react-icons** (`fa`, `lu`, `tb`, `md` sets) — no hand-rolled SVG paths.
+- Red band carries Call now + Chat on WhatsApp buttons rather than the bare number. WhatsApp deep-links via `wa.me/<gym.whatsapp>` with a prefilled message.
+- Headings: heavy oblique uppercase, last word in red italic, over a letterspaced subtitle and a short red rule.
+- Display face is **Archivo** — it carries a genuine italic and a width axis, so the oblique is real type rather than a skewed upright. Set at weight 900 / width 92%.
+- Lead-capture form sits inside the hero, as on the reference.
+- Accent hue is one variable: `--accent` in `web/src/theme.css`, hue 27.50. Change to 52.76 for the original orange.
+- Fonts load from the Google Fonts CDN. Self-host them before the PWA offline shell lands, or the shell won't be truly offline.
+- **Logo**: `public/logo.jpeg` is the supplied square lockup. It goes illegible at nav height, so `public/logo-wordmark.jpg` is a cropped horizontal MAX FIT GYM lockup derived from it (`magick logo.jpeg -crop 1105x486+59+412 +repage -resize x220`). Nav uses the wordmark, footer the full lockup. Both are black-field JPEGs shown with `mix-blend-lighten`, which needs a **dark** backdrop — they'll break on the red band or any light surface. A transparent PNG/SVG from the designer would remove that constraint.
+- **Hero deliberately carries no pricing** — it sells the gym (rating, members, coaches, hours) and the free trial. Plans are the pricing section's job.
+- Phone `+91 831 089 0652` drives the nav "Call now" button, the mobile sticky bar, the footer and the Find-us section.
+
+Added on top, as recommended:
+- Hero with the trial CTA
+- Member transformations (before/after), paired with the reviews
+- Location, hours and map
+- FAQ (joining fee, lock-in, freezing, PT cost, women's timings, parking)
+- Enquiry form — the lead capture that feeds admin Leads
+- Sticky mobile CTA bar
+
+## Scope
+
+Split into two files as of 2026-08-11:
+
+- **[V1.md](V1.md)** — what's being built now: landing page + lead capture, `/trial-claimed` page for Google Ads conversions, user accounts with WhatsApp OTP, member portal with plan pausing, daily expiry-reminder worker, CRM (dashboard / leads / members), PostHog — then invoices and the PWA last.
+- **[LATER.md](LATER.md)** — what's deferred and why: payment gateway, SMS OTP, UPI AutoPay, attendance.
+
+This file stays the **reference**: decisions and their rationale, design direction, stack, costings, open questions. Scope lives in the other two.
+
+**The one-line version of v1:** a landing page that captures leads, a CRM where the front desk works those leads into members, and a member portal that shows people what they bought. Money is handled in person — no checkout, no gateway.
+
+## Stack
+
+| Layer | Choice |
+|---|---|
+| Frontend | React 19 + TanStack Router + Vite |
+| UI | HeroUI v3 + Tailwind v4, dark-first |
+| Type | Archivo (variable — real italic + width axis) for display, Inter for body, via Google Fonts |
+| Backend | Express |
+| DB / Auth | Supabase |
+| Media | Cloudinary |
+| Auth OTP | **WhatsApp** (Meta Cloud API, own WABA) — email OTP as fallback |
+| Payments | UPI via gateway — Razorpay or PhonePe PG (TBD) |
+
+Fine for a small gym. Open questions in [Open Questions](#open-questions).
+
+## Free-tier fit
+
+| Service | Free tier | Verdict |
+|---|---|---|
+| Supabase | 500 MB DB, 1 GB storage, 50k MAU, 2 projects, **pauses after 7 days inactivity** | Fine on size. Pausing is the risk for a live site — needs Pro ($25/mo) or a keep-alive ping |
+| Cloudinary | Free credits tier | Fine, gym media is small |
+| Hosting | Vercel/Netlify free (frontend), Express needs a host — Render/Fly free tiers cold-start |
+
+The only meaningful recurring cost is the payment gateway cut.
+
+## Auth OTP — email (fallback + recovery, cost: ~₹0)
+
+Going email-only avoids **DLT registration** (the TRAI mandate that made SMS cost ₹6–12k upfront + ₹0.15/msg). Dropped entirely.
+
+Supabase Auth sends email OTP / magic links out of the box, but its **built-in SMTP is rate-limited to a couple of emails per hour on free** — unusable for real signups. Need our own SMTP:
+
+| Provider | Free tier | Paid |
+|---|---|---|
+| Resend | 3,000/mo, 100/day | $20/mo for 50k |
+| Brevo | 300/day (9k/mo) | ~₹1,600/mo |
+
+300 members ≈ a few hundred emails/month → **free tier is plenty**.
+
+Email is no longer the primary channel, but it stays for account recovery, for members without WhatsApp, and as the shipping default until the WABA clears verification. It costs nothing to keep.
+
+## Auth OTP — WhatsApp ✅ decided
+
+Priced August 2026. **The messages are nearly free; the platform around them is the cost.** Meta's India rate card charges per delivered template message (per-conversation billing ended July 2025):
+
+| Category | Meta list rate (India domestic) |
+|---|---|
+| Authentication | **₹0.115 / msg** (~$0.0014) |
+| Utility | ₹0.115 / msg |
+| Marketing | ₹0.8631 / msg |
+| Service (reply inside 24h window) | ₹0 |
+
+Authentication rates held flat in the Jan 2026 update — only marketing went up. Add **18% GST** on everything → **₹0.136 per OTP** delivered.
+
+**Budgeted volume: 2,500 OTPs/yr → ₹339/yr all-in** (2,500 × ₹0.115 = ₹287.50, +18% GST). OTP fires only at plan purchase, in person at the gym, so volume is bounded by transactions rather than logins. Renewal reminders on top (~900 utility msgs/yr for 300 annual members) add ~₹123. **Call it ₹500/yr for everything.**
+
+The message cost is not a real number and will never drive a decision here. What does is **how you get access**, where the spread is 40×:
+
+| Route | Platform fee | Per-msg | Effort |
+|---|---|---|---|
+| **Meta Cloud API direct** | ₹0 | Meta list rate | Business verification + 2–6 weeks of integration work |
+| **BSP, zero-markup tier** (AiSensy free tier, Whautomate) | ₹0–1,500/mo | list rate, no markup | 24–48h onboarding |
+| **BSP, standard** (Wati ~₹2,499/mo, Interakt ~₹999–2,499/mo) | ₹12–30k/yr | +12–26% markup | 24–48h |
+| **Twilio Verify** (drop-in for Supabase Auth) | ₹0 | **~₹4.7 / verification** ($0.05 + channel) | hours |
+
+**Chosen route: Meta Cloud API direct, own WABA, no BSP.** At 2,500 msgs/yr a ₹999/mo BSP costs ~₹12,000/yr to deliver ₹339 of messages — ~35× the message cost, for onboarding convenience we only need once. Twilio Verify is worse still (~₹4.7/verification ≈ ₹11,750/yr): its flat per-verification fee is priced for products where OTP volume tracks logins, and ours tracks purchases. If direct integration stalls, fall back to a **₹0-platform-fee BSP tier** (AiSensy free tier, Whautomate) — never a paid tier at this volume.
+
+**Build it for renewal reminders, not just OTP.** 250 annual members at ₹8–10k each means retention is the business, and a verified WhatsApp number is how you reach someone 30 days before expiry. Utility templates are the same ₹0.115 rate on the same WABA, so reminders are ~₹123/yr more. The OTP justifies the number; the reminders justify the project.
+
+### What this actually costs in work
+
+The money is settled; the effort isn't. Direct Cloud API is **2–6 weeks** end to end, most of it waiting:
+
+1. **Meta business verification** — the long pole. Needs company PAN, GST, a live website, and CIN if Pvt Ltd. Start this first, it gates everything.
+2. **WABA + phone number** — must be a number *not* currently on WhatsApp or WhatsApp Business. Don't use the gym's existing `+91 831 089 0652` if it's on WhatsApp today, or you'll lose that account's chat history. Budget for a second SIM.
+3. **Authentication template approval** — fixed format (code + copy button), no custom copy, usually approved in hours.
+4. **Integration** — Express endpoint that calls the Cloud API `/messages` endpoint, plus OTP generate/store/verify. Supabase Auth's built-in phone provider does *not* speak Cloud API directly, so this is our own code path, not a config toggle. Email OTP stays on Supabase Auth as-is.
+
+**Gotchas that actually decide this:**
+- ⚠️ **Meta business verification needs company PAN, GST, a live website, and CIN for Pvt Ltd.** This is the real gate, not the money — and it collides with the open question of whether the gym is even GST-registered. Same paperwork the payment gateway KYC needs, so do them together.
+- ⚠️ **The WABA must be registered in India.** Sending to Indian numbers from a non-India WABA hits the *authentication-international* rate of ~₹2.30–2.50/msg — **~22× domestic**. Easy to trip over with an overseas-registered BSP account.
+- Authentication templates are a fixed format (code + copy button) and need Meta approval; no custom copy.
+- None of this affects the landing page's `wa.me` "Chat on WhatsApp" deep-link — that's a plain link and stays free.
+
+**Sequencing.** Meta business verification is weeks of waiting on Meta, and the landing page ships long before that. So: build the OTP flow **channel-agnostic** (an `OtpChannel` interface with email and WhatsApp implementations), ship v1 on email, and flip purchase-time OTP to WhatsApp when the WABA clears. That way verification lead time never blocks a release, and the fallback path is real code that's been running in production rather than an untested branch.
+
+## Payments — UPI
+
+UPI has **government-mandated 0% MDR** on bank-to-bank transactions. But gateways still charge a platform fee on online checkout, so "0% UPI" marketing is misleading.
+
+| Gateway | UPI rate | Setup | AMC |
+|---|---|---|---|
+| **PhonePe PG** | 0% UPI (strongest if traffic is UPI-heavy; weak on cards) | ₹0 | ₹0 |
+| **Razorpay** | 2% + 18% GST on the fee | ₹0 | ₹0 |
+| **Cashfree** | 1.6–1.95% | ₹0 | ₹4,999/yr |
+
+**What 2% actually costs us** — on a ₹1,500 plan: ₹30 fee + ₹5.40 GST = **₹35.40/txn**. 300 members paying monthly → **~₹10,600/mo (₹1.27L/yr)**. That dwarfs every other line item combined.
+
+**Recommendation:** PhonePe PG as primary if their 0% UPI holds up (verify it's not a limited-time promo — one source flagged it as such), Razorpay as fallback/for cards. Worth ~30 min of due diligence given the ₹1L+/yr swing.
+
+**⚠️ In-person selling probably deletes this entire cost line.** A gateway exists to take money from someone who isn't in the room. If every purchase happens at the front desk, a **static UPI QR / VPA is genuinely ₹0** — zero MDR, zero platform fee, no KYC, no integration. Staff watches the payment land, marks it paid in admin. The "cost" is manual reconciliation, which the front desk is already doing for cash.
+
+That's the ~₹1.27L/yr line item in the table above going to zero, which makes it far and away the highest-value decision in this doc — bigger than every other cost question combined, WhatsApp included. The gateway becomes worth revisiting only if self-serve online purchase comes back into scope.
+
+Other notes:
+- **UPI AutoPay** for auto-renewing memberships — best per-debit economics in the ₹500–15k range. Worth it if plans are monthly.
+- Wallet-funded UPI (PPI) over ₹2,000 carries 1.1% interchange; RuPay credit-on-UPI is 0.5–2%. Minor at our volume.
+- Gateway onboarding needs business KYC — see open questions.
+
+## Invoices
+
+Generate PDF → upload to Cloudinary → store the URL on the payment row.
+
+- Server-side generation in Express (pdfkit / puppeteer). Puppeteer is heavier but easier for HTML templates.
+- If the gym is GST-registered, invoices need GSTIN, HSN/SAC, and tax split — affects the template and the DB schema. Confirm before building.
+
+## Roles
+
+Supabase custom claims via a **custom access token hook** (Postgres function that injects `role` into the JWT), then enforce with RLS policies + middleware checks in Express.
+
+- Roles to define: `owner`, `staff`/front-desk, `member`.
+- Claims are baked into the JWT at issue time, so a role change doesn't take effect until token refresh. Fine for a gym; just don't build anything that assumes instant revocation.
+
+## Notes / gotchas
+
+- Supabase free tier **pauses after 7 days inactivity** — biggest infra risk for a live site. Pro ($25/mo) or a keep-alive cron.
+- Cloudinary free tier is credit-based; gym media (photos, PDFs) won't come close.
+
+## Open questions
+
+**Blocking the landing page going live:**
+- ⚠️ **The hero form promises a callback "within a few minutes" but does not send anywhere yet** — it only `console.info`s. Wiring `/api/leads` (or, as a stopgap, a WhatsApp/email handoff) is now a prerequisite for publishing, not a nice-to-have. The promise also commits someone to actually answering the phone during opening hours.
+
+(All the below are placeholder values in `web/src/content.ts`.)
+- Address, phone, email, opening hours, Google Maps embed URL.
+- Real photos: **the hero is a Pexels stock shot of another gym** (ID 29392546) and must be swapped for a real MaxFit interior. Trainers and transformations still have no photos at all.
+- **Reviews and transformations are still placeholder content** and must not ship as-is. For a brand-new gym the honest move is to empty both arrays until real ones exist — the section then disappears on its own.
+- The actual equipment list.
+- FAQ answers, especially women's timings and parking (left blank; blank answers are filtered out rather than shown). Freeze policy is confirmed: **15 days a year** for annual members.
+- ⚠️ **The equipment copy describes a far bigger gym than 2,000 sq ft** — six power racks, four platforms, a turf track, sleds, a full cardio bank. It's placeholder text I wrote before the size was known and it will read as overselling to anyone who walks in. Needs rewriting against the real kit list.
+- Does the ₹8,000 early-bird rate stay locked on renewal, or revert to ₹10,000? The page currently promises it stays locked.
+
+**Rest:**
+- ~~PhonePe PG 0% UPI — permanent or promotional?~~ / ~~v1: real online checkout, or static UPI QR?~~ — **both largely answered by selling in person.** Static UPI QR + admin marks paid is the v1 default; gateway due diligence is deferred, not needed. Confirm Max is fine with manual reconciliation at the desk.
+- Does the front desk need anything at point-of-sale beyond "record payment" — a printed receipt then and there, card/cash as well as UPI, part payments?
+- 🚩 **Is the gym GST-registered, and is it Pvt Ltd or proprietorship?** Now the #1 blocker — Meta business verification needs PAN + GST + live website (+ CIN if Pvt Ltd), and WhatsApp OTP is a committed decision that can't start without it. Also drives invoice format and gateway KYC. **Get these documents from Max before anything else.**
+- 🚩 **Is `+91 831 089 0652` currently on WhatsApp or WhatsApp Business?** If yes, it can't become the WABA number without destroying that account — we need a separate number. Cheap to answer, expensive to discover late.
+- ~~Do members actually self-serve purchase?~~ — **answered: no, walk-in.** Portal is view-only for money.
+- ~~Plans monthly or longer-term?~~ UPI AutoPay is moot — in-person selling and annual-heavy pricing both rule it out.
+- What happens at the desk if a member has no WhatsApp, or the OTP doesn't arrive? Email fallback covers it, but staff need a defined path — not an improvised one mid-sale.
+- Exact role list beyond owner/staff/member (trainers?).
+
+## Sources
+
+- [Razorpay pricing explained](https://razorpay.com/blog/razorpay-payment-gateway-pricing-explained/)
+- [UPI transaction charges & zero MDR (Razorpay)](https://razorpay.com/learn/upi-transaction-charges/)
+- [Razorpay vs Cashfree vs PhonePe 2026](https://growwwtech.com/blog/razorpay-vs-cashfree-vs-phonepe-business-india-2026)
+- [PhonePe PG pricing (Techjockey)](https://www.techjockey.com/detail/phonepe-payment-gateway)
+- [UPI AutoPay recurring billing costs](https://razorpay.com/blog/cheapest-payment-gateway-for-recurring-billing-e-nach-upi-autopay-and-subscription/)
+- [Supabase free tier limits 2026](https://uibakery.io/blog/supabase-pricing)
+- [SMS OTP pricing India 2026 (Message Central)](https://www.messagecentral.com/en-in/blog/sms-otp-pricing-india) — kept for reference if SMS comes back
+- [WhatsApp API pricing India, Jul 2026 rate card (Whautomate)](https://whautomate.com/whatsapp-business-api-pricing-india) — per-category ₹ rates + BSP markup comparison
+- [WhatsApp API pricing explained 2026 (Authgear)](https://www.authgear.com/post/whatsapp-api-pricing/) — the authentication-international trap
+- [Twilio Verify pricing & alternatives (Authgear)](https://www.authgear.com/post/twilio-verify-pricing-and-alternatives/)
+- [WhatsApp API pricing India, 5 BSPs compared (Codingclave)](https://codingclave.com/guides/whatsapp-api-pricing-india-2026-comparison)
+- [Getting WhatsApp Business API in India (Picky Assist)](https://pickyassist.com/blog/how-to-get-whatsapp-api-for-business/) — verification document list

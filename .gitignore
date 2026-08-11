@@ -1,0 +1,10 @@
+.vercel
+node_modules
+dist
+*.local
+.DS_Store
+
+# Design reference only — a full-page screenshot of another gym's site
+# (Phoenix Fitness). Kept out of a public repo deliberately; it's someone
+# else's artwork and has no value to anyone reading this repo.
+web/inspirations/

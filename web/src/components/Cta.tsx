@@ -1,0 +1,46 @@
+import type { ReactNode } from 'react'
+
+/* Note: `inline-flex` here sets `display`, so passing `hidden`/`sm:block` via
+   `className` fights it and the winner is stylesheet order, not intent. Put
+   responsive visibility on a wrapper element instead. */
+const base =
+  'display inline-flex items-center justify-center gap-2 rounded-full text-center transition duration-200 hover:brightness-115 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent'
+
+const sizes = {
+  md: 'px-6 py-3 text-xs sm:text-sm',
+  lg: 'px-8 py-4 text-sm sm:text-base',
+  /* Bigger type, tighter horizontal padding — for standalone centred CTAs
+     where a wide pill looks stretched. */
+  xl: 'px-7 py-4 text-base sm:text-lg',
+}
+
+const tones = {
+  solid:
+    'bg-accent text-accent-foreground shadow-[0_8px_30px_-8px_var(--color-accent)]',
+  outline: 'border border-border bg-surface/60 text-foreground hover:bg-surface',
+}
+
+export function Cta({
+  href,
+  children,
+  size = 'lg',
+  tone = 'solid',
+  className = '',
+}: {
+  href: string
+  children: ReactNode
+  size?: keyof typeof sizes
+  tone?: keyof typeof tones
+  className?: string
+}) {
+  return (
+    <a href={href} className={`${base} ${sizes[size]} ${tones[tone]} ${className}`}>
+      {children}
+    </a>
+  )
+}
+
+export const ctaClasses = (
+  size: keyof typeof sizes = 'lg',
+  tone: keyof typeof tones = 'solid',
+) => `${base} ${sizes[size]} ${tones[tone]}`

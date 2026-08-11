@@ -1,0 +1,241 @@
+/**
+ * Single source of truth for everything on the landing page.
+ *
+ * Anything marked TODO is a placeholder — swap the value, no component
+ * changes needed. Images/videos live in `public/`; see public/README.md.
+ */
+
+export const gym = {
+  name: 'MaxFit',
+  tagline: 'Train hard. Get strong. Stay consistent.',
+  intro:
+    'A serious strength and conditioning gym built for people who actually show up. Proper equipment, coaches who correct your form, and no crowds at peak hour.',
+  /* Hero headline, split so the boxed / outlined treatment stays editable.
+     Deliberately about the gym — pricing is the Plans section's job. */
+  hero: {
+    boxed: 'Train hard.',
+    rest: 'Get strong.',
+    outline: 'Stay consistent.',
+  },
+  phone: '+91 831 089 0652',
+  whatsapp: '918310890652', // digits only, country code first
+  domain: 'maxfitbangalore.in',
+  city: 'Bengaluru',
+  email: 'hello@maxfitbangalore.in', // TODO — set this mailbox up before launch
+  instagram: 'maxfit.gym', // TODO — real handle, without the @
+  address: {
+    line1: '000, Street Name', // TODO — street and area
+    line2: 'Bengaluru, Karnataka', // TODO — add pincode
+  },
+  // TODO — Google Maps "embed" share link
+  mapEmbedUrl: '',
+  hours: [
+    { days: 'Monday – Friday', time: '5:00 AM – 10:00 PM' }, // TODO
+    { days: 'Saturday', time: '6:00 AM – 9:00 PM' }, // TODO
+    { days: 'Sunday', time: '7:00 AM – 1:00 PM' }, // TODO
+  ],
+  foundedYear: 2026, // TODO
+} as const
+
+/** Cap for the early-bird tier. Drives the scarcity copy in Pricing. */
+export const earlyBird = {
+  totalSeats: 200,
+  /** Just the remaining count — the front desk updates one number. */
+  seatsLeft: 20, // TODO — keep current
+} as const
+
+export type Plan = {
+  id: string
+  name: string
+  price: number
+  /** Billing period, used for the "/year" and "/month" suffix. */
+  period: 'year' | 'month'
+  strikePrice?: number
+  tagline: string
+  features: string[]
+  featured?: boolean
+  badge?: string
+}
+
+export const plans: Plan[] = [
+  {
+    id: 'monthly',
+    name: 'Monthly Pass',
+    price: 2000,
+    strikePrice: 4000,
+    period: 'month',
+    tagline: 'No commitment. Cancel whenever.',
+    features: [
+      'Full gym access, all equipment',
+      'Free fitness assessment on joining',
+      'Locker and shower access',
+      'Works out to ₹24,000 a year',
+    ],
+  },
+  {
+    id: 'early-bird',
+    name: 'Early Bird Pass',
+    price: 8000,
+    period: 'year',
+    strikePrice: 10000,
+    tagline: `Founding-member rate. First ${earlyBird.totalSeats} members only.`,
+    featured: true,
+    badge: 'Best value',
+    features: [
+      'Everything in the Annual Pass',
+      'Rate locked for as long as you stay a member',
+      '2 free personal-training sessions',
+      'Priority booking on group classes',
+    ],
+  },
+  {
+    id: 'annual',
+    name: 'Annual Pass',
+    price: 10000,
+    strikePrice: 14000,
+    period: 'year',
+    tagline: 'The regular yearly membership.',
+    features: [
+      'Full gym access, all equipment',
+      'Free fitness assessment on joining',
+      'Locker and shower access',
+      'Personal training available as an add-on',
+    ],
+  },
+]
+
+/** Monthly cost over a year — the number the annual plans are compared against. */
+export const monthlyAnnualised = 2000 * 12
+
+export const equipment = [
+  {
+    name: 'Free weights',
+    description:
+      'Full dumbbell rack to 50 kg, olympic barbells, bumper plates, and four competition-spec platforms.',
+  },
+  {
+    name: 'Power racks',
+    description:
+      'Six racks with safeties, so you can squat and bench heavy without needing a spotter.',
+  },
+  {
+    name: 'Machines',
+    description:
+      'Full plate-loaded and pin-loaded circuit — leg press, hack squat, cables, chest and row machines.',
+  },
+  {
+    name: 'Cardio floor',
+    description:
+      'Treadmills, assault bikes, rowers and stair climbers, all with screens.',
+  },
+  {
+    name: 'Functional zone',
+    description:
+      'Turf track, sleds, kettlebells, battle ropes and rigs for conditioning work.',
+  },
+  {
+    name: 'Recovery',
+    description:
+      'Stretching area, foam rollers, massage guns, and clean showers and lockers.',
+  },
+] // TODO — replace with the gym's actual equipment
+
+/**
+ * The "Inside" section — two coaches talking about the gym, plus a walk
+ * through the floor. Files go in public/videos/; add or remove entries freely,
+ * the grid adapts. An entry with no video file yet shows a labelled
+ * placeholder rather than breaking.
+ */
+export const videos = [
+  {
+    tag: 'Coach',
+    title: 'Meet your head coach', // TODO
+    caption: 'Why we set the gym up this way',
+    src: '/videos/coach-1.mp4',
+    poster: '/videos/coach-1.jpg',
+  },
+  {
+    tag: 'Coach',
+    title: 'How we train here', // TODO
+    caption: 'Programming and form, explained',
+    src: '/videos/coach-2.mp4',
+    poster: '/videos/coach-2.jpg',
+  },
+  {
+    tag: 'Gym tour',
+    title: 'A walk through the gym',
+    caption: 'The floor, end to end',
+    src: '/videos/gym-tour.mp4',
+    poster: '/videos/gym-tour.jpg',
+  },
+]
+
+/**
+ * Gallery of training shots. Currently Pexels stock — see public/README.md.
+ * Purely atmospheric: no names, no claims, nothing presented as a MaxFit
+ * member. Swap for real photos of the gym when you have them.
+ */
+/* Keep the count divisible by 2 and 3 — the grid is 2 columns on mobile and
+   3 on desktop, so 12 (or 6) fills both exactly with no ragged last row. */
+export const gallery = [
+  { src: '/gallery/1.jpg', alt: 'Chest work on the cable machine' },
+  { src: '/gallery/2.jpg', alt: 'Battle rope conditioning' },
+  { src: '/gallery/3.jpg', alt: 'Training on the leg press' },
+  { src: '/gallery/4.jpg', alt: 'Conditioning work with ropes' },
+  { src: '/gallery/5.jpg', alt: 'Barbell squats' },
+  { src: '/gallery/6.jpg', alt: 'Strength training in the gym' },
+  { src: '/gallery/7.jpg', alt: 'Dumbbell curls on the free weights floor' },
+  { src: '/gallery/8.jpg', alt: 'Bodyweight and calisthenics work' },
+  { src: '/gallery/9.jpg', alt: 'Lat pulldown' },
+  { src: '/gallery/10.jpg', alt: 'Overhead press with dumbbells' },
+  { src: '/gallery/11.jpg', alt: 'Picking weights from the dumbbell rack' },
+  { src: '/gallery/12.jpg', alt: 'Lifting a loaded barbell' },
+]
+
+export const reviews = [
+  {
+    name: 'Member name', // TODO — real reviews only, these are placeholders
+    plan: 'Member since 2026',
+    rating: 5,
+    text: 'The coaches actually watch you lift and correct you. I learnt more about form here in a month than in two years at my last gym.',
+  },
+  {
+    name: 'Member name', // TODO
+    plan: 'Member since 2026',
+    rating: 5,
+    text: 'Never have to wait for a rack, even at 7pm. That alone was worth switching for.',
+  },
+  {
+    name: 'Member name', // TODO
+    plan: 'Member since 2026',
+    rating: 5,
+    text: 'Clean, well maintained, and the staff know everyone by name. It stopped feeling like a chore to come in.',
+  },
+]
+
+export const faqs = [
+  {
+    q: 'Is there a joining fee on top of the plan price?',
+    a: 'No. The price you see is the price you pay — no registration or admission fee.', // TODO — confirm
+  },
+  {
+    q: 'Is there a lock-in period?',
+    a: 'The monthly plan has no lock-in; cancel any time. Annual plans run for twelve months from the date you join.', // TODO — confirm
+  },
+  {
+    q: 'Can I freeze my membership if I travel?',
+    a: 'Yes. Annual members can freeze for up to 15 days a year — just let the front desk know before you go.',
+  },
+  {
+    q: 'Is personal training included?',
+    a: 'Early Bird members get two free sessions. Beyond that, personal training is a separate add-on — ask at the desk for current rates.', // TODO — confirm
+  },
+  {
+    q: 'Do you have separate timings for women?',
+    a: '', // TODO — answer this, it is one of the most-asked questions
+  },
+  {
+    q: 'Is there parking?',
+    a: '', // TODO
+  },
+]

@@ -24,4 +24,6 @@ All landing-page copy, plans and gym details live in a single file — [`web/src
 
 ## Stack
 
-React 19 + TanStack Router + Vite, HeroUI v3 + Tailwind v4 (dark-first). Backend is Express + Supabase; not started yet.
+React 19 + TanStack Router + Vite, HeroUI v3 + Tailwind v4 (dark-first). Supabase for DB and auth, API as Vercel Functions in the same project, Trigger.dev for scheduled jobs — backend not started yet.
+
+Everything ships from one domain and one Vercel deploy: landing page, member portal, CRM and API. See [PROJECT.md](PROJECT.md#decisions-so-far) for why.

@@ -13,6 +13,8 @@ Last updated: 2026-08-11
 - **Invoices**: generate PDF, store in Cloudinary.
 - **Roles**: multiple roles, managed via Supabase custom JWT claims.
 - **Attendance / check-in tracking**: out of scope for v1.
+- **One domain, one Vercel project** (decided 2026-08-11). Landing page, member portal, CRM and API all ship from `maxfitbangalore.in` out of a single deploy. A split to `app.maxfitbangalore.in` was considered and rejected: same-origin removes CORS, cookie-domain and allowlist plumbing entirely, and route-level lazy loading — not a domain boundary — is what keeps CRM code out of the landing page bundle. Explicitly a **test-and-iterate setup**; moving pieces off Vercel later is expected.
+- **Scheduled jobs on Trigger.dev** (decided 2026-08-11), not Vercel Cron. Vercel's Hobby cron is daily-only, UTC-only, and fires anywhere within the hour — all three are wrong for an IST expiry reminder.
 
 ## Plans
 
@@ -85,7 +87,8 @@ This file stays the **reference**: decisions and their rationale, design directi
 | Frontend | React 19 + TanStack Router + Vite |
 | UI | HeroUI v3 + Tailwind v4, dark-first |
 | Type | Archivo (variable — real italic + width axis) for display, Inter for body, via Google Fonts |
-| Backend | Express |
+| Backend | Vercel Functions, in the same project as the frontend (`web/api/`). Express-compatible if a full app is ever warranted |
+| Scheduling | Trigger.dev |
 | DB / Auth | Supabase |
 | Media | Cloudinary |
 | Auth OTP | **WhatsApp** (Meta Cloud API, own WABA) — email OTP as fallback |
@@ -97,11 +100,12 @@ Fine for a small gym. Open questions in [Open Questions](#open-questions).
 
 | Service | Free tier | Verdict |
 |---|---|---|
-| Supabase | 500 MB DB, 1 GB storage, 50k MAU, 2 projects, **pauses after 7 days inactivity** | Fine on size. Pausing is the risk for a live site — needs Pro ($25/mo) or a keep-alive ping |
+| Supabase | 500 MB DB, 1 GB storage, 50k MAU, 2 projects, **pauses after 7 days inactivity** | Fine on size. Pausing is the risk for a live site — the daily Trigger.dev job queries the DB, so it doubles as the keep-alive |
 | Cloudinary | Free credits tier | Fine, gym media is small |
-| Hosting | Vercel/Netlify free (frontend), Express needs a host — Render/Fly free tiers cold-start |
+| Hosting | Vercel Hobby — frontend and API in one project | Fine technically. **Hobby forbids commercial use**, so a live gym belongs on Pro ($20/mo) |
+| Trigger.dev | $5/mo credits, 20 concurrent runs, **10 schedules**, 1-day log retention, no task timeout | Plenty — v1 needs one schedule. 1-day logs is the real constraint: a failed reminder is invisible by the next day unless we log sends to Postgres ourselves |
 
-The only meaningful recurring cost is the payment gateway cut.
+Recurring cost is now the plan tiers (Vercel Pro, Supabase Pro if we outgrow free) rather than the payment gateway cut, which in-person selling removes.
 
 ## Auth OTP — email (fallback + recovery, cost: ~₹0)
 
@@ -153,7 +157,7 @@ The money is settled; the effort isn't. Direct Cloud API is **2–6 weeks** end 
 1. **Meta business verification** — the long pole. Needs company PAN, GST, a live website, and CIN if Pvt Ltd. Start this first, it gates everything.
 2. **WABA + phone number** — must be a number *not* currently on WhatsApp or WhatsApp Business. Don't use the gym's existing `+91 831 089 0652` if it's on WhatsApp today, or you'll lose that account's chat history. Budget for a second SIM.
 3. **Authentication template approval** — fixed format (code + copy button), no custom copy, usually approved in hours.
-4. **Integration** — Express endpoint that calls the Cloud API `/messages` endpoint, plus OTP generate/store/verify. Supabase Auth's built-in phone provider does *not* speak Cloud API directly, so this is our own code path, not a config toggle. Email OTP stays on Supabase Auth as-is.
+4. **Integration** — an API function that calls the Cloud API `/messages` endpoint, plus OTP generate/store/verify. Supabase Auth's built-in phone provider does *not* speak Cloud API directly, so this is our own code path, not a config toggle. Email OTP stays on Supabase Auth as-is.
 
 **Gotchas that actually decide this:**
 - ⚠️ **Meta business verification needs company PAN, GST, a live website, and CIN for Pvt Ltd.** This is the real gate, not the money — and it collides with the open question of whether the gym is even GST-registered. Same paperwork the payment gateway KYC needs, so do them together.
@@ -190,20 +194,24 @@ Other notes:
 
 Generate PDF → upload to Cloudinary → store the URL on the payment row.
 
-- Server-side generation in Express (pdfkit / puppeteer). Puppeteer is heavier but easier for HTML templates.
+- Server-side generation in a Vercel Function. **Use pdfkit, not puppeteer** — a Chromium binary blows both the 250 MB function bundle limit and the 10s Hobby duration cap. If HTML templating turns out to be worth it, generate on Trigger.dev instead, where there's no timeout.
 - If the gym is GST-registered, invoices need GSTIN, HSN/SAC, and tax split — affects the template and the DB schema. Confirm before building.
 
 ## Roles
 
-Supabase custom claims via a **custom access token hook** (Postgres function that injects `role` into the JWT), then enforce with RLS policies + middleware checks in Express.
+Supabase custom claims via a **custom access token hook** (Postgres function that injects `role` into the JWT), then enforce with RLS policies + a shared guard in the API functions.
 
 - Roles to define: `owner`, `staff`/front-desk, `member`.
 - Claims are baked into the JWT at issue time, so a role change doesn't take effect until token refresh. Fine for a gym; just don't build anything that assumes instant revocation.
 
 ## Notes / gotchas
 
-- Supabase free tier **pauses after 7 days inactivity** — biggest infra risk for a live site. Pro ($25/mo) or a keep-alive cron.
+- Supabase free tier **pauses after 7 days inactivity** — biggest infra risk for a live site. The daily expiry job on Trigger.dev covers it, provided it actually queries Postgres on days it finds nothing to send.
 - Cloudinary free tier is credit-based; gym media (photos, PDFs) won't come close.
+- **Vercel Hobby: 10s max function duration.** Fine for leads and OTP sends, not for PDF generation or anything calling a slow third party. Pro raises it; Trigger.dev has no timeout at all.
+- **Vercel Hobby is non-commercial.** A revenue-generating gym site is outside the terms, and consolidating the API into the same project puts more on that footing. Pro is $20/mo.
+- **The SPA rewrite must exclude the API.** `web/vercel.json` rewrites `/(.*)` → `/index.html`. Vercel checks the filesystem before applying rewrites so functions should win, but make it explicit when `api/` lands: `"source": "/((?!api/).*)"`.
+- **Trigger.dev keeps 1 day of logs on free.** Reminder sends need to be logged to our own tables regardless — idempotency requires it — but that also becomes the only durable record of what went out.
 
 ## Open questions
 
@@ -237,6 +245,10 @@ Supabase custom claims via a **custom access token hook** (Postgres function tha
 - [PhonePe PG pricing (Techjockey)](https://www.techjockey.com/detail/phonepe-payment-gateway)
 - [UPI AutoPay recurring billing costs](https://razorpay.com/blog/cheapest-payment-gateway-for-recurring-billing-e-nach-upi-autopay-and-subscription/)
 - [Supabase free tier limits 2026](https://uibakery.io/blog/supabase-pricing)
+- [Express on Vercel](https://vercel.com/docs/frameworks/backend/express)
+- [Vercel Functions limits](https://vercel.com/docs/functions/limitations)
+- [Vercel cron usage & pricing](https://vercel.com/docs/cron-jobs/usage-and-pricing) — why scheduling went to Trigger.dev
+- [Trigger.dev pricing](https://trigger.dev/pricing)
 - [SMS OTP pricing India 2026 (Message Central)](https://www.messagecentral.com/en-in/blog/sms-otp-pricing-india) — kept for reference if SMS comes back
 - [WhatsApp API pricing India, Jul 2026 rate card (Whautomate)](https://whautomate.com/whatsapp-business-api-pricing-india) — per-category ₹ rates + BSP markup comparison
 - [WhatsApp API pricing explained 2026 (Authgear)](https://www.authgear.com/post/whatsapp-api-pricing/) — the authentication-international trap

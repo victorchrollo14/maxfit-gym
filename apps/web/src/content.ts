@@ -6,7 +6,7 @@
  */
 
 export const gym = {
-  name: 'MaxFit',
+  name: 'maxfit',
   tagline: 'Train hard. Get strong. Stay consistent.',
   intro:
     'A serious strength and conditioning gym built for people who actually show up. Proper equipment, coaches who correct your form, and no crowds at peak hour.',
@@ -24,16 +24,20 @@ export const gym = {
   email: 'hello@maxfitbangalore.in', // TODO — set this mailbox up before launch
   instagram: 'maxfit.gym', // TODO — real handle, without the @
   address: {
-    line1: '000, Street Name', // TODO — street and area
-    line2: 'Bengaluru, Karnataka', // TODO — add pincode
+    line1: "Site No A, Kithaganur Main Rd, near Domino's Pizza",
+    line2: 'Kithiganur, Krishnarajapuram, Bengaluru, Karnataka 560036',
   },
-  // TODO — Google Maps "embed" share link
-  mapEmbedUrl: '',
-  hours: [
-    { days: 'Monday – Friday', time: '5:00 AM – 10:00 PM' }, // TODO
-    { days: 'Saturday', time: '6:00 AM – 9:00 PM' }, // TODO
-    { days: 'Sunday', time: '7:00 AM – 1:00 PM' }, // TODO
-  ],
+  /* Keyless Google Maps embed — `?q=<place>&output=embed` needs no API key or
+     billing account. `t=k` opens on satellite imagery, `z=17` frames the block.
+     Swap in the iframe src from Maps' own Share → Embed panel if the pin ever
+     lands on the wrong shopfront (that panel is street-map only, though). */
+  mapEmbedUrl:
+    'https://www.google.com/maps?q=MAXFIT+GYM,+Kithaganur+Main+Rd,+Krishnarajapuram,+Bengaluru,+Karnataka+560036&t=k&z=17&output=embed',
+  /* Where the map's "Open in Maps" button goes — same place, full app. */
+  mapsUrl:
+    'https://www.google.com/maps/search/?api=1&query=MAXFIT+GYM,+Kithaganur+Main+Rd,+Krishnarajapuram,+Bengaluru,+Karnataka+560036',
+  /* Same hours every day, so this is one row — the components map over it. */
+  hours: [{ days: 'Every day', time: '6:00 AM – 10:00 PM' }],
   foundedYear: 2026, // TODO
 } as const
 
@@ -44,12 +48,30 @@ export const earlyBird = {
   seatsLeft: 20, // TODO — keep current
 } as const
 
+/** Term a plan is bought for, and how many months it covers. */
+export const periodMonths = {
+  month: 1,
+  quarter: 3,
+  'half-year': 6,
+  year: 12,
+} as const
+
+export type Period = keyof typeof periodMonths
+
+/** Suffix after the price, e.g. "₹4,000 /3 months". */
+export const periodLabel: Record<Period, string> = {
+  month: 'month',
+  quarter: '3 months',
+  'half-year': '6 months',
+  year: 'year',
+}
+
 export type Plan = {
   id: string
   name: string
   price: number
-  /** Billing period, used for the "/year" and "/month" suffix. */
-  period: 'year' | 'month'
+  /** Billing term, used for the price suffix and the savings maths. */
+  period: Period
   strikePrice?: number
   tagline: string
   features: string[]
@@ -57,7 +79,27 @@ export type Plan = {
   badge?: string
 }
 
+/* Order is display order. Early Bird leads: it's the offer being sold, and the
+   longer terms read as steps down from it rather than up from the monthly. */
 export const plans: Plan[] = [
+  {
+    id: 'early-bird',
+    name: 'Early Bird Pass',
+    price: 8000,
+    period: 'year',
+    /* The same ₹14,000 list price the Annual Pass strikes through — both are
+       yearly, so they're discounted off the same number. */
+    strikePrice: 14000,
+    tagline: `Founding-member rate. First ${earlyBird.totalSeats} members only.`,
+    featured: true,
+    badge: 'Best value',
+    features: [
+      'Everything in the Annual Pass',
+      'Rate locked for as long as you stay a member',
+      '2 free personal-training sessions',
+      'Priority booking on group classes',
+    ],
+  },
   {
     id: 'monthly',
     name: 'Monthly Pass',
@@ -73,19 +115,29 @@ export const plans: Plan[] = [
     ],
   },
   {
-    id: 'early-bird',
-    name: 'Early Bird Pass',
-    price: 8000,
-    period: 'year',
-    strikePrice: 10000,
-    tagline: `Founding-member rate. First ${earlyBird.totalSeats} members only.`,
-    featured: true,
-    badge: 'Best value',
+    id: 'quarterly',
+    name: '3 Month Pass',
+    price: 4000,
+    period: 'quarter',
+    tagline: 'A season to build the habit.',
     features: [
-      'Everything in the Annual Pass',
-      'Rate locked for as long as you stay a member',
-      '2 free personal-training sessions',
-      'Priority booking on group classes',
+      'Full gym access, all equipment',
+      'Free fitness assessment on joining',
+      'Locker and shower access',
+      'Works out to ₹1,333 a month',
+    ],
+  },
+  {
+    id: 'half-yearly',
+    name: '6 Month Pass',
+    price: 6000,
+    period: 'half-year',
+    tagline: 'Half a year, at half the monthly rate.',
+    features: [
+      'Full gym access, all equipment',
+      'Free fitness assessment on joining',
+      'Locker and shower access',
+      'Works out to ₹1,000 a month',
     ],
   },
   {
@@ -104,8 +156,11 @@ export const plans: Plan[] = [
   },
 ]
 
+/** The rate every longer term is sold against. Keep in sync with the monthly plan. */
+export const monthlyRate = 2000
+
 /** Monthly cost over a year — the number the annual plans are compared against. */
-export const monthlyAnnualised = 2000 * 12
+export const monthlyAnnualised = monthlyRate * 12
 
 export const equipment = [
   {
@@ -172,7 +227,7 @@ export const videos = [
 
 /**
  * Gallery of training shots. Currently Pexels stock — see public/README.md.
- * Purely atmospheric: no names, no claims, nothing presented as a MaxFit
+ * Purely atmospheric: no names, no claims, nothing presented as a maxfit
  * member. Swap for real photos of the gym when you have them.
  */
 /* Keep the count divisible by 2 and 3 — the grid is 2 columns on mobile and

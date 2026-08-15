@@ -1,10 +1,12 @@
 import { gym } from '../content'
 
 /**
- * The logo artwork sits on a pure-black field. `mix-blend-lighten` maps that
- * black onto whatever dark surface is behind it, so it reads as transparent
- * without needing a cut-out PNG. It relies on a dark backdrop — don't place
- * this on a light or red surface.
+ * Both files are real alpha PNGs — the supplied artwork's black field was
+ * un-premultiplied into an alpha channel — so this needs no blend mode and no
+ * opaque surface behind it. It sits over the hero photo fine.
+ *
+ * The artwork's own interior shading is dark, so it still reads best on a dark
+ * backdrop; on the red band or a light surface it will look thin.
  *
  * `wordmark` is a horizontal crop of the same file (MAX FIT GYM only), because
  * the full square lockup goes illegible at nav height. `full` keeps the emblem
@@ -19,9 +21,9 @@ export function Logo({
 }) {
   return (
     <img
-      src={variant === 'full' ? '/logo.jpeg' : '/logo-wordmark.jpg'}
+      src={variant === 'full' ? '/logo.png' : '/logo-wordmark.png'}
       alt={`${gym.name} Gym`}
-      className={`${className} w-auto mix-blend-lighten`}
+      className={`${className} w-auto`}
     />
   )
 }

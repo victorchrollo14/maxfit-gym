@@ -5,7 +5,7 @@ import { gym } from '../content'
 const perks = [
   'Free fitness assessment',
   'Coaches on the floor',
-  'Open from 5am, 7 days',
+  'Open from 6am, 7 days',
   'Lockers & showers',
   'Personal training',
   'No crowds at peak hour',
@@ -16,17 +16,14 @@ export function Hero() {
     <section id="top" className="relative overflow-hidden">
       <HeroBackdrop />
 
-      <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pt-12 pb-16 sm:pt-20 sm:pb-24 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16">
+      {/* Top padding clears the fixed header (~68px mobile, ~66px desktop) on
+          top of the hero's own spacing — the header no longer takes up flow. */}
+      <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pt-28 pb-16 sm:pt-36 sm:pb-24 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16">
         {/* min-w-0: grid items default to min-width:auto, so the marquee's
             w-max track below would otherwise stretch this column to its full
             unclipped width. */}
         <div className="min-w-0">
-          <p className="eyebrow inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1.5 text-accent">
-            <span className="size-1.5 rounded-full bg-accent" />
-            {gym.city} · Open 7 days from 5 AM
-          </p>
-
-          <h1 className="mt-6">
+          <h1>
             <span className="display block text-4xl sm:text-6xl lg:text-7xl">
               <span className="inline-block bg-accent px-3 py-1 text-accent-foreground shadow-[0_8px_40px_-10px_var(--color-accent)]">
                 {gym.hero.boxed}
@@ -67,7 +64,7 @@ export function Hero() {
           className="scroll-mt-24 rounded-2xl border border-border bg-surface/80 p-6 shadow-2xl backdrop-blur sm:p-7"
         >
           <h2 className="display text-xl sm:text-2xl">
-            Claim your <span className="ml-[0.12em] text-accent">free trial</span>
+            Claim your <span className="text-accent">free trial</span>
           </h2>
           <p className="mt-2 mb-6 text-sm text-muted text-pretty">
             One session on us. No card details, no obligation — we'll call you back

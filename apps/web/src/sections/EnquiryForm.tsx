@@ -49,12 +49,6 @@ export function EnquiryForm() {
         <FieldError />
       </TextField>
 
-      <TextField name="email" type="email" className="w-full">
-        <Label className="eyebrow text-muted">Email (optional)</Label>
-        <Input placeholder="you@example.com" />
-        <FieldError />
-      </TextField>
-
       <button
         type="submit"
         disabled={status === 'sending'}

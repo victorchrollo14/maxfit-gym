@@ -19,18 +19,21 @@ Last updated: 2026-08-12
 
 ## Plans
 
-Gym name: **MaxFit**.
+Gym name: **maxfit** — lowercase wherever it's written as prose (WhatsApp messages, page title, alt text). The display type uppercases headings anyway, so the casing only shows where it matters.
 
 | Plan | Price | Notes |
 |---|---|---|
-| Monthly | ₹2,000 / month | ₹24,000/yr — the anchor the annual plans are sold against |
-| Early bird | ₹8,000 / year | Founding-member launch discount, capped at the first 200 members |
+| Early bird | ₹8,000 / year | Founding-member launch discount, capped at the first 200 members. **Listed first** — it's the offer being sold |
+| Monthly | ₹2,000 / month | ₹24,000/yr — the anchor every longer term is sold against |
+| 3 month | ₹4,000 / 3 months | ₹1,333/mo — 33% off the monthly rate |
+| 6 month | ₹6,000 / 6 months | ₹1,000/mo — 50% off the monthly rate |
 | Standard | ₹10,000 / year | The regular annual rate once early bird sells out |
 
-- Early bird is a **limited-seat launch discount**, not an off-peak tier — so the landing page sells it with scarcity (struck-through ₹10,000, seats-claimed bar).
+- Early bird is a **limited-seat launch discount**, not an off-peak tier — so the landing page sells it with scarcity (struck-through ₹14,000 — the same yearly list price the Annual Pass strikes, since both are yearly — plus the seats-left pill).
 - Annual vs monthly: early bird is **67% off** the monthly rate, standard is **58% off**. That gap is the main pricing argument on the page.
 - Seat counter lives in `earlyBird.seatsTaken` in `apps/web/src/content.ts` — needs updating manually until the admin panel owns it.
 - Annual-heavy pricing makes UPI AutoPay much less relevant (see [Payments](#payments--upi)).
+- Cards drop the `/period` suffix when the plan's name already states the term — "3 Month Pass … ₹4,000 /3 months" stutters. Early Bird keeps it, since its name doesn't say the term.
 
 ## Landing page sections
 
@@ -39,7 +42,7 @@ Confirmed by Max:
 - Personal trainers
 - Video recordings from the gym's own trainers — served as static files from `apps/web/public/videos/`, not Cloudinary
 - Customer reviews
-- Pricing (the three plans above)
+- Pricing (the five plans above)
 
 ### Design direction
 
@@ -50,17 +53,22 @@ Modelled on the Phoenix Fitness offers page (`apps/web/inspirations/`), applied 
 - Hero perks run as an infinite left-scrolling marquee, paused for `prefers-reduced-motion`.
 - Hero backdrop (`HeroBackdrop.tsx`) is layered CSS — accent glows, angled slashes, diagonal hatch, SVG grain, vignette — with the photo as an optional top layer. It holds up with no photo at all, so the hero never depends on having artwork.
 - **Mobile header is logo + hamburger only.** Both CTAs live in the floating bottom bar so they aren't duplicated; the desktop header keeps Call now + Free trial.
-- **Header stays solid and sticky, never transparent over the hero.** Tried it; the photo shows through the logo's black field because `mix-blend-lighten` needs an opaque dark surface behind it. Don't re-attempt without a transparent-background logo.
+- **Header is fixed and transparent over the hero, turning solid past ~16px of scroll** (`bg-background/95` + blur). This became possible once the logo got a real alpha channel — the earlier blocker was `mix-blend-lighten` needing an opaque dark surface. `Hero` carries the top padding that used to come from the header sitting in flow.
+- **Mobile menu is a full-screen sheet**, not a dropdown: staggered display-type links, the hero's glow/slash furniture, and the two CTAs pinned at the bottom. It renders as a sibling of `<header>` — a `backdrop-blur` ancestor is a containing block for `fixed` children, which pins the sheet to the bar's height if it's nested inside.
 - Icons come from **react-icons** (`fa`, `lu`, `tb`, `md` sets) — no hand-rolled SVG paths.
 - Red band carries Call now + Chat on WhatsApp buttons rather than the bare number. WhatsApp deep-links via `wa.me/<gym.whatsapp>` with a prefilled message.
-- Headings: heavy oblique uppercase, last word in red italic, over a letterspaced subtitle and a short red rule.
-- Display face is **Archivo** — it carries a genuine italic and a width axis, so the oblique is real type rather than a skewed upright. Set at weight 900 / width 92%.
+- Headings: heavy upright uppercase, last word in red, over a letterspaced subtitle and a short red rule. **Upright, not oblique** — the italic display type read as too styled and was dropped everywhere (the `display-upright` utility folded into `display`).
+- Display face is **Rajdhani** at 700 (its heaviest) — squarish and naturally condensed, so no width axis is needed; `font-stretch` would only make the browser synthesise one. Body is **Manrope** 400/500. Rajdhani was tried for body as well and dropped: it thins out and reads cramped by 14px, which is where most of this page lives — Barlow had the same narrowness problem.
 - Lead-capture form sits inside the hero, as on the reference.
+- **Plan cards CTA into WhatsApp**, not the form — plans are sold in person, so the card opens a chat with the plan and price already typed (`whatsappHref()` in `lib/links.ts`). The hero form stays the free-trial path.
 - Accent hue is one variable: `--accent` in `apps/web/src/theme.css`, hue 27.50. Change to 52.76 for the original orange.
 - Fonts load from the Google Fonts CDN. Self-host them before the PWA offline shell lands, or the shell won't be truly offline.
-- **Logo**: `public/logo.jpeg` is the supplied square lockup. It goes illegible at nav height, so `public/logo-wordmark.jpg` is a cropped horizontal MAX FIT GYM lockup derived from it (`magick logo.jpeg -crop 1105x486+59+412 +repage -resize x220`). Nav uses the wordmark, footer the full lockup. Both are black-field JPEGs shown with `mix-blend-lighten`, which needs a **dark** backdrop — they'll break on the red band or any light surface. A transparent PNG/SVG from the designer would remove that constraint.
+- **Logo**: `public/logo.png` is the supplied square lockup. It goes illegible at nav height, so `public/logo-wordmark.png` is a cropped horizontal MAX FIT GYM lockup derived from it (originally `magick logo.jpeg -crop 1105x486+59+412 +repage -resize x220`, against the supplied JPEG that the PNGs have since replaced). Nav uses the wordmark, footer the full lockup. Both started as black-field JPEGs and were un-premultiplied into real alpha PNGs (alpha = `max(r,g,b)`, colour ÷ alpha), so no blend mode is involved and they sit over the hero photo cleanly. The artwork's own interior shading is still dark, so it reads best on a dark surface — a vector from the designer would be the proper fix.
 - **Hero deliberately carries no pricing** — it sells the gym (rating, members, coaches, hours) and the free trial. Plans are the pricing section's job.
-- Phone `+91 831 089 0652` drives the nav "Call now" button, the mobile sticky bar, the footer and the Find-us section.
+- Phone `+91 831 089 0652` drives the nav "Call now" button, the mobile sticky bar and the footer. The Location section shows address, hours and map only — no phone or email, so there's one place to call from per screen.
+- **Address and hours are real** as of 2026-08-15: Site No A, Kithaganur Main Rd, near Domino's Pizza, Kithiganur, Krishnarajapuram, Bengaluru 560036 — open every day 6 AM – 10 PM (one row in `gym.hours`, the components map over it).
+- Map is a **keyless Google embed** (`?q=<place>&t=k&z=17&output=embed`) — no API key, opens on satellite. Google's own "Open in Maps" chip lives inside the iframe and can't be styled cross-origin, so `Visit.tsx` covers it with our own "Open in Maps" button — white, red text, `rounded-md`, same corner. Geometry is measured, not chosen: Google's chip sits **8px in from the map's top-left and is ~129x32** (same on mobile and desktop, plus a small tab beneath it on mobile). Our button matches that origin and stays larger, or Google's white edge shows around it — which is what a 12px inset looked like. It carries a text label rather than a bare icon for the same reason: an icon-only button is too narrow to cover, and moving it to another corner just read as two buttons.
+- **Lead form asks for name and phone only** — the gym calls back, so email was dead weight on a mobile form.
 
 Added on top, as recommended:
 - Hero with the trial CTA
@@ -87,7 +95,7 @@ This file stays the **reference**: decisions and their rationale, design directi
 |---|---|
 | Frontend | React 19 + TanStack Router + Vite |
 | UI | HeroUI v3 + Tailwind v4, dark-first |
-| Type | Archivo (variable — real italic + width axis) for display, Inter for body, via Google Fonts |
+| Type | Rajdhani 700 for display, Manrope for body, via Google Fonts |
 | Repo | pnpm workspace monorepo — `apps/web` (site), `apps/backend` (DB + API), `apps/trigger` (scheduled jobs) |
 | Backend | **Supabase Edge Functions** in `apps/backend`, see below. Per-endpoint choice, so a Vercel Function can still be used where Node deps or same-origin matter |
 | Scheduling | Trigger.dev |

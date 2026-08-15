@@ -26,15 +26,28 @@ export function Cta({
   size = 'lg',
   tone = 'solid',
   className = '',
+  onClick,
+  external,
 }: {
   href: string
   children: ReactNode
   size?: keyof typeof sizes
   tone?: keyof typeof tones
   className?: string
+  /** For same-page anchors that also need to dismiss something, e.g. the
+      mobile menu closing as it jumps to the enquiry form. */
+  onClick?: () => void
+  /** Opens in a new tab — for links that leave the site, e.g. WhatsApp. */
+  external?: boolean
 }) {
   return (
-    <a href={href} className={`${base} ${sizes[size]} ${tones[tone]} ${className}`}>
+    <a
+      href={href}
+      onClick={onClick}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noreferrer' : undefined}
+      className={`${base} ${sizes[size]} ${tones[tone]} ${className}`}
+    >
       {children}
     </a>
   )

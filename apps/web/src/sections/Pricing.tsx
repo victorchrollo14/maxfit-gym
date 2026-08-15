@@ -1,15 +1,34 @@
 import { Section } from '../components/Section'
 import { Cta } from '../components/Cta'
-import { FaCheck } from 'react-icons/fa'
-import { earlyBird, monthlyAnnualised, plans, type Plan } from '../content'
+import { FaCheck, FaWhatsapp } from 'react-icons/fa'
+import {
+  earlyBird,
+  gym,
+  monthlyRate,
+  periodLabel,
+  periodMonths,
+  plans,
+  type Plan,
+} from '../content'
 import { formatINR } from '../lib/format'
+import { whatsappHref } from '../lib/links'
 
-/** Savings vs paying the monthly rate for a full year. */
+/** Savings vs paying the monthly rate for the same stretch of time. */
 function savingsVsMonthly(plan: Plan) {
-  if (plan.period !== 'year') return null
-  const saved = monthlyAnnualised - plan.price
+  const months = periodMonths[plan.period]
+  if (months === 1) return null
+  const atMonthly = monthlyRate * months
+  const saved = atMonthly - plan.price
   if (saved <= 0) return null
-  return { amount: saved, percent: Math.round((saved / monthlyAnnualised) * 100) }
+  return { amount: saved, percent: Math.round((saved / atMonthly) * 100) }
+}
+
+/**
+ * "3 MONTH PASS … ₹4,000 /3 months" stutters. The suffix only earns its place
+ * on a plan whose name doesn't already state the term — Early Bird, say.
+ */
+function nameStatesTerm(plan: Plan) {
+  return /month|annual|year/i.test(plan.name)
 }
 
 function PlanCard({ plan }: { plan: Plan }) {
@@ -38,12 +57,12 @@ function PlanCard({ plan }: { plan: Plan }) {
             {formatINR(plan.strikePrice)}
           </span>
         )}
-        <span className="display-upright text-4xl sm:text-5xl">
+        <span className="display text-4xl sm:text-5xl">
           {formatINR(plan.price)}
         </span>
-        <span className="eyebrow text-muted">
-          /{plan.period === 'year' ? 'year' : 'month'}
-        </span>
+        {!nameStatesTerm(plan) && (
+          <span className="eyebrow text-muted">/{periodLabel[plan.period]}</span>
+        )}
       </div>
 
       {savings && (
@@ -68,14 +87,22 @@ function PlanCard({ plan }: { plan: Plan }) {
         ))}
       </ul>
 
+      {/* Plans are sold in person, so the card hands the conversation to
+          WhatsApp with the plan already named rather than to a form. */}
       <div className="mt-auto pt-8">
         <Cta
-          href="#enquiry"
+          href={whatsappHref(
+            `Hi ${gym.name}, I'd like to enquire about the ${plan.name} (${formatINR(
+              plan.price,
+            )} / ${periodLabel[plan.period]}).`,
+          )}
+          external
           size="md"
           tone={plan.featured ? 'solid' : 'outline'}
           className="w-full"
         >
-          {plan.featured ? 'Claim this rate' : `Choose ${plan.name}`}
+          <FaWhatsapp className="size-4" aria-hidden="true" />
+          Enquire now
         </Cta>
       </div>
     </article>
@@ -90,9 +117,16 @@ export function Pricing() {
       accent="Plans"
       sub="No joining fee. No hidden charges. Cancel monthly any time."
     >
-      <div className="grid gap-6 pt-3 lg:grid-cols-3 lg:items-stretch">
+      {/* Flex rather than grid: with five plans the last row is short, and
+          wrapping flex items centre it instead of leaving a hole on the right. */}
+      <div className="flex flex-wrap justify-center gap-6 pt-3">
         {plans.map((p) => (
-          <PlanCard key={p.id} plan={p} />
+          <div
+            key={p.id}
+            className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+          >
+            <PlanCard plan={p} />
+          </div>
         ))}
       </div>
 

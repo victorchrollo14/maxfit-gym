@@ -38,7 +38,7 @@ const columns = [
   {
     heading: 'Visit',
     links: [
-      { href: '#visit', label: 'Find us' },
+      { href: '#visit', label: 'Location' },
       { href: '#visit', label: 'Opening hours' },
       { href: '#faq', label: 'FAQ' },
       { href: '#enquiry', label: 'Free trial' },
@@ -59,7 +59,7 @@ export function Footer() {
           <div className="relative mx-auto max-w-2xl">
             <h2 className="display text-3xl sm:text-4xl md:text-5xl">
               Ready to start your{' '}
-              <span className="ml-[0.12em] text-accent">transformation?</span>
+              <span className="text-accent">transformation?</span>
             </h2>
             <p className="mt-5 text-muted text-pretty">
               Book a free trial session and see the place for yourself.{' '}

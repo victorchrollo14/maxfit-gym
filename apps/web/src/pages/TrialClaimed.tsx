@@ -56,9 +56,9 @@ export function TrialClaimed() {
         </div>
 
         <p className="eyebrow mt-8 text-accent">You're in</p>
-        <h1 className="display-upright mt-4 text-4xl sm:text-5xl md:text-6xl">
+        <h1 className="display mt-4 text-4xl sm:text-5xl md:text-6xl">
           Free trial{' '}
-          <span className="display ml-[0.12em] text-accent">claimed.</span>
+          <span className="display text-accent">claimed.</span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-md text-pretty text-muted">

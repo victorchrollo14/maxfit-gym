@@ -18,8 +18,8 @@ breaks while these are empty.
 
 ```
 public/
-  logo.jpeg                       Supplied square lockup (footer)
-  logo-wordmark.jpg               Cropped horizontal lockup (nav) — derived
+  logo.png                        Supplied square lockup (footer), alpha-keyed
+  logo-wordmark.png               Cropped horizontal lockup (nav) — derived
   gym/hero.jpg                    Hero background (landscape, 16:9)
   videos/coach-1.mp4              Reel, vertical 9:16 (phone footage is ideal)
   videos/coach-1.jpg              Poster frame for the clip above

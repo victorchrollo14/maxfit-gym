@@ -1,6 +1,6 @@
 import { Section } from '../components/Section'
 import { Cta } from '../components/Cta'
-import { FaCheck, FaWhatsapp } from 'react-icons/fa'
+import { FaWhatsapp } from 'react-icons/fa'
 import {
   earlyBird,
   gym,
@@ -77,15 +77,6 @@ function PlanCard({ plan }: { plan: Plan }) {
           Only {earlyBird.seatsLeft} early bird passes left
         </p>
       )}
-
-      <ul className="mt-6 space-y-3">
-        {plan.features.map((f) => (
-          <li key={f} className="flex gap-3 text-sm">
-            <FaCheck className="mt-1 size-3.5 shrink-0 text-accent" />
-            <span className="text-pretty text-muted">{f}</span>
-          </li>
-        ))}
-      </ul>
 
       {/* Plans are sold in person, so the card hands the conversation to
           WhatsApp with the plan already named rather than to a form. */}

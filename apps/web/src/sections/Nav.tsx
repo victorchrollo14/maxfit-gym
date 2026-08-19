@@ -3,13 +3,15 @@ import { Cta } from '../components/Cta'
 import { Logo } from '../components/Logo'
 import { FaPhoneAlt } from 'react-icons/fa'
 import { LuMenu, LuX } from 'react-icons/lu'
-import { gym } from '../content'
+import { gym, reviews } from '../content'
 
+/* Results renders nothing while there are no reviews, so the link to it has to
+   go too — a nav item that scrolls nowhere is worse than one less item. */
 const links = [
   { href: '#pricing', label: 'Plans' },
   { href: '#equipment', label: 'Equipment' },
   { href: '#inside', label: 'Inside' },
-  { href: '#results', label: 'Results' },
+  ...(reviews.length > 0 ? [{ href: '#results', label: 'Results' }] : []),
   { href: '#visit', label: 'Location' },
 ]
 

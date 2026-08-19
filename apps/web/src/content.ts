@@ -259,26 +259,35 @@ export const gallery = [
   { src: '/gallery/12.jpg', alt: 'Lifting a loaded barbell' },
 ]
 
-export const reviews = [
-  {
-    name: 'Member name', // TODO — real reviews only, these are placeholders
-    plan: 'Member since 2026',
-    rating: 5,
-    text: 'The coaches actually watch you lift and correct you. I learnt more about form here in a month than in two years at my last gym.',
-  },
-  {
-    name: 'Member name', // TODO
-    plan: 'Member since 2026',
-    rating: 5,
-    text: 'Never have to wait for a rack, even at 7pm. That alone was worth switching for.',
-  },
-  {
-    name: 'Member name', // TODO
-    plan: 'Member since 2026',
-    rating: 5,
-    text: 'Clean, well maintained, and the staff know everyone by name. It stopped feeling like a chore to come in.',
-  },
-]
+/* No real reviews yet, so the Results section hides itself. Uncomment and
+   replace with genuine ones — these were always placeholders. */
+export const reviews: {
+  name: string
+  plan: string
+  rating: number
+  text: string
+}[] = []
+
+// [
+//   {
+//     name: 'Member name', // TODO — real reviews only, these are placeholders
+//     plan: 'Member since 2026',
+//     rating: 5,
+//     text: 'The coaches actually watch you lift and correct you. I learnt more about form here in a month than in two years at my last gym.',
+//   },
+//   {
+//     name: 'Member name', // TODO
+//     plan: 'Member since 2026',
+//     rating: 5,
+//     text: 'Never have to wait for a rack, even at 7pm. That alone was worth switching for.',
+//   },
+//   {
+//     name: 'Member name', // TODO
+//     plan: 'Member since 2026',
+//     rating: 5,
+//     text: 'Clean, well maintained, and the staff know everyone by name. It stopped feeling like a chore to come in.',
+//   },
+// ]
 
 export const faqs = [
   {

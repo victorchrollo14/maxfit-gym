@@ -27,12 +27,17 @@ export const gym = {
     line1: "Site No A, Kithaganur Main Rd, near Domino's Pizza",
     line2: 'Kithiganur, Krishnarajapuram, Bengaluru, Karnataka 560036',
   },
-  /* Keyless Google Maps embed — `?q=<place>&output=embed` needs no API key or
-     billing account. `t=k` opens on satellite imagery, `z=17` frames the block.
-     Swap in the iframe src from Maps' own Share → Embed panel if the pin ever
-     lands on the wrong shopfront (that panel is street-map only, though). */
+  /* Keyless fallback, used only when VITE_GOOGLE_MAPS_EMBED_KEY is unset. The
+     marker form `q=<lat>,<lng>` is not interchangeable with `q=<place name>`:
+     the name form renders an info card but draws no pin, so this one is
+     coordinates. Neither draws the gym's label — only the keyed Embed API
+     does. See MapEmbed.tsx. */
   mapEmbedUrl:
-    'https://www.google.com/maps?q=MAXFIT+GYM,+Kithaganur+Main+Rd,+Krishnarajapuram,+Bengaluru,+Karnataka+560036&t=k&z=17&output=embed',
+    'https://www.google.com/maps?q=13.0287704,77.7079326+(maxfit+gym)&z=18&output=embed',
+  /* Query for the keyed Embed API. Name, not coordinates — that is what makes
+     Google label the pin. */
+  mapsQuery:
+    'MAXFIT GYM, Kithaganur Main Rd, Krishnarajapuram, Bengaluru, Karnataka 560036',
   /* Where the map's "Open in Maps" button goes — same place, full app. */
   mapsUrl:
     'https://www.google.com/maps/search/?api=1&query=MAXFIT+GYM,+Kithaganur+Main+Rd,+Krishnarajapuram,+Bengaluru,+Karnataka+560036',
@@ -40,6 +45,13 @@ export const gym = {
   hours: [{ days: 'Every day', time: '6:00 AM – 10:00 PM' }],
   foundedYear: 2026, // TODO
 } as const
+
+/** One block of text for the clipboard, on the trial-claimed page. */
+export const fullAddress = [
+  `${gym.name.toUpperCase()} Gym`,
+  gym.address.line1,
+  gym.address.line2,
+].join('\n')
 
 /** Cap for the early-bird tier. Drives the scarcity copy in Pricing. */
 export const earlyBird = {

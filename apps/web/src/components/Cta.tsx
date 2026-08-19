@@ -18,6 +18,7 @@ const tones = {
   solid:
     'bg-accent text-accent-foreground shadow-[0_8px_30px_-8px_var(--color-accent)]',
   outline: 'border border-border bg-surface/60 text-foreground hover:bg-surface',
+  white: 'bg-white text-neutral-900 hover:bg-white/90',
 }
 
 export function Cta({

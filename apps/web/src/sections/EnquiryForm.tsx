@@ -1,53 +1,74 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { FieldError, Form, Input, Label, TextField } from '@heroui/react'
-import { FaCheck } from 'react-icons/fa'
 import { ctaClasses } from '../components/Cta'
+import { createLead, normalisePhone } from '../lib/leads'
+import { markTrialClaimed } from '../lib/trialClaim'
+import { gym } from '../content'
+import { telHref } from '../lib/links'
 
-type Status = 'idle' | 'sending' | 'sent'
+type Status = 'idle' | 'sending' | 'failed'
 
 export function EnquiryForm() {
   const [status, setStatus] = useState<Status>('idle')
+  const [error, setError] = useState<ReactNode>(null)
+  const navigate = useNavigate()
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const data = Object.fromEntries(new FormData(e.currentTarget))
+    const data = new FormData(e.currentTarget)
+    const name = String(data.get('name') ?? '')
+    const phone = String(data.get('phone') ?? '')
+
+    if (!normalisePhone(phone)) {
+      setError("That doesn't look like a mobile number — 10 digits, please.")
+      setStatus('failed')
+      return
+    }
+
     setStatus('sending')
+    setError(null)
 
-    // TODO: POST to the Express `/api/leads` endpoint once it exists, so this
-    // lands in the admin Leads table. Until then it only logs.
-    console.info('Lead captured (not yet persisted):', data)
-    await new Promise((r) => setTimeout(r, 400))
-    setStatus('sent')
-  }
+    try {
+      await createLead({ name, phone })
+    } catch (err) {
+      console.error('Lead submission failed', err)
+      setError(
+        <>
+          Something went wrong on our side. Call us on{' '}
+          <a href={telHref} className="underline underline-offset-4">
+            {gym.phone}
+          </a>{' '}
+          and we'll sort it out.
+        </>,
+      )
+      setStatus('failed')
+      return
+    }
 
-  if (status === 'sent') {
-    return (
-      <div className="rounded-xl border border-accent/40 bg-accent/10 p-6 text-center">
-        <div className="mx-auto grid size-11 place-items-center rounded-full bg-accent text-accent-foreground">
-          <FaCheck className="size-5" />
-        </div>
-        <h3 className="display mt-4 text-lg">Got it — keep your phone handy</h3>
-        <p className="mt-2 text-sm text-muted text-pretty">
-          Someone from the gym will call you within a few minutes to book your walk-in
-          and free session.
-        </p>
-      </div>
-    )
+    markTrialClaimed()
+    navigate({ to: '/trial-claimed' })
   }
 
   return (
     <Form onSubmit={handleSubmit} className="grid gap-4">
       <TextField name="name" isRequired className="w-full">
         <Label className="eyebrow text-muted">Name</Label>
-        <Input placeholder="Your full name" />
+        <Input placeholder="Your full name" autoComplete="name" />
         <FieldError />
       </TextField>
 
       <TextField name="phone" type="tel" isRequired className="w-full">
         <Label className="eyebrow text-muted">Phone</Label>
-        <Input placeholder="10-digit mobile" inputMode="tel" />
+        <Input placeholder="10-digit mobile" inputMode="tel" autoComplete="tel" />
         <FieldError />
       </TextField>
+
+      {error && (
+        <p role="alert" className="text-sm text-pretty text-danger">
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"

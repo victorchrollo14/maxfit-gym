@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroui/react": "^3.2.3",
     "@heroui/styles": "^3.2.3",
+    "@supabase/supabase-js": "^2.112.3",
     "@tanstack/react-router": "^1.170.18",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

@@ -58,29 +58,16 @@ a mess.
 
 ### Seed data
 
-13 users, 6 plans, 11 memberships. Phone numbers are the logins; all dates are
-relative to today, so the interesting states stay interesting however long from now
-you reset.
+Deliberately minimal: **one row per table**, enough to boot the app and log in. Test
+data is created by hand through the UI, and `pnpm db:reset` puts it back to this.
 
-| Phone | Who | State |
-|---|---|---|
-| `…001` | Michael D'Souza | `admin` + `plans_admin` — the only one who can change pricing |
-| `…002` | Lakshmi | `admin` — front desk, deliberately *cannot* touch plans |
-| `…003` | Ravi Kumar | annual couple, **paused right now**, 5/15 days used |
-| `…004` | Priya Kumar | same couple membership, same pause |
-| `…005` | Suresh Nair | monthly, **expires in 2 days** → in the reminder window |
-| `…006` | Anita Rao | annual, renewed once — has membership history |
-| `…007` | Vikram Shetty | **lapsed 11 days ago** — the win-back case |
-| `…008` | Meera Joseph | quarterly, expires in 6 days |
-| `…009` | Karthik B | **phone never verified** (desk-enrolled), plus a cancelled couple seat |
-| `…010` | Deepa Menon | annual, 11/15 pause days used across two past pauses, one resumed early |
-| `…011` | Rohan Gupta | **part-paid** (₹1000 of ₹2000) and already holds next month's renewal |
-| `…012` | Sneha Iyer | half-yearly with a **pending** payment awaiting desk verification |
-| `…013` | Arjun Pillai | couple plan with a cancelled partner, **pause allowance fully spent** |
-
-Payments cover every branch: UPI reconciled, card **unreconciled** (the worklist),
-cash, pending, partial and refunded. Rohan is the case that proves `expiring_soon`
-excludes anyone who has already bought their next term.
+| | |
+|---|---|
+| Login | `+919000000001` — Michael D'Souza, `admin` + `plans_admin` |
+| Plan | Annual, 365 days, ₹18,000, 15 pause days |
+| Membership | Started 30 days ago, one 3-day pause already taken |
+| Payment | ₹18,000 UPI, paid and reconciled |
+| Lead | One `free_trial` lead, status `new` |
 
 ## Connecting to a hosted project
 
@@ -91,8 +78,11 @@ no hosted project.
 
 | Function | What it does |
 |---|---|
-| `leads` | `POST` from both landing-page forms — the standing blocker on publishing |
 | `send-otp` | Supabase **Send SMS hook**: delivers the OTP Auth generated, over WhatsApp Cloud API |
+
+`leads` is not on this list any more — the landing page inserts into the table directly
+with the anon key, fenced in by a column-level grant and an insert policy. See
+[V1.md](../../V1.md#leads-without-an-endpoint).
 
 Specs in [V1.md](../../V1.md). `send-otp` is not called by our own code — Supabase Auth
 calls it. It owns *delivery only*; Auth still generates, stores, rate-limits and verifies

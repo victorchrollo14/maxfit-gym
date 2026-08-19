@@ -1,3 +1,19 @@
+# web — landing page, member portal, CRM
+
+## Running it
+
+```sh
+cp .env.example .env.local     # then fill in VITE_SUPABASE_ANON_KEY
+pnpm dev
+```
+
+The free-trial form writes to the `leads` table with the Supabase client, so it needs
+a database to talk to. `cd ../backend && pnpm db:start` prints both env values; see
+[apps/backend/README.md](../backend/README.md). Without them the site still renders —
+the form is the only thing that fails, loudly, in the console.
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.

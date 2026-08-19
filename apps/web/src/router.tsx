@@ -3,9 +3,11 @@ import {
   createRoute,
   createRouter,
   Outlet,
+  redirect,
 } from '@tanstack/react-router'
 import { Landing } from './pages/Landing'
 import { TrialClaimed } from './pages/TrialClaimed'
+import { hasTrialClaim } from './lib/trialClaim'
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -17,12 +19,14 @@ const indexRoute = createRoute({
   component: Landing,
 })
 
-/* Conversion page for the free-trial forms. Deliberately not linked yet — the
-   forms don't submit anywhere until `POST /api/leads` exists. See the note in
-   TrialClaimed.tsx before wiring it up. */
+/* Gated so Google Ads can't count a bookmark or a shared link as a second
+   lead — see lib/trialClaim.ts. */
 const trialClaimedRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/trial-claimed',
+  beforeLoad: () => {
+    if (!hasTrialClaim()) throw redirect({ to: '/' })
+  },
   component: TrialClaimed,
 })
 

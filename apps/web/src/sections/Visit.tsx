@@ -11,7 +11,7 @@ export function Visit() {
       accent="Location"
       sub="Walk in during opening hours — no appointment needed"
     >
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
         <div>
           <BarLabel>Where we are</BarLabel>
           {/* The street line carries the display treatment; the locality line
@@ -39,7 +39,7 @@ export function Visit() {
           </div>
         </div>
 
-        <MapEmbed className="h-80 w-full lg:h-full" />
+        <MapEmbed className="h-80 w-full sm:h-96 lg:aspect-square lg:h-auto" />
       </div>
     </Section>
   )

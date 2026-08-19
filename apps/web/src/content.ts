@@ -5,6 +5,10 @@
  * changes needed. Images/videos live in `public/`; see public/README.md.
  */
 
+/* Pulled out of `gym` so the embed URL and the structured data can share them —
+   a self-referencing object literal can't. */
+const coords = { lat: 13.0287704, lng: 77.7079326 }
+
 export const gym = {
   name: 'maxfit',
   tagline: 'Train hard. Get strong. Stay consistent.',
@@ -32,8 +36,8 @@ export const gym = {
      the name form renders an info card but draws no pin, so this one is
      coordinates. Neither draws the gym's label — only the keyed Embed API
      does. See MapEmbed.tsx. */
-  mapEmbedUrl:
-    'https://www.google.com/maps?q=13.0287704,77.7079326+(maxfit+gym)&z=18&output=embed',
+  coords,
+  mapEmbedUrl: `https://www.google.com/maps?q=${coords.lat},${coords.lng}+(maxfit+gym)&z=18&output=embed`,
   /* Query for the keyed Embed API. Name, not coordinates — that is what makes
      Google label the pin. */
   mapsQuery:
@@ -43,6 +47,8 @@ export const gym = {
     'https://www.google.com/maps/search/?api=1&query=MAXFIT+GYM,+Kithaganur+Main+Rd,+Krishnarajapuram,+Bengaluru,+Karnataka+560036',
   /* Same hours every day, so this is one row — the components map over it. */
   hours: [{ days: 'Every day', time: '6:00 AM – 10:00 PM' }],
+  /* The same hours in 24h, for structured data. Keep the two in step. */
+  hoursSpec: { opens: '06:00', closes: '22:00' },
   foundedYear: 2026, // TODO
 } as const
 

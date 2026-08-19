@@ -12,11 +12,16 @@ import {
 import { formatINR } from '../lib/format'
 import { whatsappHref } from '../lib/links'
 
-/** Savings vs paying the monthly rate for the same stretch of time. */
+/**
+ * Savings vs paying the monthly rate for the same stretch of time — times the
+ * number of people covered, or a couple plan reads as terrible value against a
+ * single monthly membership.
+ */
 function savingsVsMonthly(plan: Plan) {
   const months = periodMonths[plan.period]
-  if (months === 1) return null
-  const atMonthly = monthlyRate * months
+  const seats = plan.seats ?? 1
+  if (months === 1 && seats === 1) return null
+  const atMonthly = monthlyRate * months * seats
   const saved = atMonthly - plan.price
   if (saved <= 0) return null
   return { amount: saved, percent: Math.round((saved / atMonthly) * 100) }

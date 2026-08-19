@@ -3,7 +3,8 @@ insert into plans (id, family, name, duration_days, price, max_seats, pause_days
  ('a0000000-0000-0000-0000-000000000002','monthly',   'Monthly Pass',     30,  2000, 1,  0, true),
  ('a0000000-0000-0000-0000-000000000003','quarterly', '3 Month Pass',     90,  4000, 1,  0, true),
  ('a0000000-0000-0000-0000-000000000004','halfyearly','6 Month Pass',    180,  6000, 1,  7, true),
- ('a0000000-0000-0000-0000-000000000005','annual',    'Annual Pass',     365, 10000, 1, 15, true);
+ ('a0000000-0000-0000-0000-000000000005','annual',    'Annual Pass',     365, 10000, 1, 15, true),
+ ('a0000000-0000-0000-0000-000000000006','couple',    'Couple Pass',     365, 16000, 2, 15, true);
 
 insert into auth.users
  (id, instance_id, aud, role, phone, phone_confirmed_at,

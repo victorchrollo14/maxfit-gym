@@ -91,6 +91,8 @@ export type Plan = {
   /** Billing term, used for the price suffix and the savings maths. */
   period: Period
   strikePrice?: number
+  /** How many people the plan covers. Drives the savings maths. */
+  seats?: number
   tagline: string
   features: string[]
   featured?: boolean
@@ -172,6 +174,22 @@ export const plans: Plan[] = [
       'Free fitness assessment on joining',
       'Locker and shower access',
       'Personal training available as an add-on',
+    ],
+  },
+  {
+    id: 'couple',
+    name: 'Couple Pass',
+    price: 16000,
+    /* Two Annual Passes bought separately. */
+    strikePrice: 20000,
+    period: 'year',
+    seats: 2,
+    tagline: 'One year for two — ₹8,000 each.',
+    features: [
+      'Everything in the Annual Pass, for two people',
+      'Free fitness assessment for both on joining',
+      'Locker and shower access',
+      'Train on your own schedule — no need to come together',
     ],
   },
 ]

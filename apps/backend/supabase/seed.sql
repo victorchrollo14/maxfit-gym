@@ -1,5 +1,9 @@
 insert into plans (id, family, name, duration_days, price, max_seats, pause_days_allowed, is_active) values
- ('a0000000-0000-0000-0000-000000000001','annual','Annual', 365, 18000, 1, 15, true);
+ ('a0000000-0000-0000-0000-000000000001','early_bird','Early Bird Pass', 365,  8000, 1, 15, true),
+ ('a0000000-0000-0000-0000-000000000002','monthly',   'Monthly Pass',     30,  2000, 1,  0, true),
+ ('a0000000-0000-0000-0000-000000000003','quarterly', '3 Month Pass',     90,  4000, 1,  0, true),
+ ('a0000000-0000-0000-0000-000000000004','halfyearly','6 Month Pass',    180,  6000, 1,  7, true),
+ ('a0000000-0000-0000-0000-000000000005','annual',    'Annual Pass',     365, 10000, 1, 15, true);
 
 insert into auth.users
  (id, instance_id, aud, role, phone, phone_confirmed_at,
@@ -23,7 +27,7 @@ insert into payments
  (membership_id, paid_by, amount, method, reference_id, status,
   reconciled_at, marked_by, invoice_number) values
  ('b0000000-0000-0000-0000-000000000001','d0000000-0000-0000-0000-000000000001',
-  18000,'upi','452312909981','paid', now(),
+  8000,'upi','452312909981','paid', now(),
   'd0000000-0000-0000-0000-000000000001','INV-2026-00001');
 
 insert into leads (name, phone, source, status) values

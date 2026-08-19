@@ -61,12 +61,16 @@ a mess.
 Deliberately minimal: **one row per table**, enough to boot the app and log in. Test
 data is created by hand through the UI, and `pnpm db:reset` puts it back to this.
 
+Plan prices are duplicated in `apps/web/src/content.ts`, which is what the landing
+page renders — the site has no plans endpoint yet, so the two have to be changed
+together until it does.
+
 | | |
 |---|---|
 | Login | `+919000000001` — Michael D'Souza, `admin` + `plans_admin` |
-| Plan | Annual, 365 days, ₹18,000, 15 pause days |
-| Membership | Started 30 days ago, one 3-day pause already taken |
-| Payment | ₹18,000 UPI, paid and reconciled |
+| Plans | The five sold on the landing page — Monthly ₹2,000, 3 Month ₹4,000, 6 Month ₹6,000, Early Bird ₹8,000, Annual ₹10,000 |
+| Membership | Early Bird, started 30 days ago, one 3-day pause already taken |
+| Payment | ₹8,000 UPI, paid and reconciled — balance settles to zero |
 | Lead | One `free_trial` lead, status `new` |
 
 ## Connecting to a hosted project

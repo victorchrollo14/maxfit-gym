@@ -26,25 +26,45 @@ jobs:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
+      # There is no hosted project yet. Rather than fail every push until there
+      # is, skip and say so — a workflow that is always red is one nobody reads.
+      # It starts working the moment the secrets exist, with no edit here.
+      - name: Check for credentials
+        id: cfg
+        working-directory: .
+        run: |
+          if [ -z "${{ secrets.SUPABASE_PROJECT_ID }}" ]; then
+            echo "::notice::No Supabase secrets set — skipping. See apps/backend/README.md."
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == 'true'
 
       # Pinned to the version in apps/backend/package.json — this touches the
       # production database, so it shouldn't change under us on its own.
       - uses: supabase/setup-cli@v1
+        if: steps.cfg.outputs.ready == 'true'
         with:
           version: 2.114.0
 
       - name: Link the project
+        if: steps.cfg.outputs.ready == 'true'
         run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
 
       # What would run, in the log, before anything runs — the only record of
       # what a deploy was about to change if it then fails half way.
       - name: Plan
+        if: steps.cfg.outputs.ready == 'true'
         run: supabase db push --linked --dry-run
 
       # No --include-seed: seed.sql is dev data and must never reach production.
       - name: Apply migrations
+        if: steps.cfg.outputs.ready == 'true'
         run: supabase db push --linked
 
       - name: Confirm applied
+        if: steps.cfg.outputs.ready == 'true'
         run: supabase migration list --linked

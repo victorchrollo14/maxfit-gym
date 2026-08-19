@@ -80,8 +80,13 @@ project on every push to `main` that touches `supabase/migrations/` or `config.t
 Nothing else triggers it, and runs are queued rather than cancelled — two overlapping
 pushes are how you get a half-migrated database.
 
-⚠️ **There is no hosted project yet, so the workflow will fail until one exists.**
-It is written and waiting; three things have to happen first.
+**There is no hosted project yet, so the workflow skips itself** — it checks for
+`SUPABASE_PROJECT_ID` first and exits green with a notice if it's missing, rather
+than painting `main` red on every push. It starts applying migrations the moment the
+secrets exist, with no change to the file. The flip side: if the secrets are ever
+deleted, deploys stop silently, and the only clue is the notice on the run.
+
+Three things have to happen first.
 
 **1. Create the project** at supabase.com, in a region near Bengaluru
 (`ap-south-1`, Mumbai). Note the project ref from the URL and the database password

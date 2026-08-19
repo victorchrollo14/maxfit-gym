@@ -279,12 +279,36 @@ create unique index payments_reference_uniq
 
 create sequence invoice_seq;
 
+create table leads (
+  id     uuid primary key default gen_random_uuid(),
+  name   text not null check (length(btrim(name)) between 1 and 120),
+  phone  text not null check (phone ~ '^\+[1-9][0-9]{7,14}$'),
+  email  text check (email is null or length(email) <= 254),
+
+  source text not null default 'free_trial'
+           check (source in ('free_trial', 'call', 'whatsapp', 'walk_in', 'referral')),
+
+  status text not null default 'new'
+           check (status in ('new', 'hot', 'warm', 'cold', 'converted', 'lost')),
+
+  notes text,
+
+  user_id      uuid references user_profiles(id) on delete set null,
+  converted_at timestamptz,
+
+  admin_id   uuid references user_profiles(id) on delete set null,
+  created_at timestamptz not null default now(),
+
+  check ((status = 'converted') = (converted_at is not null))
+);
+
 alter table user_profiles    enable row level security;
 alter table plans            enable row level security;
 alter table memberships      enable row level security;
 alter table membership_users enable row level security;
 alter table pause_days       enable row level security;
 alter table payments         enable row level security;
+alter table leads            enable row level security;
 
 create policy "SELECT" on user_profiles for select to authenticated
   using ((select auth.uid()) = id or (select has_claim('admin')));
@@ -339,6 +363,19 @@ create policy "INSERT" on payments for insert to authenticated
 create policy "UPDATE" on payments for update to authenticated
   using ((select has_claim('admin')));
 
+-- Column-level grant, so an anonymous visitor cannot set status or user_id.
+grant insert (name, phone, email, source) on leads to anon;
+
+create policy "INSERT anon" on leads for insert to anon
+  with check (source = 'free_trial');
+
+create policy "SELECT" on leads for select to authenticated
+  using ((select has_claim('admin')));
+create policy "INSERT" on leads for insert to authenticated
+  with check ((select has_claim('admin')));
+create policy "UPDATE" on leads for update to authenticated
+  using ((select has_claim('admin')));
+
 create index user_profiles_phone_idx     on user_profiles(phone);
 create index membership_users_user_idx   on membership_users(user_id);
 create index memberships_end_date_idx    on memberships(end_date);
@@ -347,81 +384,6 @@ create index payments_paid_by_idx        on payments(paid_by);
 create index payments_pending_idx        on payments(created_at) where status = 'pending';
 create index payments_unreconciled_idx   on payments(created_at)
   where status = 'paid' and reconciled_at is null and method <> 'cash';
-
-create or replace view membership_seats
-with (security_invoker = true) as
-select
-  mu.id                                             as membership_user_id,
-  mu.membership_id,
-  mu.user_id,
-  mu.status,
-  m.plan_id,
-  pl.name                                           as plan_name,
-  m.start_date,
-  m.end_date                                        as contractual_end_date,
-  pl.pause_days_allowed,
-  coalesce(pd.days_used, 0)                         as pause_days_used,
-  pl.pause_days_allowed - coalesce(pd.days_used, 0) as pause_days_remaining,
-  m.end_date + coalesce(pd.days_used, 0)            as effective_end_date
-from membership_users mu
-join memberships m on m.id = mu.membership_id
-join plans pl      on pl.id = m.plan_id
-left join lateral (
-  select sum(paused_to - paused_from + 1)::int as days_used
-  from pause_days
-  where membership_id = m.id
-) pd on true;
-
-create or replace view active_memberships
-with (security_invoker = true) as
-select distinct on (user_id) *
-from membership_seats
-where status = 'active'
-  and today_ist() between start_date and effective_end_date
-order by user_id, effective_end_date desc;
-
-create or replace view expiring_soon
-with (security_invoker = true) as
-select am.*
-from active_memberships am
-where am.effective_end_date between today_ist() and today_ist() + 7
-  and not exists (
-    select 1 from membership_seats s2
-    where s2.user_id = am.user_id
-      and s2.start_date > am.effective_end_date
-  );
-
-create or replace view paused_today
-with (security_invoker = true) as
-select
-  pd.id as pause_id,
-  pd.membership_id,
-  mu.user_id,
-  pd.paused_from,
-  pd.paused_to
-from pause_days pd
-join membership_users mu on mu.membership_id = pd.membership_id
-where today_ist() between pd.paused_from and pd.paused_to;
-
-create or replace view membership_balances
-with (security_invoker = true) as
-select
-  m.id                                                      as membership_id,
-  pl.price                                                  as plan_price,
-  m.discount_amount,
-  pl.price - m.discount_amount                              as amount_due,
-  coalesce(pay.total_paid, 0)                               as amount_paid,
-  pl.price - m.discount_amount - coalesce(pay.total_paid, 0) as balance
-from memberships m
-join plans pl on pl.id = m.plan_id
-left join lateral (
-  select sum(amount) as total_paid
-  from payments
-  where membership_id = m.id and status = 'paid'
-) pay on true;
-
-grant select on membership_seats, active_memberships, expiring_soon,
-                paused_today, membership_balances to authenticated;
 
 create or replace function create_membership(
   p_user_ids   uuid[],
@@ -455,12 +417,18 @@ begin
 
   select greatest(
            today_ist(),
-           coalesce(max(s.effective_end_date) + 1, today_ist())
+           coalesce(max(m.end_date + coalesce(pd.days_used, 0)) + 1, today_ist())
          )
     into v_start
-  from membership_seats s
-  where s.user_id = any(p_user_ids)
-    and s.status = 'active';
+  from membership_users mu
+  join memberships m on m.id = mu.membership_id
+  left join lateral (
+    select sum(paused_to - paused_from + 1)::int as days_used
+    from pause_days
+    where membership_id = m.id
+  ) pd on true
+  where mu.user_id = any(p_user_ids)
+    and mu.status = 'active';
 
   insert into memberships
     (plan_id, start_date, end_date, discount_amount, discount_reason, created_by)
@@ -484,3 +452,6 @@ grant select, insert, update, delete on all tables in schema public
   to authenticated, service_role;
 grant usage, select on all sequences in schema public
   to authenticated, service_role;
+
+-- Leads are marked 'lost', never removed. No delete policy either.
+revoke delete on leads from authenticated;

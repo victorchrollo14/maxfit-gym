@@ -73,10 +73,48 @@ together until it does.
 | Payment | ₹8,000 UPI, paid and reconciled — balance settles to zero |
 | Lead | One `free_trial` lead, status `new` |
 
-## Connecting to a hosted project
+## Deploying
 
-`supabase link --project-ref <ref>`, then `pnpm db:push`. Not done yet — there is
-no hosted project.
+`.github/workflows/supabase-migrate.yml` runs `supabase db push` against the linked
+project on every push to `main` that touches `supabase/migrations/` or `config.toml`.
+Nothing else triggers it, and runs are queued rather than cancelled — two overlapping
+pushes are how you get a half-migrated database.
+
+⚠️ **There is no hosted project yet, so the workflow will fail until one exists.**
+It is written and waiting; three things have to happen first.
+
+**1. Create the project** at supabase.com, in a region near Bengaluru
+(`ap-south-1`, Mumbai). Note the project ref from the URL and the database password
+you set — you cannot read the password back later.
+
+**2. Add three GitHub secrets** (Settings → Secrets and variables → Actions). The
+workflow declares `environment: production`, so put them on that environment if you
+want a required reviewer on schema changes, or at repository level if not.
+
+| Secret | Where it comes from |
+|---|---|
+| `SUPABASE_ACCESS_TOKEN` | supabase.com/dashboard/account/tokens — a personal access token |
+| `SUPABASE_PROJECT_ID` | the project ref, e.g. `abcdefghijklmnop` |
+| `SUPABASE_DB_PASSWORD` | the database password from step 1 |
+
+**3. Point the web app at it.** In Vercel, set `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` from Project Settings → API. Both are public and end up in
+the browser bundle; RLS is what keeps the anon key harmless. The service-role key
+never goes near Vercel.
+
+**What the workflow deliberately does not do:**
+
+- **No seed.** `db push` applies migrations only. `seed.sql` is the dev dataset and
+  must never reach production — that is why there is no `--include-seed`.
+- **No edge functions.** There are none yet. When `send-otp` lands, add a
+  `supabase functions deploy` step, or a second workflow keyed on `functions/**`.
+- **No rollback.** Migrations are forward-only. A bad one is fixed by writing the
+  next migration, not by reverting the commit — reverting removes the file but the
+  remote history table still says it ran.
+
+⚠️ **This applies schema changes to production the moment they land on `main`,**
+and this repo commits straight to `main`. Check `supabase db diff` locally before
+pushing anything that touches a table with real data in it.
 
 ## Endpoints v1 needs
 

@@ -24,7 +24,60 @@
       content="Proper equipment, coaches who correct your form, and passes from ₹8,000 a year. Book a free trial at maxfit Bengaluru."
     />
     <meta property="og:image" content="https://maxfitbangalore.in/gym/hero.jpg" />
+    <meta property="og:image:alt" content="The training floor at maxfit Gym, Bengaluru" />
+    <meta property="og:locale" content="en_IN" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Local-business markup is what puts a gym in the map pack, and it has to
+         be in the served HTML rather than injected by React for a crawler to
+         see it without running JS. Keep in sync with `gym` in src/content.ts. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HealthClub",
+        "@id": "https://maxfitbangalore.in/#gym",
+        "name": "maxfit Gym",
+        "description": "A strength and conditioning gym in Krishnarajapuram, Bengaluru.",
+        "url": "https://maxfitbangalore.in/",
+        "image": "https://maxfitbangalore.in/gym/hero.jpg",
+        "logo": "https://maxfitbangalore.in/logo.png",
+        "telephone": "+918310890652",
+        "priceRange": "₹2000-₹10000",
+        "currenciesAccepted": "INR",
+        "paymentAccepted": "Cash, UPI",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Site No A, Kithaganur Main Rd, near Domino's Pizza",
+          "addressLocality": "Krishnarajapuram, Bengaluru",
+          "addressRegion": "Karnataka",
+          "postalCode": "560036",
+          "addressCountry": "IN"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 13.0287704,
+          "longitude": 77.7079326
+        },
+        "hasMap": "https://www.google.com/maps/search/?api=1&query=MAXFIT+GYM,+Kithaganur+Main+Rd,+Krishnarajapuram,+Bengaluru,+Karnataka+560036",
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "opens": "06:00",
+            "closes": "22:00"
+          }
+        ],
+        "sameAs": ["https://www.instagram.com/max_fit_.gym_/"]
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

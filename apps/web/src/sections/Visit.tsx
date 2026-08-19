@@ -11,7 +11,7 @@ export function Visit() {
       accent="Location"
       sub="Walk in during opening hours — no appointment needed"
     >
-      <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
+      <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
         <div>
           <BarLabel>Where we are</BarLabel>
           {/* The street line carries the display treatment; the locality line

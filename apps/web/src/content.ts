@@ -22,7 +22,7 @@ export const gym = {
   domain: 'maxfitbangalore.in',
   city: 'Bengaluru',
   email: 'hello@maxfitbangalore.in', // TODO — set this mailbox up before launch
-  instagram: 'maxfit.gym', // TODO — real handle, without the @
+  instagram: 'max_fit_.gym_', // without the @
   address: {
     line1: "Site No A, Kithaganur Main Rd, near Domino's Pizza",
     line2: 'Kithiganur, Krishnarajapuram, Bengaluru, Karnataka 560036',

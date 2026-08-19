@@ -3,7 +3,7 @@
 ## Running it
 
 ```sh
-cp .env.example .env.local     # then fill in VITE_SUPABASE_ANON_KEY
+cp .env.example .env.local     # then fill in VITE_SUPABASE_PUBLISHABLE_KEY
 pnpm dev
 ```
 

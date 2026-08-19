@@ -31,8 +31,9 @@ pnpm db:reset     # re-apply migrations + seed; the one you'll use constantly
 | Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 | Mailpit (catches outbound mail) | `http://127.0.0.1:54324` |
 
-The anon key it prints goes in `apps/web` as `VITE_SUPABASE_ANON_KEY`. Local keys are
-the same on every machine and are not secret.
+The publishable key it prints goes in `apps/web` as `VITE_SUPABASE_PUBLISHABLE_KEY`.
+Local keys are the same on every machine and are not secret. `db:start` also prints a
+legacy `anon` JWT — that still works, but the publishable key is the current one.
 
 Other scripts: `pnpm db:diff` (does the running DB match the migrations?),
 `pnpm db:stop`, `pnpm db:push` (apply to the linked remote project).
@@ -103,9 +104,9 @@ want a required reviewer on schema changes, or at repository level if not.
 | `SUPABASE_DB_PASSWORD` | the database password from step 1 |
 
 **3. Point the web app at it.** In Vercel, set `VITE_SUPABASE_URL` and
-`VITE_SUPABASE_ANON_KEY` from Project Settings → API. Both are public and end up in
-the browser bundle; RLS is what keeps the anon key harmless. The service-role key
-never goes near Vercel.
+`VITE_SUPABASE_PUBLISHABLE_KEY` from Project Settings → API keys. Both are public and
+end up in the browser bundle; RLS is what keeps the publishable key harmless. The
+secret / service-role key never goes near Vercel.
 
 **What the workflow deliberately does not do:**
 
@@ -128,7 +129,7 @@ pushing anything that touches a table with real data in it.
 | `send-otp` | Supabase **Send SMS hook**: delivers the OTP Auth generated, over WhatsApp Cloud API |
 
 `leads` is not on this list any more — the landing page inserts into the table directly
-with the anon key, fenced in by a column-level grant and an insert policy. See
+with the publishable key, fenced in by a column-level grant and an insert policy. See
 [V1.md](../../V1.md#leads-without-an-endpoint).
 
 Specs in [V1.md](../../V1.md). `send-otp` is not called by our own code — Supabase Auth
@@ -144,7 +145,7 @@ because a login is blocked on its response.
   headers. The Vercel-function version of this API wouldn't have — that's the
   cost of the split, and it's one shared helper.
 - **The service-role key never reaches the browser.** It lives in function env
-  only. The web app gets the anon key and is fenced in by RLS.
+  only. The web app gets the publishable key and is fenced in by RLS.
 
 Roles ride in the JWT via `auth.users.raw_app_meta_data`, which only the
 service-role key can write — see [PROJECT.md](../../PROJECT.md#roles).

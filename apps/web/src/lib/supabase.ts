@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 const url = import.meta.env.VITE_SUPABASE_URL
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
 let client: SupabaseClient | null = null
 
@@ -9,18 +9,18 @@ let client: SupabaseClient | null = null
    vars are missing, and this module is reached from the hero form, so a
    mistyped Vercel variable would white-screen the landing page. */
 export function getSupabase(): SupabaseClient {
-  if (!url || !anonKey) {
+  if (!url || !publishableKey) {
     throw new Error(
-      'Supabase is not configured — set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY',
+      'Supabase is not configured — set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY',
     )
   }
-  client ??= createClient(url, anonKey, {
+  client ??= createClient(url, publishableKey, {
     auth: { detectSessionInUrl: false, persistSession: true },
   })
   return client
 }
 
-export const isSupabaseConfigured = Boolean(url && anonKey)
+export const isSupabaseConfigured = Boolean(url && publishableKey)
 
 if (import.meta.env.DEV && !isSupabaseConfigured) {
   console.warn(

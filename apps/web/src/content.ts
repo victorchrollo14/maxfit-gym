@@ -130,6 +130,7 @@ export const plans: Plan[] = [
     id: 'quarterly',
     name: '3 Month Pass',
     price: 4000,
+    strikePrice: 6000,
     period: 'quarter',
     tagline: 'A season to build the habit.',
     features: [
@@ -143,6 +144,7 @@ export const plans: Plan[] = [
     id: 'half-yearly',
     name: '6 Month Pass',
     price: 6000,
+    strikePrice: 12000,
     period: 'half-year',
     tagline: 'Half a year, at half the monthly rate.',
     features: [

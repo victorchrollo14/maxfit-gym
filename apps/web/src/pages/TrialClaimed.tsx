@@ -62,7 +62,7 @@ export function TrialClaimed() {
         </div>
 
         <div className="mt-10">
-          <MapEmbed className="h-80 w-full sm:h-96" />
+          <MapEmbed className="h-80 w-full sm:h-96 md:aspect-square md:h-auto" />
         </div>
 
         <address className="mt-8 not-italic">

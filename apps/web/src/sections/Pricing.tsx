@@ -2,7 +2,6 @@ import { Section } from '../components/Section'
 import { Cta } from '../components/Cta'
 import { FaWhatsapp } from 'react-icons/fa'
 import {
-  earlyBird,
   gym,
   monthlyRate,
   periodLabel,
@@ -49,7 +48,13 @@ function PlanCard({ plan }: { plan: Plan }) {
       )}
 
       <h3 className="display text-2xl">{plan.name}</h3>
-      <p className="mt-1.5 text-sm text-muted text-pretty">{plan.tagline}</p>
+      {/* Fixed heights so the price and savings rows line up across cards
+          whatever the tagline wraps to, and whether or not a plan saves
+          anything — Monthly is the rate everything else is measured against,
+          so it never does. */}
+      <p className="mt-1.5 min-h-10 text-sm text-muted text-pretty">
+        {plan.tagline}
+      </p>
 
       <div className="mt-6 flex flex-wrap items-baseline gap-x-2.5">
         {plan.strikePrice && (
@@ -65,18 +70,10 @@ function PlanCard({ plan }: { plan: Plan }) {
         )}
       </div>
 
-      {savings && (
-        <p className="eyebrow mt-3 text-accent">
-          Save {formatINR(savings.amount)} — {savings.percent}% off monthly
-        </p>
-      )}
-
-      {plan.featured && (
-        <p className="eyebrow mt-5 inline-flex items-center gap-2 self-start rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-accent">
-          <span className="size-1.5 rounded-full bg-accent" />
-          Only {earlyBird.seatsLeft} early bird passes left
-        </p>
-      )}
+      <p className="eyebrow mt-3 min-h-4 text-accent">
+        {savings &&
+          `Save ${formatINR(savings.amount)} — ${savings.percent}% off monthly`}
+      </p>
 
       {/* Plans are sold in person, so the card hands the conversation to
           WhatsApp with the plan already named rather than to a form. */}

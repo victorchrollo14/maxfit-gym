@@ -9,16 +9,22 @@ const embedKey = import.meta.env.VITE_GOOGLE_MAPS_EMBED_KEY
    With a key, the Maps Embed API labels the pin itself — that is the one we
    want, and it is free and unmetered. Without one there is no keyless URL that
    draws both a pin and a label: `q=<name>` gives an info card and no pin,
-   `q=<lat>,<lng>` gives a pin and no label (checked at zoom 17-20). So the
-   keyless path fakes the label in HTML, which only holds because that URL
-   centres exactly on the marker — hence `pointer-events-none`, since panning
-   would slide the map out from under it. Set the key and all of that goes. */
+   `q=<lat>,<lng>` gives a pin and no label (checked at zoom 17-20).
+
+   So the keyless path names the place in a corner card instead of floating a
+   fake label over the marker. Anything positioned over the marker is a lie the
+   moment the map moves — pan, zoom or switch to satellite and it is pointing
+   at the wrong place, or gone. The card is attached to the frame, not the map,
+   so it survives all three. Set the key and it goes.
+
+   Click-to-activate stays for a separate reason: an always-live map swallows
+   one-finger scroll on touch, halfway down a long page. */
 const src = embedKey
   ? `https://www.google.com/maps/embed/v1/place?key=${embedKey}&q=${encodeURIComponent(gym.mapsQuery)}&zoom=18`
   : gym.mapEmbedUrl
 
 export function MapEmbed({ className = 'h-80 w-full' }: { className?: string }) {
-  const [loaded, setLoaded] = useState(false)
+  const [active, setActive] = useState(!!embedKey)
 
   if (!src) {
     return (
@@ -37,19 +43,34 @@ export function MapEmbed({ className = 'h-80 w-full' }: { className?: string }) 
         src={src}
         title={`Map to ${gym.name} gym`}
         loading="lazy"
-        tabIndex={embedKey ? undefined : -1}
-        onLoad={() => setLoaded(true)}
+        tabIndex={active ? undefined : -1}
         referrerPolicy="no-referrer-when-downgrade"
-        className={`border-0 ${embedKey ? '' : 'pointer-events-none'} ${className}`}
+        className={`border-0 ${active ? '' : 'pointer-events-none'} ${className}`}
       />
 
+      {!active && (
+        <button
+          type="button"
+          onClick={() => setActive(true)}
+          aria-label={`Activate the map to ${gym.name} gym`}
+          className="absolute inset-0 cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+        />
+      )}
+
       {!embedKey && (
-        <span
+        /* Inert: the address is already in the Location section as an
+           <address>, and clicks belong to the map underneath. */
+        <div
           aria-hidden="true"
-          className={`absolute top-[calc(50%-1.25rem)] left-[calc(50%+1.15rem)] -translate-y-1/2 text-[0.9375rem] font-bold whitespace-nowrap text-neutral-900 transition-opacity duration-300 [text-shadow:0_0_4px_#fff,0_0_4px_#fff,0_0_4px_#fff,0_0_4px_#fff,0_0_4px_#fff] ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className="pointer-events-none absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] rounded-md bg-white px-3.5 py-2.5 shadow-lg"
         >
-          {gym.name} gym
-        </span>
+          <p className="display text-sm leading-tight text-neutral-900">
+            {gym.name} gym
+          </p>
+          <p className="mt-1 text-xs leading-snug text-pretty text-neutral-600">
+            {gym.address.line1}
+          </p>
+        </div>
       )}
 
       <a

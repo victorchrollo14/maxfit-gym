@@ -2,6 +2,7 @@ import { MapEmbed } from '../components/MapEmbed'
 import { Section } from '../components/Section'
 import { BarLabel } from '../components/SectionHeading'
 import { gym } from '../content'
+import { formatList } from '../lib/format'
 
 export function Visit() {
   return (
@@ -25,6 +26,16 @@ export function Visit() {
               {gym.address.line2}
             </p>
           </address>
+
+          <div className="mt-10">
+            <BarLabel>Nearby</BarLabel>
+            {/* Named in full because a "gym near <locality>" search has nothing
+                to match unless the page says the locality out loud. */}
+            <p className="mt-4 text-sm text-muted text-pretty">
+              We're on Kithaganur Main Road, right by {gym.landmark} — a short
+              ride from {formatList(gym.nearby)}.
+            </p>
+          </div>
 
           <div className="mt-10">
             <BarLabel>Opening hours</BarLabel>

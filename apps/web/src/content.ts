@@ -9,6 +9,11 @@
    a self-referencing object literal can't. */
 const coords = { lat: 13.0287704, lng: 77.7079326 }
 
+/* The landmark locals actually navigate by. The postal address keeps Domino's
+   — it has to match the Google Maps listing exactly — so this one carries the
+   Location copy and the meta description instead. */
+const landmark = 'Garden City University'
+
 export const gym = {
   name: 'maxfit',
   tagline: 'Train hard. Get strong. Stay consistent.',
@@ -27,9 +32,12 @@ export const gym = {
   city: 'Bengaluru',
   email: 'hello@maxfitbangalore.in', // TODO — set this mailbox up before launch
   instagram: 'max_fit_.gym_', // without the @
+  landmark,
+  /* Verbatim from the Google Maps listing — the schema, the page and the
+     listing all have to agree for Google to treat them as the same place. */
   address: {
     line1: "Site No A, Kithaganur Main Rd, near Domino's Pizza",
-    line2: 'Kithiganur, Krishnarajapuram, Bengaluru, Karnataka 560036',
+    line2: 'Krishnarajapuram, Kithiganur, Bengaluru, Karnataka 560036',
   },
   /* Keyless fallback, used only when VITE_GOOGLE_MAPS_EMBED_KEY is unset. The
      marker form `q=<lat>,<lng>` is not interchangeable with `q=<place name>`:
@@ -41,10 +49,23 @@ export const gym = {
   /* Query for the keyed Embed API. Name, not coordinates — that is what makes
      Google label the pin. */
   mapsQuery:
-    'MAXFIT GYM, Kithaganur Main Rd, Krishnarajapuram, Bengaluru, Karnataka 560036',
-  /* Where the map's "Open in Maps" button goes — same place, full app. */
-  mapsUrl:
-    'https://www.google.com/maps/search/?api=1&query=MAXFIT+GYM,+Kithaganur+Main+Rd,+Krishnarajapuram,+Bengaluru,+Karnataka+560036',
+    'MAXFIT GYM, Site No A, Kithaganur Main Rd, Krishnarajapuram, Kithiganur, Bengaluru, Karnataka 560036',
+  /* Where the map's "Open in Maps" button goes. The listing's CID, decoded
+     from the share link — a name search can land on a similarly-named place,
+     this can't. */
+  mapsUrl: 'https://maps.google.com/?cid=5138046663084002118',
+  /* Localities the gym draws from, nearest first. Used in the Location section
+     and as areaServed in the structured data — the page has to say these names
+     somewhere for a "gym near <locality>" search to have anything to match. */
+  nearby: [
+    'Kithaganur',
+    'Kithaganur Colony',
+    'Battarahalli',
+    'Medahalli',
+    'Margondanahalli',
+    'Hallehalli',
+    'K.R. Puram',
+  ],
   /* Same hours every day, so this is one row — the components map over it. */
   hours: [{ days: 'Every day', time: '6:00 AM – 10:00 PM' }],
   /* The same hours in 24h, for structured data. Keep the two in step. */
@@ -193,6 +214,32 @@ export const plans: Plan[] = [
     ],
   },
 ]
+
+/**
+ * Head tags for the homepage. Injected into index.html at build time by
+ * vite.config.ts, so the title, the OG tags and the schema all come from here
+ * rather than three hand-edited copies.
+ *
+ * Keep `title` under ~60 characters and `description` under ~160 — past that
+ * Google truncates mid-sentence.
+ */
+const earlyBirdPrice = plans
+  .find((p) => p.id === 'early-bird')!
+  .price.toLocaleString('en-IN')
+
+export const seo = {
+  title: `Strength & Conditioning Gym in K.R. Puram, Bengaluru — ${gym.name}`,
+  description: `Strength & conditioning gym on Kithaganur Main Rd, K.R. Puram, by ${gym.landmark}. Early Bird year pass ₹${earlyBirdPrice}. Free trial, open every day.`,
+  /* Link previews get the offer first — a shared link is read as an ad. */
+  ogDescription: `Proper racks, real coaching, no waiting at peak hour. Early Bird annual pass ₹${earlyBirdPrice} — first ${earlyBird.totalSeats} members. Kithaganur Main Rd, K.R. Puram.`,
+  image: {
+    url: '/gym/hero.jpg',
+    width: 1920,
+    height: 1080,
+    alt: `The training floor at ${gym.name} Gym, Bengaluru`,
+  },
+  logo: { url: '/logo.png', width: 1136, height: 1054 },
+} as const
 
 /** The rate every longer term is sold against. Keep in sync with the monthly plan. */
 export const monthlyRate = 2000

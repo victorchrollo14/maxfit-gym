@@ -6,12 +6,17 @@ insert into plans (id, family, name, duration_days, price, max_seats, pause_days
  ('a0000000-0000-0000-0000-000000000005','annual',    'Annual Pass',     365, 10000, 1, 15, true),
  ('a0000000-0000-0000-0000-000000000006','couple',    'Couple Pass',     365, 16000, 2, 15, true);
 
+-- The token columns are '' rather than null because GoTrue reads them as
+-- strings and errors on null during an email OTP.
 insert into auth.users
- (id, instance_id, aud, role, phone, phone_confirmed_at,
+ (id, instance_id, aud, role, phone, phone_confirmed_at, email, email_confirmed_at,
+  confirmation_token, email_change, email_change_token_new, recovery_token,
   raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
  ('d0000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated',
-  '+919000000001', now(), '{"admin":true,"plans_admin":true}', '{"name":"Michael D''Souza"}', now(), now());
+  '+919000000001', now(), 'victor20030214@gmail.com', now(),
+  '', '', '', '',
+  '{"admin":true,"plans_admin":true,"claims_admin":true}', '{"name":"Michael D''Souza"}', now(), now());
 
 insert into memberships (id, plan_id, start_date, end_date, created_by) values
  ('b0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000001',

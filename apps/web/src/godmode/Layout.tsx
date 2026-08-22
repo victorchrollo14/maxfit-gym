@@ -192,10 +192,10 @@ export function Layout() {
       </aside>
 
       <Drawer.Backdrop isOpen={drawerOpen} onOpenChange={setDrawerOpen}>
-        <Drawer.Content placement="left" className="w-64">
+        <Drawer.Content placement="left">
           <Drawer.Dialog
             aria-label="Godmode menu"
-            className="flex flex-col items-start p-0"
+            className="flex w-64 flex-col items-start p-0"
           >
             {sidebar(() => setDrawerOpen(false))}
           </Drawer.Dialog>

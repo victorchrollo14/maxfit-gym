@@ -63,7 +63,7 @@ const dashboardRoute = createRoute({
 const leadsRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'leads',
-  component: lazyRouteComponent(() => import('./godmode/Leads'), 'Leads'),
+  component: lazyRouteComponent(() => import('./godmode/leads/Leads'), 'Leads'),
 })
 
 const claimsRoute = createRoute({

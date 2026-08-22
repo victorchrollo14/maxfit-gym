@@ -38,12 +38,27 @@ legacy `anon` JWT — that still works, but the publishable key is the current o
 Other scripts: `pnpm db:diff` (does the running DB match the migrations?),
 `pnpm db:stop`, `pnpm db:push` (apply to the linked remote project).
 
-**Logging in locally.** Auth is phone OTP and there's no WhatsApp in the local stack,
-so the code is written to the container logs instead of sent:
+**Logging in locally.** Two channels, because staff and members sign in differently:
+godmode (`/godmode/login`) is **email OTP**, the member portal is **phone OTP**.
+
+Email codes land in Mailpit at <http://127.0.0.1:54324> — sign in as
+`victor20030214@gmail.com` and read the six digits there. Phone codes have nowhere
+to go without WhatsApp, so they're written to the container logs instead:
 
 ```sh
 docker logs supabase_auth_backend 2>&1 | grep -i otp | tail -5
 ```
+
+⚠️ **The Magic Link email template has to carry `{{ .Token }}`.** GoTrue's default
+sends a *link*, godmode asks for a *code*, and the code is not recoverable from
+anywhere else — not the mail, not the container logs, not `auth.users`. Set it in the
+dashboard under Authentication → Emails → Magic Link. This is dashboard state, not
+repo state: nothing in `supabase/` configures it, and `db push` never touches it.
+
+Until it is set on a given project, staff sign-in on that project does not work.
+Clicking the default link is not a way round it either — the app sets
+`detectSessionInUrl: false` and `site_url` points at port 3000, so the link lands
+nowhere useful.
 
 ### Persistence
 
@@ -68,7 +83,7 @@ together until it does.
 
 | | |
 |---|---|
-| Login | `+919000000001` — Michael D'Souza, `admin` + `plans_admin` |
+| Login | `victor20030214@gmail.com` (godmode) / `+919000000001` (portal) — Michael D'Souza, `admin` + `plans_admin` + `claims_admin` |
 | Plans | The six sold on the landing page — Monthly ₹2,000, 3 Month ₹4,000, 6 Month ₹6,000, Early Bird ₹8,000, Annual ₹10,000, Couple ₹16,000 (2 seats) |
 | Membership | Early Bird, started 30 days ago, one 3-day pause already taken |
 | Payment | ₹8,000 UPI, paid and reconciled — balance settles to zero |

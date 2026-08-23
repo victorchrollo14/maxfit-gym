@@ -4,6 +4,7 @@ import { LuRefreshCw } from 'react-icons/lu'
 import { getSupabase } from '../../lib/supabase'
 import { PageHeader } from '../PageHeader'
 import { AddLead } from './AddLead'
+import { DayFilter } from './DayFilter'
 import { LeadColumn } from './LeadColumn'
 import { LeadDrawer } from './LeadDrawer'
 import {
@@ -12,7 +13,6 @@ import {
   type Lead,
   columnAccent,
   dayBounds,
-  todayLocal,
 } from './shared'
 
 export function Leads() {
@@ -105,21 +105,7 @@ export function Leads() {
           <Input placeholder="Search name or phone" />
         </SearchField>
 
-        <input
-          type="date"
-          aria-label="Filter by day"
-          value={day}
-          max={todayLocal()}
-          onChange={(e) => setDay(e.target.value)}
-          className="h-10 rounded-(--field-radius) border border-border bg-field-background px-3 text-sm text-field-foreground"
-        />
-        <Button
-          variant="secondary"
-          size="sm"
-          onPress={() => setDay(day === todayLocal() ? '' : todayLocal())}
-        >
-          {day === todayLocal() ? 'All days' : 'Today'}
-        </Button>
+        <DayFilter day={day} onChange={setDay} />
       </div>
 
       <div className="min-h-0 w-full flex-1">

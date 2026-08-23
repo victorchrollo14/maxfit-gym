@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { usePostHog } from '@posthog/react'
 import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { LuCheck, LuClock, LuMapPin } from 'react-icons/lu'
 import { CopyButton } from '../components/CopyButton'
@@ -7,6 +8,7 @@ import { HeroBackdrop } from '../components/HeroBackdrop'
 import { Logo } from '../components/Logo'
 import { MapEmbed } from '../components/MapEmbed'
 import { fullAddress, gym } from '../content'
+import { useCtaTracker } from '../lib/analytics'
 import { telHref, whatsappHref } from '../lib/links'
 import { takeConversionToken } from '../lib/trialClaim'
 
@@ -15,6 +17,9 @@ const waHref = whatsappHref(
 )
 
 export function TrialClaimed() {
+  const posthog = usePostHog()
+  const track = useCtaTracker('trial_claimed')
+
   /* No head manager in the app, and this is the only route that needs to differ
      from index.html. */
   useEffect(() => {
@@ -32,11 +37,12 @@ export function TrialClaimed() {
     }
   }, [])
 
-  /* Once per claim, not once per view. TODO (V1 §7): send to PostHog. */
+  /* Once per claim, not once per view — a reload or a shared link must not
+     count a second conversion. */
   useEffect(() => {
     if (!takeConversionToken()) return
-    console.info('conversion: free trial claimed')
-  }, [])
+    posthog.capture('trial_conversion')
+  }, [posthog])
 
   return (
     <div className="relative min-h-dvh overflow-hidden bg-background text-foreground">
@@ -102,13 +108,25 @@ export function TrialClaimed() {
         </div>
 
         <div className="mx-auto mt-10 grid max-w-lg gap-3 sm:grid-cols-2">
-          <Cta href={telHref} size="lg" className="w-full">
+          <Cta
+            href={telHref}
+            size="lg"
+            className="w-full"
+            onClick={() => track('call')}
+          >
             <FaPhoneAlt className="size-4" aria-hidden="true" />
             Call now
           </Cta>
-          <Cta href={waHref} size="lg" tone="white" className="w-full" external>
+          <Cta
+            href={waHref}
+            size="lg"
+            tone="white"
+            className="w-full"
+            external
+            onClick={() => track('whatsapp')}
+          >
             <FaWhatsapp className="size-5" aria-hidden="true" />
-            Chat on WhatsApp
+            Chat now
           </Cta>
         </div>
 

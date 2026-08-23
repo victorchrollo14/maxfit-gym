@@ -1,5 +1,5 @@
 import { Section } from '../components/Section'
-import { Cta } from '../components/Cta'
+import { CtaPair } from '../components/CtaPair'
 import { FaDumbbell } from 'react-icons/fa'
 import { MdFitnessCenter } from 'react-icons/md'
 import { TbBarbell, TbJumpRope, TbStretching, TbTreadmill } from 'react-icons/tb'
@@ -42,7 +42,7 @@ export function Equipment() {
       </div>
 
       <div className="mt-12 text-center">
-        <Cta href="#enquiry">Train here free for a day</Cta>
+        <CtaPair location="equipment" />
       </div>
     </Section>
   )

@@ -1,27 +1,48 @@
 import { FaEnvelope, FaInstagram, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
-import { Cta } from '../components/Cta'
+import { CtaPair } from '../components/CtaPair'
 import { Logo } from '../components/Logo'
 import { earlyBird, gym } from '../content'
+import { type CtaAction, useCtaTracker } from '../lib/analytics'
+import { telHref, whatsappHref } from '../lib/links'
 
-const telHref = `tel:${gym.phone.replace(/\s/g, '')}`
-const waHref = `https://wa.me/${gym.whatsapp}?text=${encodeURIComponent(
+const waHref = whatsappHref(
   `Hi ${gym.name}, I'd like to know more about membership.`,
-)}`
+)
 
-const socials = [
-  { label: `Call ${gym.phone}`, href: telHref, Icon: FaPhoneAlt, external: false },
-  { label: 'Chat on WhatsApp', href: waHref, Icon: FaWhatsapp, external: true },
+const socials: {
+  label: string
+  href: string
+  Icon: typeof FaPhoneAlt
+  external: boolean
+  action: CtaAction
+}[] = [
+  {
+    label: `Call ${gym.phone}`,
+    href: telHref,
+    Icon: FaPhoneAlt,
+    external: false,
+    action: 'call',
+  },
+  {
+    label: 'Chat on WhatsApp',
+    href: waHref,
+    Icon: FaWhatsapp,
+    external: true,
+    action: 'whatsapp',
+  },
   {
     label: `${gym.name} on Instagram`,
     href: `https://instagram.com/${gym.instagram}`,
     Icon: FaInstagram,
     external: true,
+    action: 'instagram',
   },
   {
     label: `Email ${gym.email}`,
     href: `mailto:${gym.email}`,
     Icon: FaEnvelope,
     external: false,
+    action: 'email',
   },
 ]
 
@@ -47,6 +68,8 @@ const columns = [
 ]
 
 export function Footer() {
+  const track = useCtaTracker('footer_socials')
+
   return (
     <footer>
       {/* The closing CTA stays a contained card. */}
@@ -62,13 +85,11 @@ export function Footer() {
               <span className="text-accent">transformation?</span>
             </h2>
             <p className="mt-5 text-muted text-pretty">
-              Book a free trial session and see the place for yourself.{' '}
+              Call us or message on WhatsApp and we'll show you around.{' '}
               {earlyBird.seatsLeft} early bird passes are still open.
             </p>
-            <div className="mt-8 flex justify-center">
-              <Cta href="#enquiry" size="xl">
-                Claim free trial
-              </Cta>
+            <div className="mt-8">
+              <CtaPair location="footer" size="xl" />
             </div>
           </div>
         </div>
@@ -96,6 +117,7 @@ export function Footer() {
                   <a
                     href={s.href}
                     aria-label={s.label}
+                    onClick={() => track(s.action)}
                     {...(s.external
                       ? { target: '_blank', rel: 'noopener noreferrer' }
                       : {})}
@@ -135,7 +157,11 @@ export function Footer() {
                 {gym.address.line2}
               </p>
               <p>
-                <a href={telHref} className="transition-colors hover:text-accent">
+                <a
+                  href={telHref}
+                  onClick={() => track('call')}
+                  className="transition-colors hover:text-accent"
+                >
                   {gym.phone}
                 </a>
               </p>

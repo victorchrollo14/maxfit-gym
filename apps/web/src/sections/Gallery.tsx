@@ -1,6 +1,6 @@
 import { Section } from '../components/Section'
 import { Media } from '../components/Media'
-import { Cta } from '../components/Cta'
+import { CtaPair } from '../components/CtaPair'
 import { gallery } from '../content'
 
 export function Gallery() {
@@ -33,7 +33,7 @@ export function Gallery() {
       </div>
 
       <div className="mt-12 text-center">
-        <Cta href="#enquiry">See it in person</Cta>
+        <CtaPair location="gallery" />
       </div>
     </Section>
   )

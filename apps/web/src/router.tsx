@@ -5,14 +5,58 @@ import {
   lazyRouteComponent,
   Outlet,
   redirect,
+  useRouterState,
 } from '@tanstack/react-router'
+import { PostHogProvider } from '@posthog/react'
 import { Landing } from './pages/Landing'
 import { TrialClaimed } from './pages/TrialClaimed'
 import { hasTrialClaim } from './lib/trialClaim'
 
 const rootRoute = createRootRoute({
-  component: () => <Outlet />,
+  component: RootComponent,
 })
+
+function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+
+  /* Public site only. Not mounting the provider means posthog-js never
+     initialises on /godmode, so the CRM's lead names and phone numbers can't
+     reach a session replay. */
+  if (pathname.startsWith('/godmode')) return <Outlet />
+
+  const apiKey = import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN
+  const apiHost = import.meta.env.VITE_PUBLIC_POSTHOG_HOST
+
+  if (!apiKey || !apiHost) {
+    if (import.meta.env.DEV) {
+      const missingVariable = apiKey
+        ? 'VITE_PUBLIC_POSTHOG_HOST'
+        : 'VITE_PUBLIC_POSTHOG_PROJECT_TOKEN'
+      throw new Error(
+        `${missingVariable} variable required by PostHog is missing or un-configured, this causes events to be silently missed. This error stops appearing once ${missingVariable} is configured`,
+      )
+    }
+
+    return <Outlet />
+  }
+
+  return (
+    <PostHogProvider
+      apiKey={apiKey}
+      options={{
+        api_host: apiHost,
+        defaults: '2026-01-30',
+        capture_exceptions: true,
+        debug: import.meta.env.DEV,
+        /* Already the default, pinned because the enquiry form takes a name
+           and a phone number — nothing typed should reach a replay. */
+        session_recording: { maskAllInputs: true },
+      }}
+    >
+      <Outlet />
+    </PostHogProvider>
+  )
+}
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Cta } from '../components/Cta'
+import { CtaPair } from '../components/CtaPair'
 import { Logo } from '../components/Logo'
-import { FaPhoneAlt } from 'react-icons/fa'
 import { LuMenu, LuX } from 'react-icons/lu'
 import { gym, reviews } from '../content'
 
@@ -14,8 +13,6 @@ const links = [
   ...(reviews.length > 0 ? [{ href: '#results', label: 'Results' }] : []),
   { href: '#visit', label: 'Location' },
 ]
-
-const telHref = `tel:${gym.phone.replace(/\s/g, '')}`
 
 export function Nav() {
   const [open, setOpen] = useState(false)
@@ -85,18 +82,8 @@ export function Nav() {
           </ul>
 
           {/* Desktop only — on mobile the floating bottom bar carries both CTAs. */}
-          <a
-            href={telHref}
-            className="eyebrow ml-8 hidden shrink-0 items-center gap-2 rounded-full border border-accent/50 px-4 py-2.5 text-accent transition-colors hover:bg-accent/10 lg:flex"
-          >
-            <FaPhoneAlt className="size-3.5" />
-            Call now
-          </a>
-
-          <div className="hidden shrink-0 lg:block">
-            <Cta href="#enquiry" size="md">
-              Free trial
-            </Cta>
+          <div className="ml-8 hidden shrink-0 lg:block">
+            <CtaPair location="nav" size="md" layout="row" />
           </div>
 
           <button
@@ -162,16 +149,12 @@ export function Nav() {
               className="animate-row-in mt-auto grid gap-3 pt-10 motion-reduce:animate-none"
               style={{ animationDelay: `${60 + links.length * 55}ms` }}
             >
-              <Cta href="#enquiry" size="lg" onClick={() => setOpen(false)}>
-                Claim free trial
-              </Cta>
-              <a
-                href={telHref}
-                className="eyebrow flex items-center justify-center gap-2.5 rounded-full border border-accent/50 px-4 py-4 text-accent"
-              >
-                <FaPhoneAlt className="size-4" />
-                Call now
-              </a>
+              <CtaPair
+                location="nav_sheet"
+                layout="column"
+                fill
+                onNavigate={() => setOpen(false)}
+              />
             </div>
           </div>
         </div>

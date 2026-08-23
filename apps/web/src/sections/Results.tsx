@@ -1,5 +1,5 @@
 import { Section } from '../components/Section'
-import { Cta } from '../components/Cta'
+import { CtaPair } from '../components/CtaPair'
 import { FaStar } from 'react-icons/fa'
 import { reviews } from '../content'
 
@@ -33,7 +33,7 @@ export function Results() {
       </div>
 
       <div className="mt-12 text-center">
-        <Cta href="#enquiry">Start your transformation</Cta>
+        <CtaPair location="results" />
       </div>
     </Section>
   )

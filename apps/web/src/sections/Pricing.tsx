@@ -9,6 +9,7 @@ import {
   plans,
   type Plan,
 } from '../content'
+import { useCtaTracker } from '../lib/analytics'
 import { formatINR } from '../lib/format'
 import { whatsappHref } from '../lib/links'
 
@@ -36,6 +37,7 @@ function nameStatesTerm(plan: Plan) {
 }
 
 function PlanCard({ plan }: { plan: Plan }) {
+  const track = useCtaTracker('pricing_card')
   const savings = savingsVsMonthly(plan)
 
   return (
@@ -93,6 +95,7 @@ function PlanCard({ plan }: { plan: Plan }) {
           size="md"
           tone={plan.featured ? 'solid' : 'outline'}
           className="w-full"
+          onClick={() => track('whatsapp', { plan: plan.name })}
         >
           <FaWhatsapp className="size-4" aria-hidden="true" />
           Enquire now

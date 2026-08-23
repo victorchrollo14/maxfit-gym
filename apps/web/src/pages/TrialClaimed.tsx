@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { usePostHog } from '@posthog/react'
 import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { LuCheck, LuClock, LuMapPin } from 'react-icons/lu'
 import { CopyButton } from '../components/CopyButton'
@@ -8,7 +7,7 @@ import { HeroBackdrop } from '../components/HeroBackdrop'
 import { Logo } from '../components/Logo'
 import { MapEmbed } from '../components/MapEmbed'
 import { fullAddress, gym } from '../content'
-import { useCtaTracker } from '../lib/analytics'
+import { capture, ctaTracker } from '../lib/analytics'
 import { telHref, whatsappHref } from '../lib/links'
 import { takeConversionToken } from '../lib/trialClaim'
 
@@ -17,8 +16,7 @@ const waHref = whatsappHref(
 )
 
 export function TrialClaimed() {
-  const posthog = usePostHog()
-  const track = useCtaTracker('trial_claimed')
+  const track = ctaTracker('trial_claimed')
 
   /* No head manager in the app, and this is the only route that needs to differ
      from index.html. */
@@ -41,8 +39,8 @@ export function TrialClaimed() {
      count a second conversion. */
   useEffect(() => {
     if (!takeConversionToken()) return
-    posthog.capture('trial_conversion')
-  }, [posthog])
+    capture('trial_conversion')
+  }, [])
 
   return (
     <div className="relative min-h-dvh overflow-hidden bg-background text-foreground">

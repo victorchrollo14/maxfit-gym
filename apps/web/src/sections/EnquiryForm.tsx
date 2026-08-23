@@ -1,9 +1,8 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { usePostHog } from '@posthog/react'
 import { useNavigate } from '@tanstack/react-router'
 import { FieldError, Form, Input, Label, TextField } from '@heroui/react'
 import { ctaClasses } from '../components/Cta'
-import { useCtaTracker } from '../lib/analytics'
+import { capture, ctaTracker } from '../lib/analytics'
 import { createLead, normalisePhone } from '../lib/leads'
 import { markTrialClaimed } from '../lib/trialClaim'
 import { gym } from '../content'
@@ -15,8 +14,7 @@ export function EnquiryForm() {
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<ReactNode>(null)
   const navigate = useNavigate()
-  const posthog = usePostHog()
-  const track = useCtaTracker('enquiry_form_error')
+  const track = ctaTracker('enquiry_form_error')
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -27,7 +25,7 @@ export function EnquiryForm() {
     if (!normalisePhone(phone)) {
       setError("That doesn't look like a mobile number — 10 digits, please.")
       setStatus('failed')
-      posthog.capture('trial_form_failed', { reason: 'invalid_phone' })
+      capture('trial_form_failed', { reason: 'invalid_phone' })
       return
     }
 
@@ -52,11 +50,11 @@ export function EnquiryForm() {
         </>,
       )
       setStatus('failed')
-      posthog.capture('trial_form_failed', { reason: 'request_failed' })
+      capture('trial_form_failed', { reason: 'request_failed' })
       return
     }
 
-    posthog.capture('trial_claimed')
+    capture('trial_claimed')
     markTrialClaimed()
     navigate({ to: '/trial-claimed' })
   }

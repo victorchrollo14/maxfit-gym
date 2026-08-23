@@ -1,7 +1,7 @@
 import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { Cta } from './Cta'
 import { gym } from '../content'
-import { type CtaAction, useCtaTracker } from '../lib/analytics'
+import { type CtaAction, ctaTracker } from '../lib/analytics'
 import { telHref, whatsappHref } from '../lib/links'
 
 const waHref = whatsappHref(
@@ -35,7 +35,7 @@ export function CtaPair({
   className?: string
   onNavigate?: () => void
 }) {
-  const track = useCtaTracker(location)
+  const track = ctaTracker(location)
 
   const press = (action: CtaAction) => () => {
     track(action)

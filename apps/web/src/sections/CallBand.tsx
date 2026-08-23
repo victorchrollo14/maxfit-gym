@@ -1,6 +1,6 @@
 import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { gym } from '../content'
-import { useCtaTracker } from '../lib/analytics'
+import { ctaTracker } from '../lib/analytics'
 import { telHref, whatsappHref } from '../lib/links'
 
 const waHref = whatsappHref(
@@ -15,7 +15,7 @@ const waHref = whatsappHref(
  * site's normal solid/outline tones have nothing to sit against.
  */
 export function CallBand() {
-  const track = useCtaTracker('call_band')
+  const track = ctaTracker('call_band')
 
   return (
     <section className="bg-accent px-5 py-10 text-accent-foreground sm:py-12">

@@ -9,7 +9,7 @@ import {
   plans,
   type Plan,
 } from '../content'
-import { useCtaTracker } from '../lib/analytics'
+import { ctaTracker } from '../lib/analytics'
 import { formatINR } from '../lib/format'
 import { whatsappHref } from '../lib/links'
 
@@ -37,7 +37,7 @@ function nameStatesTerm(plan: Plan) {
 }
 
 function PlanCard({ plan }: { plan: Plan }) {
-  const track = useCtaTracker('pricing_card')
+  const track = ctaTracker('pricing_card')
   const savings = savingsVsMonthly(plan)
 
   return (

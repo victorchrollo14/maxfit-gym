@@ -2,7 +2,7 @@ import { FaEnvelope, FaInstagram, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { CtaPair } from '../components/CtaPair'
 import { Logo } from '../components/Logo'
 import { earlyBird, gym } from '../content'
-import { type CtaAction, useCtaTracker } from '../lib/analytics'
+import { type CtaAction, ctaTracker } from '../lib/analytics'
 import { telHref, whatsappHref } from '../lib/links'
 
 const waHref = whatsappHref(
@@ -68,7 +68,7 @@ const columns = [
 ]
 
 export function Footer() {
-  const track = useCtaTracker('footer_socials')
+  const track = ctaTracker('footer_socials')
 
   return (
     <footer>

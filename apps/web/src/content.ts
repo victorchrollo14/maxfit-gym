@@ -9,6 +9,10 @@
    a self-referencing object literal can't. */
 const coords = { lat: 13.0287704, lng: 77.7079326 }
 
+/* The listing's CID, decoded from the share link. Addressing the place by its
+   feature id is what makes the keyless embed load the listing itself. */
+const cid = '5138046663084002118'
+
 /* The landmark locals actually navigate by. The postal address keeps Domino's
    — it has to match the Google Maps listing exactly — so this one carries the
    Location copy and the meta description instead. */
@@ -39,21 +43,19 @@ export const gym = {
     line1: "Site No A, Kithaganur Main Rd, near Domino's Pizza",
     line2: 'Krishnarajapuram, Kithiganur, Bengaluru, Karnataka 560036',
   },
-  /* Keyless fallback, used only when VITE_GOOGLE_MAPS_EMBED_KEY is unset. The
-     marker form `q=<lat>,<lng>` is not interchangeable with `q=<place name>`:
-     the name form renders an info card but draws no pin, so this one is
-     coordinates. Neither draws the gym's label — only the keyed Embed API
-     does. See MapEmbed.tsx. */
+  /* Keyless fallback, used only when VITE_GOOGLE_MAPS_EMBED_KEY is unset. A
+     `?cid=` embed is not a search, so it loads the place — unlike
+     `q=<lat>,<lng>`, which pins a bare coordinate with nothing to label. It
+     takes the listing's own framing and ignores `&z=`. See MapEmbed.tsx. */
   coords,
-  mapEmbedUrl: `https://www.google.com/maps?q=${coords.lat},${coords.lng}+(maxfit+gym)&z=18&output=embed`,
+  mapEmbedUrl: `https://maps.google.com/maps?cid=${cid}&output=embed`,
   /* Query for the keyed Embed API. Name, not coordinates — that is what makes
      Google label the pin. */
   mapsQuery:
     'MAXFIT GYM, Site No A, Kithaganur Main Rd, Krishnarajapuram, Kithiganur, Bengaluru, Karnataka 560036',
-  /* Where the map's "Open in Maps" button goes. The listing's CID, decoded
-     from the share link — a name search can land on a similarly-named place,
-     this can't. */
-  mapsUrl: 'https://maps.google.com/?cid=5138046663084002118',
+  /* Where the map's "Open in Maps" button goes — the listing itself, not a
+     name search that can land on a similarly-named place. */
+  mapsUrl: `https://maps.google.com/?cid=${cid}`,
   /* Localities the gym draws from, nearest first. Used in the Location section
      and as areaServed in the structured data — the page has to say these names
      somewhere for a "gym near <locality>" search to have anything to match. */

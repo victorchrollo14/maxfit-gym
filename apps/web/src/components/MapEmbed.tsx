@@ -6,15 +6,16 @@ const embedKey = import.meta.env.VITE_GOOGLE_MAPS_EMBED_KEY
 
 /* Two ways to draw this map, and they are not equivalent.
 
-   With a key, the Maps Embed API labels the pin itself — that is the one we
-   want, and it is free and unmetered. Without one there is no keyless URL that
-   draws both a pin and a label: `q=<name>` gives an info card and no pin,
-   `q=<lat>,<lng>` gives a pin and no label (checked at zoom 17-20).
+   With a key, the Maps Embed API labels the pin itself and takes a zoom, and
+   it is free and unmetered. The keyless URL addresses the listing by its CID
+   instead of running a search, so it loads the place rather than the bare
+   coordinate a `q=<lat>,<lng>` embed pins with nothing to label — but on
+   Google's own framing.
 
-   So the keyless path names the place in a corner card instead of floating a
-   fake label over the marker. Anything positioned over the marker is a lie the
-   moment the map moves — pan, zoom or switch to satellite and it is pointing
-   at the wrong place, or gone. The card is attached to the frame, not the map,
+   The corner card names the place instead of floating a fake label over the
+   marker. Anything positioned over the marker is a lie the moment the map
+   moves — pan, zoom or switch to satellite and it is pointing at the wrong
+   place, or gone. The card is attached to the frame, not the map,
    so it survives all three. Set the key and it goes.
 
    Click-to-activate stays for a separate reason: an always-live map swallows

@@ -43,7 +43,11 @@ export function TrialClaimed() {
   }, [])
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-background text-foreground">
+    /* Pinned dark for the same reason as Landing — see the note there. */
+    <div
+      data-theme="dark"
+      className="relative min-h-dvh overflow-hidden bg-background text-foreground"
+    >
       <HeroBackdrop />
 
       <main className="relative mx-auto w-full max-w-2xl px-5 py-16 sm:py-20">

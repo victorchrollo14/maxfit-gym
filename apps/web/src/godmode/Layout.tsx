@@ -23,6 +23,7 @@ import { Logo } from '../components/Logo'
 import { getSupabase } from '../lib/supabase'
 import { GodmodeContext } from './context'
 import { hasClaim, useSession } from './session'
+import { ThemeSwitch } from './ThemeSwitch'
 
 type NavItem = {
   label: string
@@ -177,7 +178,8 @@ export function Layout() {
         />
       </nav>
       <Separator />
-      <div className="px-2 py-2">
+      <div className="flex flex-col gap-0.5 px-2 py-2">
+        <ThemeSwitch />
         <UserMenu email={session.user.email} />
       </div>
     </>
@@ -195,7 +197,10 @@ export function Layout() {
         <Drawer.Content placement="left">
           <Drawer.Dialog
             aria-label="Godmode menu"
-            className="flex w-64 flex-col items-start p-0"
+            /* No items-start: the column has to stretch, or the nav pills and
+               the theme row stop short of the edge instead of filling the
+               drawer the way they fill the desktop rail. */
+            className="flex w-64 flex-col p-0"
           >
             {sidebar(() => setDrawerOpen(false))}
           </Drawer.Dialog>

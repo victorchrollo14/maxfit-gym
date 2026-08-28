@@ -13,7 +13,11 @@ import { StickyCta } from '../components/StickyCta'
 
 export function Landing() {
   return (
-    <div className="min-h-dvh bg-background text-foreground">
+    /* Pinned: godmode's theme switch writes light/dark to <html>, and the
+       landing page's art direction — the hero glows, the outlined display type
+       — only reads on near black. Nothing here renders through a portal, so
+       pinning the shell is enough to hold the whole page. */
+    <div data-theme="dark" className="min-h-dvh bg-background text-foreground">
       <Nav />
       <main>
         <Hero />

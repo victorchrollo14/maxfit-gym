@@ -168,6 +168,7 @@ export function Footer() {
               <p>
                 <a
                   href={`mailto:${gym.email}`}
+                  onClick={() => track('email')}
                   className="transition-colors hover:text-accent"
                 >
                   {gym.email}
@@ -178,6 +179,7 @@ export function Footer() {
                   href={`https://instagram.com/${gym.instagram}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track('instagram')}
                   className="transition-colors hover:text-accent"
                 >
                   @{gym.instagram}

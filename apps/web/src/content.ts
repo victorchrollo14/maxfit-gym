@@ -84,7 +84,7 @@ export const fullAddress = [
 
 /** Cap for the early-bird tier. Drives the scarcity copy in Pricing. */
 export const earlyBird = {
-  totalSeats: 200,
+  totalSeats: 150,
   /** Just the remaining count — the front desk updates one number. */
   seatsLeft: 20, // TODO — keep current
 } as const

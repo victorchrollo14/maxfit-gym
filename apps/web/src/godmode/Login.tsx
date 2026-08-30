@@ -74,7 +74,7 @@ export function Login() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center gap-6 px-6">
       <div className="flex flex-col items-center gap-2">
-        <Logo variant="full" className="h-24" />
+        <Logo variant="full" className="h-24" plate />
         <p className="eyebrow text-base tracking-[0.08em] text-muted">
           Staff sign in
         </p>

@@ -18,9 +18,8 @@ breaks while these are empty.
 
 ```
 public/
-  logo.png                        Supplied square lockup (footer), alpha-keyed
-  logo-wordmark.png               Cropped horizontal lockup (nav) — derived
-  logo-square.png                 Lockup flattened onto black — schema.org logo
+  logo-wordmark.png               Cropped horizontal lockup (nav), alpha-keyed
+  logo-square.png                 Full lockup on black — footer, schema.org logo
   favicon.ico                     M monogram on black, 16/32/48 — derived
   icon-192.png                    Same monogram, PNG for Google and Android
   apple-touch-icon.png            Same monogram, 180px for iOS home screens
@@ -35,10 +34,12 @@ public/
 ```
 
 Paths are set in `src/content.ts` — rename freely, just keep the two in sync.
-The icons are derived from `logo.png` and are flattened onto `#0a0a0a` on
-purpose: the lockup is dark-on-dark artwork with a transparent background, and
-Google draws favicons and knowledge-panel logos on a white chip, where it all
-but disappears. Regenerate them if the logo ever changes.
+The icons and `logo-square.png` are derived from the supplied lockup and are
+flattened onto black on purpose: the artwork is silver-and-red on a black field
+that was keyed out into an alpha channel, so on a light surface the "MAX" and
+"GYM" simply vanish — which is what Google's white favicon chip, and godmode's
+light theme, both are. `logo-square.png` uses the dark theme's own background,
+so it is seamless in the footer. Regenerate them if the logo ever changes.
 
 **On the videos:** these ship in the repo and are served as plain files, so keep
 each clip short and compress it hard (target well under 10 MB, 720p is plenty).

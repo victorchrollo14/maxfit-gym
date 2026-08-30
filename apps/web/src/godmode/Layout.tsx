@@ -167,7 +167,7 @@ export function Layout() {
   const sidebar = (onNavigate?: () => void) => (
     <>
       <div className="flex h-14 shrink-0 items-center gap-2 px-5">
-        <Logo className="h-7" />
+        <Logo className="h-7" plate />
         <span className="eyebrow text-[10px] text-muted">admin</span>
       </div>
       <nav className="flex-1 overflow-y-auto px-2 py-3">

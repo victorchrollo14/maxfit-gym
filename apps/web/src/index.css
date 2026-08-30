@@ -100,6 +100,13 @@
   letter-spacing: 0.2em;
 }
 
+/* The logo artwork only reads on black, so anywhere it can land on a light
+   surface it brings its own field. Matches the dark theme's --background, so
+   it disappears there. */
+@utility logo-plate {
+  background: oklch(8% 0 0);
+}
+
 /* Outlined headline text, as used on the hero's second line. */
 @utility text-outline {
   color: transparent;

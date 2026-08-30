@@ -84,7 +84,7 @@ together until it does.
 | | |
 |---|---|
 | Login | `victor20030214@gmail.com` (godmode) / `+919000000001` (portal) — Michael D'Souza, `admin` + `plans_admin` + `claims_admin` |
-| Plans | The six sold on the landing page — Monthly ₹2,000, 3 Month ₹4,000, 6 Month ₹6,000, Early Bird ₹8,000, Annual ₹10,000, Couple ₹16,000 (2 seats) |
+| Plans | The six sold on the landing page — Monthly ₹2,000, 3 Month ₹4,000, 6 Month ₹6,000, Early Bird ₹8,000, Annual ₹10,000, Couple ₹15,000 (2 seats) |
 | Membership | Early Bird, started 30 days ago, one 3-day pause already taken |
 | Payment | ₹8,000 UPI, paid and reconciled — balance settles to zero |
 | Lead | One `free_trial` lead, status `new` |

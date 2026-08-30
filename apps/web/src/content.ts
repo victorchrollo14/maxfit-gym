@@ -202,12 +202,12 @@ export const plans: Plan[] = [
   {
     id: 'couple',
     name: 'Couple Pass',
-    price: 16000,
+    price: 15000,
     /* Two Annual Passes bought separately. */
     strikePrice: 20000,
     period: 'year',
     seats: 2,
-    tagline: 'One year for two — ₹8,000 each.',
+    tagline: 'One year for two — ₹7,500 each.',
     features: [
       'Everything in the Annual Pass, for two people',
       'Free fitness assessment for both on joining',

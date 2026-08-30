@@ -20,6 +20,10 @@ breaks while these are empty.
 public/
   logo.png                        Supplied square lockup (footer), alpha-keyed
   logo-wordmark.png               Cropped horizontal lockup (nav) — derived
+  logo-square.png                 Lockup flattened onto black — schema.org logo
+  favicon.ico                     M monogram on black, 16/32/48 — derived
+  icon-192.png                    Same monogram, PNG for Google and Android
+  apple-touch-icon.png            Same monogram, 180px for iOS home screens
   gym/hero.jpg                    Hero background (landscape, 16:9)
   videos/coach-1.mp4              Reel, vertical 9:16 (phone footage is ideal)
   videos/coach-1.jpg              Poster frame for the clip above
@@ -31,6 +35,10 @@ public/
 ```
 
 Paths are set in `src/content.ts` — rename freely, just keep the two in sync.
+The icons are derived from `logo.png` and are flattened onto `#0a0a0a` on
+purpose: the lockup is dark-on-dark artwork with a transparent background, and
+Google draws favicons and knowledge-panel logos on a white chip, where it all
+but disappears. Regenerate them if the logo ever changes.
 
 **On the videos:** these ship in the repo and are served as plain files, so keep
 each clip short and compress it hard (target well under 10 MB, 720p is plenty).

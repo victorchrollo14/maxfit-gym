@@ -240,7 +240,8 @@ export const seo = {
     height: 1080,
     alt: `The training floor at ${gym.name} Gym, Bengaluru`,
   },
-  logo: { url: '/logo.png', width: 1136, height: 1054 },
+  /* Opaque square — the transparent lockup vanishes on Google's light surfaces. */
+  logo: { url: '/logo-square.png', width: 512, height: 512 },
 } as const
 
 /** The rate every longer term is sold against. Keep in sync with the monthly plan. */

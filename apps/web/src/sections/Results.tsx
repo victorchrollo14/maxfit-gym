@@ -1,5 +1,4 @@
 import { Section } from '../components/Section'
-import { CtaPair } from '../components/CtaPair'
 import { FaStar } from 'react-icons/fa'
 import { reviews } from '../content'
 
@@ -30,10 +29,6 @@ export function Results() {
             </footer>
           </blockquote>
         ))}
-      </div>
-
-      <div className="mt-12 text-center">
-        <CtaPair location="results" />
       </div>
     </Section>
   )

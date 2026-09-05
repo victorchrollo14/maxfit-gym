@@ -4,10 +4,10 @@ Drop real files at these paths and they replace the placeholders automatically �
 components fall back to a labelled block when a file is missing, so nothing
 breaks while these are empty.
 
-> **The videos and every photo here are currently Pexels stock** — free for
-> commercial use, no attribution required, but none of it is MaxFit. The three
-> clips are placeholder reels so the section is playable; replace them with your
-> own phone footage (vertical 9:16, keep each well under ~5 MB).
+> **The videos are still Pexels stock** — free for commercial use, no
+> attribution required, but none of it is MaxFit. The three clips are
+> placeholder reels so the section is playable; replace them with your own phone
+> footage (vertical 9:16, keep each well under ~5 MB). The gallery is real.
 >
 > **`gym/hero.jpg` is currently a stock photo** — Pexels ID 29392546, free for
 > commercial use, no attribution required. It is somebody else's gym. Fine as a
@@ -30,7 +30,7 @@ public/
   videos/coach-2.jpg
   videos/gym-tour.mp4             Walk through the floor / interiors
   videos/gym-tour.jpg
-  gallery/1.jpg … 10.jpg          Gallery tiles, mixed aspect ratios
+  gallery/1.jpg … n.jpg           Gallery tiles, cropped to 4:5
 ```
 
 Paths are set in `src/content.ts` — rename freely, just keep the two in sync.

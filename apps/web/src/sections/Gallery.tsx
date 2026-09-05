@@ -1,6 +1,5 @@
 import { Section } from '../components/Section'
 import { Media } from '../components/Media'
-import { CtaPair } from '../components/CtaPair'
 import { gallery } from '../content'
 
 export function Gallery() {
@@ -30,10 +29,6 @@ export function Gallery() {
             />
           </figure>
         ))}
-      </div>
-
-      <div className="mt-12 text-center">
-        <CtaPair location="gallery" />
       </div>
     </Section>
   )

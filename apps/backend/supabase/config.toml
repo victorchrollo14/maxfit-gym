@@ -244,6 +244,14 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# godmode signs in with an email OTP, but GoTrue's stock Magic Link mail sends a
+# *link*. The six digits are not recoverable from anywhere else — not the mail,
+# not the container logs, not auth.users — so the template has to carry
+# {{ .Token }} or staff sign-in simply does not work.
+[auth.email.template.magic_link]
+subject = "Your maxfit sign-in code"
+content_path = "./supabase/templates/magic_link.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"

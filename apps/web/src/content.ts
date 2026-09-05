@@ -321,18 +321,11 @@ export const videos = [
 /* Keep the count divisible by 2 and 3 — the grid is 2 columns on mobile and
    3 on desktop, so 12 (or 6) fills both exactly with no ragged last row. */
 export const gallery = [
-  { src: '/gallery/1.jpg', alt: 'Chest work on the cable machine' },
-  { src: '/gallery/2.jpg', alt: 'Battle rope conditioning' },
-  { src: '/gallery/3.jpg', alt: 'Training on the leg press' },
-  { src: '/gallery/4.jpg', alt: 'Conditioning work with ropes' },
-  { src: '/gallery/5.jpg', alt: 'Barbell squats' },
-  { src: '/gallery/6.jpg', alt: 'Strength training in the gym' },
-  { src: '/gallery/7.jpg', alt: 'Dumbbell curls on the free weights floor' },
-  { src: '/gallery/8.jpg', alt: 'Bodyweight and calisthenics work' },
-  { src: '/gallery/9.jpg', alt: 'Lat pulldown' },
-  { src: '/gallery/10.jpg', alt: 'Overhead press with dumbbells' },
-  { src: '/gallery/11.jpg', alt: 'Picking weights from the dumbbell rack' },
-  { src: '/gallery/12.jpg', alt: 'Lifting a loaded barbell' },
+  { src: '/gallery/1.jpg', alt: 'The main floor — leg press, racks and loaded barbells' },
+  { src: '/gallery/2.jpg', alt: 'The dumbbell rack and preacher bench along the mirrored wall' },
+  { src: '/gallery/3.jpg', alt: 'Sled on the turf lane, with the leg press behind' },
+  { src: '/gallery/4.jpg', alt: 'Selectorised machines beside the painted wall' },
+  { src: '/gallery/5.jpg', alt: 'Lat pulldown station by the mural' },
 ]
 
 /* No real reviews yet, so the Results section hides itself. Uncomment and

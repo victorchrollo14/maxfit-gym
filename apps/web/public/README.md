@@ -4,10 +4,10 @@ Drop real files at these paths and they replace the placeholders automatically �
 components fall back to a labelled block when a file is missing, so nothing
 breaks while these are empty.
 
-> **The videos are still Pexels stock** — free for commercial use, no
-> attribution required, but none of it is MaxFit. The three clips are
-> placeholder reels so the section is playable; replace them with your own phone
-> footage (vertical 9:16, keep each well under ~5 MB). The gallery is real.
+> **`videos/gym-tour.mp4` is still Pexels stock** — free for commercial use, no
+> attribution required, but it isn't MaxFit. `coach-1` and `coach-2` are real
+> MaxFit footage. Replace the tour with your own phone footage (vertical 9:16,
+> keep it well under ~5 MB). The gallery is real.
 >
 > **`gym/hero.jpg` is currently a stock photo** — Pexels ID 29392546, free for
 > commercial use, no attribution required. It is somebody else's gym. Fine as a
@@ -24,9 +24,9 @@ public/
   icon-192.png                    Same monogram, PNG for Google and Android
   apple-touch-icon.png            Same monogram, 180px for iOS home screens
   gym/hero.jpg                    Hero background (landscape, 16:9)
-  videos/coach-1.mp4              Reel, vertical 9:16 (phone footage is ideal)
+  videos/coach-1.mp4              Training reel, vertical 9:16, with audio
   videos/coach-1.jpg              Poster frame for the clip above
-  videos/coach-2.mp4              Second coach reel
+  videos/coach-2.mp4              Gym walkthrough reel, with audio
   videos/coach-2.jpg
   videos/gym-tour.mp4             Walk through the floor / interiors
   videos/gym-tour.jpg

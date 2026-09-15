@@ -277,23 +277,23 @@ export const equipment = [
 ] // TODO — replace with the gym's actual equipment
 
 /**
- * The "Inside" section — two coaches talking about the gym, plus a walk
+ * The "Inside" section — a training session, a tour of the gym, plus a walk
  * through the floor. Files go in public/videos/; add or remove entries freely,
  * the grid adapts. An entry with no video file yet shows a labelled
  * placeholder rather than breaking.
  */
 export const videos = [
   {
-    tag: 'Coach',
-    title: 'Meet your head coach', // TODO
-    caption: 'Why we set the gym up this way',
+    tag: 'Training',
+    title: 'A session on the floor',
+    caption: 'Push, pull, press',
     src: '/videos/coach-1.mp4',
     poster: '/videos/coach-1.jpg',
   },
   {
-    tag: 'Coach',
-    title: 'How we train here', // TODO
-    caption: 'Programming and form, explained',
+    tag: 'Gym tour',
+    title: 'See the gym',
+    caption: 'Cardio, turf, racks and machines',
     src: '/videos/coach-2.mp4',
     poster: '/videos/coach-2.jpg',
   },

@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react'
 import { Section } from '../components/Section'
 import { Media } from '../components/Media'
-import { FaPause, FaPlay } from 'react-icons/fa'
+import { FaPause, FaPlay, FaVolumeMute, FaVolumeUp } from 'react-icons/fa'
 import { gym, videos } from '../content'
 
 function VideoCard({ video }: { video: (typeof videos)[number] }) {
   const ref = useRef<HTMLVideoElement>(null)
   const [failed, setFailed] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [muted, setMuted] = useState(true)
 
   function toggle() {
     const el = ref.current
@@ -44,6 +45,7 @@ function VideoCard({ video }: { video: (typeof videos)[number] }) {
             ref={ref}
             preload="metadata"
             playsInline
+            muted={muted}
             src={video.src}
             poster={video.poster}
             onPlay={() => setPlaying(true)}
@@ -75,6 +77,20 @@ function VideoCard({ video }: { video: (typeof videos)[number] }) {
               )}
             </span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setMuted((m) => !m)}
+            aria-label={muted ? `Unmute ${video.title}` : `Mute ${video.title}`}
+            aria-pressed={!muted}
+            className="absolute top-3 right-3 grid size-10 place-items-center rounded-full bg-background/70 text-foreground backdrop-blur-sm"
+          >
+            {muted ? (
+              <FaVolumeMute className="size-4" />
+            ) : (
+              <FaVolumeUp className="size-4" />
+            )}
+          </button>
         </>
       )}
 
@@ -99,7 +115,7 @@ export function Videos() {
       id="inside"
       lead="Inside"
       accent={gym.name}
-      sub="Hear it from the coaches, and see the floor before you visit"
+      sub="See the training and the floor before you visit"
     >
       {/* Horizontal reel strip. Negative margin + padding lets cards bleed to
           the screen edge on mobile while staying aligned on desktop. */}

@@ -29,8 +29,8 @@ function savingsVsMonthly(plan: Plan) {
 }
 
 /**
- * "3 MONTH PASS … ₹4,000 /3 months" stutters. The suffix only earns its place
- * on a plan whose name doesn't already state the term — Early Bird, say.
+ * "3 MONTH PASS … ₹3,999 /3 months" stutters. The suffix only earns its place
+ * on a plan whose name doesn't already state the term — the Festival Offer, say.
  */
 function nameStatesTerm(plan: Plan) {
   return /month|annual|year/i.test(plan.name)

@@ -1,7 +1,7 @@
 import { FaEnvelope, FaInstagram, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { CtaPair } from '../components/CtaPair'
 import { Logo } from '../components/Logo'
-import { earlyBird, gym } from '../content'
+import { gym } from '../content'
 import { type CtaAction, ctaTracker } from '../lib/analytics'
 import { telHref, whatsappHref } from '../lib/links'
 
@@ -86,7 +86,7 @@ export function Footer() {
             </h2>
             <p className="mt-5 text-muted text-pretty">
               Call us or message on WhatsApp and we'll show you around.{' '}
-              {earlyBird.seatsLeft} early bird passes are still open.
+              The festival offer won't last.
             </p>
             <div className="mt-8">
               <CtaPair location="footer" size="xl" />

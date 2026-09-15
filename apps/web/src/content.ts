@@ -82,13 +82,6 @@ export const fullAddress = [
   gym.address.line2,
 ].join('\n')
 
-/** Cap for the early-bird tier. Drives the scarcity copy in Pricing. */
-export const earlyBird = {
-  totalSeats: 150,
-  /** Just the remaining count — the front desk updates one number. */
-  seatsLeft: 20, // TODO — keep current
-} as const
-
 /** Term a plan is bought for, and how many months it covers. */
 export const periodMonths = {
   month: 1,
@@ -99,7 +92,7 @@ export const periodMonths = {
 
 export type Period = keyof typeof periodMonths
 
-/** Suffix after the price, e.g. "₹4,000 /3 months". */
+/** Suffix after the price, e.g. "₹3,999 /3 months". */
 export const periodLabel: Record<Period, string> = {
   month: 'month',
   quarter: '3 months',
@@ -122,18 +115,18 @@ export type Plan = {
   badge?: string
 }
 
-/* Order is display order. Early Bird leads: it's the offer being sold, and the
+/* Order is display order. The Festival Offer leads: it's the offer being sold, and the
    longer terms read as steps down from it rather than up from the monthly. */
 export const plans: Plan[] = [
   {
-    id: 'early-bird',
-    name: 'Early Bird Pass',
-    price: 8000,
+    id: 'festival',
+    name: 'Festival Offer',
+    price: 8999,
     period: 'year',
-    /* The same ₹14,000 list price the Annual Pass strikes through — both are
+    /* The same ₹13,999 list price the Annual Pass strikes through — both are
        yearly, so they're discounted off the same number. */
-    strikePrice: 14000,
-    tagline: `Founding-member rate. First ${earlyBird.totalSeats} members only.`,
+    strikePrice: 13999,
+    tagline: 'A full year at our festive-season rate.',
     featured: true,
     badge: 'Best value',
     features: [
@@ -146,22 +139,22 @@ export const plans: Plan[] = [
   {
     id: 'monthly',
     name: 'Monthly Pass',
-    price: 2000,
-    strikePrice: 4000,
+    price: 1999,
+    strikePrice: 3999,
     period: 'month',
     tagline: 'No commitment. Cancel whenever.',
     features: [
       'Full gym access, all equipment',
       'Free fitness assessment on joining',
       'Locker and shower access',
-      'Works out to ₹24,000 a year',
+      'Works out to ₹23,988 a year',
     ],
   },
   {
     id: 'quarterly',
     name: '3 Month Pass',
-    price: 4000,
-    strikePrice: 6000,
+    price: 3999,
+    strikePrice: 5999,
     period: 'quarter',
     tagline: 'A season to build the habit.',
     features: [
@@ -174,22 +167,22 @@ export const plans: Plan[] = [
   {
     id: 'half-yearly',
     name: '6 Month Pass',
-    price: 6000,
-    strikePrice: 12000,
+    price: 5999,
+    strikePrice: 11999,
     period: 'half-year',
     tagline: 'Half a year, at half the monthly rate.',
     features: [
       'Full gym access, all equipment',
       'Free fitness assessment on joining',
       'Locker and shower access',
-      'Works out to ₹1,000 a month',
+      'Works out to under ₹1,000 a month',
     ],
   },
   {
     id: 'annual',
     name: 'Annual Pass',
-    price: 10000,
-    strikePrice: 14000,
+    price: 9999,
+    strikePrice: 13999,
     period: 'year',
     tagline: 'The regular yearly membership.',
     features: [
@@ -202,12 +195,12 @@ export const plans: Plan[] = [
   {
     id: 'couple',
     name: 'Couple Pass',
-    price: 15000,
+    price: 14999,
     /* Two Annual Passes bought separately. */
-    strikePrice: 20000,
+    strikePrice: 19998,
     period: 'year',
     seats: 2,
-    tagline: 'One year for two — ₹7,500 each.',
+    tagline: 'One year for two — under ₹7,500 each.',
     features: [
       'Everything in the Annual Pass, for two people',
       'Free fitness assessment for both on joining',
@@ -225,15 +218,15 @@ export const plans: Plan[] = [
  * Keep `title` under ~60 characters and `description` under ~160 — past that
  * Google truncates mid-sentence.
  */
-const earlyBirdPrice = plans
-  .find((p) => p.id === 'early-bird')!
+const festivalPrice = plans
+  .find((p) => p.id === 'festival')!
   .price.toLocaleString('en-IN')
 
 export const seo = {
   title: `Strength & Conditioning Gym in K.R. Puram, Bengaluru — ${gym.name}`,
-  description: `Strength & conditioning gym on Kithaganur Main Rd, K.R. Puram, by ${gym.landmark}. Early Bird year pass ₹${earlyBirdPrice}. Free trial, open every day.`,
+  description: `Strength & conditioning gym on Kithaganur Main Rd, K.R. Puram, by ${gym.landmark}. Festival Offer year pass ₹${festivalPrice}. Free trial, open every day.`,
   /* Link previews get the offer first — a shared link is read as an ad. */
-  ogDescription: `Proper racks, real coaching, no waiting at peak hour. Early Bird annual pass ₹${earlyBirdPrice} — first ${earlyBird.totalSeats} members. Kithaganur Main Rd, K.R. Puram.`,
+  ogDescription: `Proper racks, real coaching, no waiting at peak hour. Festival Offer annual pass ₹${festivalPrice}. Kithaganur Main Rd, K.R. Puram.`,
   image: {
     url: '/gym/hero.jpg',
     width: 1920,
@@ -245,7 +238,7 @@ export const seo = {
 } as const
 
 /** The rate every longer term is sold against. Keep in sync with the monthly plan. */
-export const monthlyRate = 2000
+export const monthlyRate = 1999
 
 /** Monthly cost over a year — the number the annual plans are compared against. */
 export const monthlyAnnualised = monthlyRate * 12
@@ -373,7 +366,7 @@ export const faqs = [
   },
   {
     q: 'Is personal training included?',
-    a: 'Early Bird members get two free sessions. Beyond that, personal training is a separate add-on — ask at the desk for current rates.', // TODO — confirm
+    a: 'Festival Offer members get two free sessions. Beyond that, personal training is a separate add-on — ask at the desk for current rates.', // TODO — confirm
   },
   {
     q: 'Do you have separate timings for women?',

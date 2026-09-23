@@ -1,8 +1,8 @@
 import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
-import { Cta } from './Cta'
-import { gym } from '../content'
-import { type CtaAction, ctaTracker } from '../lib/analytics'
-import { telHref, whatsappHref } from '../lib/links'
+import { Cta } from '../../../../components/Cta'
+import { gym } from '../../../../../content'
+import { type CtaAction, ctaTracker } from '../../../../../lib/analytics'
+import { telHref, whatsappHref } from '../../../../../lib/links'
 
 const waHref = whatsappHref(
   `Hi ${gym.name}, I'd like to know more about membership.`,

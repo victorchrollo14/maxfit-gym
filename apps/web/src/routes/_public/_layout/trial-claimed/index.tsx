@@ -1,39 +1,45 @@
 import { useEffect } from 'react'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { LuCheck, LuClock, LuMapPin } from 'react-icons/lu'
-import { CopyButton } from '../components/CopyButton'
-import { Cta } from '../components/Cta'
-import { HeroBackdrop } from '../components/HeroBackdrop'
-import { Logo } from '../components/Logo'
-import { MapEmbed } from '../components/MapEmbed'
-import { fullAddress, gym } from '../content'
-import { capture, ctaTracker } from '../lib/analytics'
-import { telHref, whatsappHref } from '../lib/links'
-import { takeConversionToken } from '../lib/trialClaim'
+
+import { CopyButton } from './components/CopyButton'
+import { Cta } from '../../../components/Cta'
+import { HeroBackdrop } from '../../../components/HeroBackdrop'
+import { Logo } from '../../../components/Logo'
+import { MapEmbed } from '../../../components/MapEmbed'
+import { fullAddress, gym } from '../../../../content'
+import { capture, ctaTracker } from '../../../../lib/analytics'
+import { telHref, whatsappHref } from '../../../../lib/links'
+import { hasTrialClaim, takeConversionToken } from '../../../../lib/trialClaim'
 
 const waHref = whatsappHref(
   `Hi ${gym.name}, I just claimed the free trial on your website.`,
 )
 
-export function TrialClaimed() {
+/* Gated so Google Ads can't count a bookmark or a shared link as a second
+   lead — see lib/trialClaim.ts. The claim is in sessionStorage, which only the
+   browser can read, so the page isn't server-rendered. The redirect lives in
+   the component rather than beforeLoad: a beforeLoad redirect during hydration
+   is a hydration error. */
+export const Route = createFileRoute('/_public/_layout/trial-claimed/')({
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: `Free trial claimed — ${gym.name} Gym` },
+      { name: 'robots', content: 'noindex' },
+    ],
+  }),
+  component: TrialClaimedGate,
+})
+
+function TrialClaimedGate() {
+  if (!hasTrialClaim()) return <Navigate to="/" replace />
+  return <TrialClaimed />
+}
+
+function TrialClaimed() {
   const track = ctaTracker('trial_claimed')
-
-  /* No head manager in the app, and this is the only route that needs to differ
-     from index.html. */
-  useEffect(() => {
-    const meta = document.createElement('meta')
-    meta.name = 'robots'
-    meta.content = 'noindex'
-    document.head.appendChild(meta)
-
-    const previousTitle = document.title
-    document.title = `Free trial claimed — ${gym.name} Gym`
-
-    return () => {
-      meta.remove()
-      document.title = previousTitle
-    }
-  }, [])
 
   /* Once per claim, not once per view — a reload or a shared link must not
      count a second conversion. */
@@ -43,11 +49,7 @@ export function TrialClaimed() {
   }, [])
 
   return (
-    /* Pinned dark for the same reason as Landing — see the note there. */
-    <div
-      data-theme="dark"
-      className="relative min-h-dvh overflow-hidden bg-background text-foreground"
-    >
+    <div className="relative min-h-dvh overflow-hidden">
       <HeroBackdrop />
 
       <main className="relative mx-auto w-full max-w-2xl px-5 py-16 sm:py-20">

@@ -284,6 +284,13 @@ max_frequency = "5s"
 # Force log out if the user has been inactive longer than the specified duration.
 # inactivity_timeout = "8h"
 
+# Delivers phone OTPs over WhatsApp. Off locally until there's a WhatsApp number to
+# send from — see apps/web/README.md.
+[auth.hook.send_sms]
+enabled = false
+uri = "http://host.docker.internal:5173/api/webhooks/send-wa-otp"
+secrets = "env(SEND_SMS_HOOK_SECRETS)"
+
 # This hook runs before a new user is created and allows developers to reject the request based on the incoming user object.
 # [auth.hook.before_user_created]
 # enabled = true

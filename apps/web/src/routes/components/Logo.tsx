@@ -1,4 +1,4 @@
-import { gym } from '../content'
+import { gym } from '../../content'
 
 /**
  * The supplied artwork is silver-and-red on black, so it only reads on a dark

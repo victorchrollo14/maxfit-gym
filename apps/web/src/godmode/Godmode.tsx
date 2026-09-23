@@ -1,13 +1,10 @@
 import { Outlet } from '@tanstack/react-router'
 import { Toast } from '@heroui/react'
-import { gym } from '../content'
 import { isSupabaseConfigured } from '../lib/supabase'
 
 export function Godmode() {
   return (
     <div className="min-h-dvh bg-background text-foreground">
-      <title>{`Godmode — ${gym.name}`}</title>
-      <meta name="robots" content="noindex, nofollow" />
       {isSupabaseConfigured ? (
         <Outlet />
       ) : (

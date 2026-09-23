@@ -1,14 +1,12 @@
 # backend — Supabase
 
-The database and the API. Kept out of `apps/web` on purpose: the functions run on
-Deno with their own dependency world and their own deploy step, so mixing them
-into the Vite app's `package.json` and build only buys confusion.
+The database: schema, local stack and migrations. The API lives in the web app —
+see [`apps/web`](../web/README.md).
 
 ```
 supabase/config.toml   local stack config, written by `supabase init`
 supabase/migrations/   schema, in order
 supabase/seed.sql      dev data, re-applied on every `db:reset`
-supabase/functions/    edge functions (Deno), one directory per endpoint — empty for now
 ```
 
 ## Running it locally
@@ -118,17 +116,16 @@ want a required reviewer on schema changes, or at repository level if not.
 | `SUPABASE_PROJECT_ID` | the project ref, e.g. `abcdefghijklmnop` |
 | `SUPABASE_DB_PASSWORD` | the database password from step 1 |
 
-**3. Point the web app at it.** In Vercel, set `VITE_SUPABASE_URL` and
-`VITE_SUPABASE_PUBLISHABLE_KEY` from Project Settings → API keys. Both are public and
-end up in the browser bundle; RLS is what keeps the publishable key harmless. The
-secret / service-role key never goes near Vercel.
+**3. Point the web app at it.** Pass `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_PUBLISHABLE_KEY` (Project Settings → API keys) as build args when
+building the web image — see [apps/web/README.md](../web/README.md#deploying). Both
+are public and end up in the browser bundle; RLS is what keeps the publishable key
+harmless. The secret / service-role key is never a `VITE_` variable.
 
 **What the workflow deliberately does not do:**
 
 - **No seed.** `db push` applies migrations only. `seed.sql` is the dev dataset and
   must never reach production — that is why there is no `--include-seed`.
-- **No edge functions.** There are none yet. When `send-otp` lands, add a
-  `supabase functions deploy` step, or a second workflow keyed on `functions/**`.
 - **No rollback.** Migrations are forward-only. A bad one is fixed by writing the
   next migration, not by reverting the commit — reverting removes the file but the
   remote history table still says it ran.
@@ -137,30 +134,10 @@ secret / service-role key never goes near Vercel.
 and this repo commits straight to `main`. Check `supabase db diff` locally before
 pushing anything that touches a table with real data in it.
 
-## Endpoints v1 needs
+## Don't get this wrong
 
-| Function | What it does |
-|---|---|
-| `send-otp` | Supabase **Send SMS hook**: delivers the OTP Auth generated, over WhatsApp Cloud API |
-
-`leads` is not on this list any more — the landing page inserts into the table directly
-with the publishable key, fenced in by a column-level grant and an insert policy. See
-[V1.md](../../V1.md#leads-without-an-endpoint).
-
-Specs in [V1.md](../../V1.md). `send-otp` is not called by our own code — Supabase Auth
-calls it. It owns *delivery only*; Auth still generates, stores, rate-limits and verifies
-the code. Two things it must do: **verify the `standardwebhooks` signature** (an unsigned
-endpoint lets anyone send WhatsApp messages on our WABA) and **return synchronously**,
-because a login is blocked on its response.
-
-## Two things not to get wrong
-
-- **CORS.** These are served from `*.supabase.co`, a different origin from the
-  site, so every function needs the preflight handler and the `Access-Control-*`
-  headers. The Vercel-function version of this API wouldn't have — that's the
-  cost of the split, and it's one shared helper.
-- **The service-role key never reaches the browser.** It lives in function env
-  only. The web app gets the publishable key and is fenced in by RLS.
+**The service-role key never reaches the browser.** It lives in the web server's
+runtime env only, never as a `VITE_` variable. The web app gets the publishable key and is fenced in by RLS.
 
 Roles ride in the JWT via `auth.users.raw_app_meta_data`, which only the
-service-role key can write — see [PROJECT.md](../../PROJECT.md#roles).
+service-role key can write.

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { gym } from '../content'
+import { gym } from '../../content'
 
 const embedKey = import.meta.env.VITE_GOOGLE_MAPS_EMBED_KEY
 

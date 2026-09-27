@@ -19,8 +19,8 @@ import {
   LuTarget,
   LuUser,
 } from 'react-icons/lu'
-import { Logo } from '../routes/components/Logo'
-import { getSupabase } from '../lib/supabase'
+import { Logo } from '@/routes/components/Logo'
+import { getSupabase } from '@/lib/supabase'
 import { GodmodeContext } from './context'
 import { hasClaim, useSession } from './session'
 import { ThemeSwitch } from './ThemeSwitch'

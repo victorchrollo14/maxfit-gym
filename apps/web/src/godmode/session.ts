@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { getSupabase } from '../lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export const CLAIMS = ['admin', 'plans_admin', 'claims_admin'] as const
 

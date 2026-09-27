@@ -1,6 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import { Toast } from '@heroui/react'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { isSupabaseConfigured } from '@/lib/supabase'
 
 export function Godmode() {
   return (

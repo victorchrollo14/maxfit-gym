@@ -30,12 +30,12 @@ import { LuMenu, LuX } from 'react-icons/lu'
 import { MdFitnessCenter } from 'react-icons/md'
 import { TbBarbell, TbJumpRope, TbStretching, TbTreadmill } from 'react-icons/tb'
 
-import { Cta, ctaClasses } from '../../../components/Cta'
+import { Cta, ctaClasses } from '@/routes/components/Cta'
 import { CtaPair } from './components/CtaPair'
-import { HeroBackdrop } from '../../../components/HeroBackdrop'
-import { Logo } from '../../../components/Logo'
-import { MapEmbed } from '../../../components/MapEmbed'
-import { Media } from '../../../components/Media'
+import { HeroBackdrop } from '@/routes/components/HeroBackdrop'
+import { Logo } from '@/routes/components/Logo'
+import { MapEmbed } from '@/routes/components/MapEmbed'
+import { Media } from '@/routes/components/Media'
 import { Section } from './components/Section'
 import { BarLabel } from './components/SectionHeading'
 import { StickyCta } from './components/StickyCta'
@@ -51,12 +51,12 @@ import {
   reviews,
   videos,
   type Plan,
-} from '../../../../content'
-import { capture, ctaTracker, type CtaAction } from '../../../../lib/analytics'
-import { formatINR, formatList } from '../../../../lib/format'
-import { createLead, normalisePhone } from '../../../../lib/leads'
-import { telHref, whatsappHref } from '../../../../lib/links'
-import { markTrialClaimed } from '../../../../lib/trialClaim'
+} from '@/content'
+import { capture, ctaTracker, type CtaAction } from '@/lib/analytics'
+import { formatINR, formatList } from '@/lib/format'
+import { createLead, normalisePhone } from '@/lib/leads'
+import { telHref, whatsappHref } from '@/lib/links'
+import { markTrialClaimed } from '@/lib/trialClaim'
 
 const waHref = whatsappHref(
   `Hi ${gym.name}, I'd like to know more about membership.`,

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Login } from '../../godmode/Login'
+import { Login } from '@/godmode/Login'
 
 export const Route = createFileRoute('/godmode/login')({
   validateSearch: (search: Record<string, unknown>) => ({

@@ -6,9 +6,9 @@ import {
   Scripts,
   useRouterState,
 } from '@tanstack/react-router'
-import { startAnalytics } from '../lib/analytics'
-import { siteHead } from '../seo'
-import '../index.css'
+import { startAnalytics } from '@/lib/analytics'
+import { siteHead } from '@/seo'
+import '@/index.css'
 
 export const Route = createRootRoute({
   head: () => ({

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Webhook } from 'standardwebhooks'
-import { env } from '../../../server/env'
-import { sendWhatsAppOtp } from '../../../server/whatsapp'
+import { env } from '@/server/env'
+import { sendWhatsAppOtp } from '@/server/whatsapp'
 
 type SendSmsEvent = {
   user: { id: string; phone: string }

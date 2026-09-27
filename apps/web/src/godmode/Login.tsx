@@ -8,8 +8,8 @@ import {
   TextField,
   Toast,
 } from '@heroui/react'
-import { Logo } from '../routes/components/Logo'
-import { getSupabase } from '../lib/supabase'
+import { Logo } from '@/routes/components/Logo'
+import { getSupabase } from '@/lib/supabase'
 
 const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
 

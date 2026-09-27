@@ -13,7 +13,7 @@ import {
 } from '@heroui/react'
 import { LuCopy, LuPhone } from 'react-icons/lu'
 import { FaWhatsapp } from 'react-icons/fa'
-import { getSupabase } from '../../lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import {
   type Lead,
   SETTABLE_STATUSES,

@@ -4,14 +4,14 @@ import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa'
 import { LuCheck, LuClock, LuMapPin } from 'react-icons/lu'
 
 import { CopyButton } from './components/CopyButton'
-import { Cta } from '../../../components/Cta'
-import { HeroBackdrop } from '../../../components/HeroBackdrop'
-import { Logo } from '../../../components/Logo'
-import { MapEmbed } from '../../../components/MapEmbed'
-import { fullAddress, gym } from '../../../../content'
-import { capture, ctaTracker } from '../../../../lib/analytics'
-import { telHref, whatsappHref } from '../../../../lib/links'
-import { hasTrialClaim, takeConversionToken } from '../../../../lib/trialClaim'
+import { Cta } from '@/routes/components/Cta'
+import { HeroBackdrop } from '@/routes/components/HeroBackdrop'
+import { Logo } from '@/routes/components/Logo'
+import { MapEmbed } from '@/routes/components/MapEmbed'
+import { fullAddress, gym } from '@/content'
+import { capture, ctaTracker } from '@/lib/analytics'
+import { telHref, whatsappHref } from '@/lib/links'
+import { hasTrialClaim, takeConversionToken } from '@/lib/trialClaim'
 
 const waHref = whatsappHref(
   `Hi ${gym.name}, I just claimed the free trial on your website.`,

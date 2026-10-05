@@ -11,12 +11,13 @@ values
   '{"admin":true,"claims_admin":true}', '{"name":"Michael D''Souza"}', now(), now());
 
 -- The Festival Offer is the Annual Pass with a discount, not a plan of its own.
+-- end_date is worked out by a trigger, pauses included.
 insert into memberships
  (id, plan_key, plan_name, price, duration_days, pause_days_allowed,
-  discount_amount, discount_reason, start_date, end_date, created_by) values
+  discount_amount, discount_reason, start_date, created_by) values
  ('b0000000-0000-0000-0000-000000000001',
   'annual', 'Annual Pass', 9999, 365, 15, 1000, 'Festival offer',
-  today_ist() - 30, today_ist() + 334, 'd0000000-0000-0000-0000-000000000001');
+  today_ist() - 30, 'd0000000-0000-0000-0000-000000000001');
 
 insert into membership_users (membership_id, user_id, status) values
  ('b0000000-0000-0000-0000-000000000001','d0000000-0000-0000-0000-000000000001','active');

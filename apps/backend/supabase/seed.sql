@@ -29,12 +29,13 @@ insert into pause_days (membership_id, paused_from, paused_to, requested_on, req
  ('b0000000-0000-0000-0000-000000000001', today_ist() - 10, today_ist() - 8,
   today_ist() - 11, 'd0000000-0000-0000-0000-000000000001');
 
+-- invoice_number is left to the trigger, which takes it from invoice_seq.
 insert into payments
  (membership_id, paid_by, amount, method, reference_id, status,
-  reconciled_at, marked_by, invoice_number) values
+  reconciled_at, marked_by) values
  ('b0000000-0000-0000-0000-000000000001','d0000000-0000-0000-0000-000000000001',
   8000,'upi','452312909981','paid', now(),
-  'd0000000-0000-0000-0000-000000000001','INV-2026-00001');
+  'd0000000-0000-0000-0000-000000000001');
 
 insert into leads (name, phone, source, status) values
  ('Nikhil Bhat', '+919000001001', 'free_trial', 'new');

@@ -18,8 +18,11 @@ values
   '', '', '', '',
   '{"admin":true,"plans_admin":true,"claims_admin":true}', '{"name":"Michael D''Souza"}', now(), now());
 
-insert into memberships (id, plan_id, start_date, end_date, created_by) values
+insert into memberships
+ (id, plan_id, plan_key, plan_name, price, duration_days, pause_days_allowed,
+  start_date, end_date, created_by) values
  ('b0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000001',
+  'early_bird', 'Early Bird Pass', 8000, 365, 15,
   today_ist() - 30, today_ist() + 334, 'd0000000-0000-0000-0000-000000000001');
 
 insert into membership_users (membership_id, user_id, status) values

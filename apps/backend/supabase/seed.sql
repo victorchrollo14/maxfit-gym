@@ -1,11 +1,3 @@
-insert into plans (id, family, name, duration_days, price, max_seats, pause_days_allowed, is_active) values
- ('a0000000-0000-0000-0000-000000000001','early_bird','Early Bird Pass', 365,  8000, 1, 15, true),
- ('a0000000-0000-0000-0000-000000000002','monthly',   'Monthly Pass',     30,  2000, 1,  0, true),
- ('a0000000-0000-0000-0000-000000000003','quarterly', '3 Month Pass',     90,  4000, 1,  0, true),
- ('a0000000-0000-0000-0000-000000000004','halfyearly','6 Month Pass',    180,  6000, 1,  7, true),
- ('a0000000-0000-0000-0000-000000000005','annual',    'Annual Pass',     365, 10000, 1, 15, true),
- ('a0000000-0000-0000-0000-000000000006','couple',    'Couple Pass',     365, 15000, 2, 15, true);
-
 -- The token columns are '' rather than null because GoTrue reads them as
 -- strings and errors on null during an email OTP.
 insert into auth.users
@@ -16,13 +8,14 @@ values
  ('d0000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated',
   '+919000000001', now(), 'victor20030214@gmail.com', now(),
   '', '', '', '',
-  '{"admin":true,"plans_admin":true,"claims_admin":true}', '{"name":"Michael D''Souza"}', now(), now());
+  '{"admin":true,"claims_admin":true}', '{"name":"Michael D''Souza"}', now(), now());
 
+-- The Festival Offer is the Annual Pass with a discount, not a plan of its own.
 insert into memberships
- (id, plan_id, plan_key, plan_name, price, duration_days, pause_days_allowed,
-  start_date, end_date, created_by) values
- ('b0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000001',
-  'early_bird', 'Early Bird Pass', 8000, 365, 15,
+ (id, plan_key, plan_name, price, duration_days, pause_days_allowed,
+  discount_amount, discount_reason, start_date, end_date, created_by) values
+ ('b0000000-0000-0000-0000-000000000001',
+  'annual', 'Annual Pass', 9999, 365, 15, 1000, 'Festival offer',
   today_ist() - 30, today_ist() + 334, 'd0000000-0000-0000-0000-000000000001');
 
 insert into membership_users (membership_id, user_id, status) values
@@ -36,7 +29,7 @@ insert into payments
  (membership_id, paid_by, amount, method, reference_id, status,
   reconciled_at, marked_by, invoice_number) values
  ('b0000000-0000-0000-0000-000000000001','d0000000-0000-0000-0000-000000000001',
-  8000,'upi','452312909981','paid', now(),
+  8999,'upi','452312909981','paid', now(),
   'd0000000-0000-0000-0000-000000000001','INV-2026-00001');
 
 insert into leads (name, phone, source, status) values

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { getSupabase } from '@/lib/supabase'
 
-export const CLAIMS = ['admin', 'plans_admin', 'claims_admin'] as const
+export const CLAIMS = ['admin', 'claims_admin'] as const
 
 export type Claim = (typeof CLAIMS)[number]
 

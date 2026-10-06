@@ -18,6 +18,7 @@ import {
   LuShield,
   LuTarget,
   LuUser,
+  LuUsers,
 } from 'react-icons/lu'
 import { Logo } from '@/routes/components/Logo'
 import { getSupabase } from '@/lib/supabase'
@@ -137,6 +138,7 @@ export function Layout() {
     const nav: NavItem[] = []
     if (isAdmin) {
       nav.push({ label: 'Dashboard', to: '/godmode', icon: LuLayoutDashboard })
+      nav.push({ label: 'Members', to: '/godmode/members', icon: LuUsers })
       nav.push({ label: 'Leads', to: '/godmode/leads', icon: LuTarget })
     }
     if (isClaimsAdmin) {

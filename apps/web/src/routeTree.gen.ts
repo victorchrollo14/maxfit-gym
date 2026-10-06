@@ -19,6 +19,8 @@ import { Route as GodmodeShellClaimsRouteImport } from './routes/godmode/_shell/
 import { Route as GodmodeShellLeadsRouteImport } from './routes/godmode/_shell/leads'
 import { Route as PublicLayouthomeIndexRouteImport } from './routes/_public/_layout/(home)/index'
 import { Route as PublicLayoutTrialClaimedIndexRouteImport } from './routes/_public/_layout/trial-claimed/index'
+import { Route as GodmodeShellMembersIndexRouteImport } from './routes/godmode/_shell/members/index'
+import { Route as GodmodeShellMembersMemberIdRouteImport } from './routes/godmode/_shell/members/$memberId'
 
 const GodmodeRoute = GodmodeRouteImport.update({
   id: '/godmode',
@@ -69,6 +71,18 @@ const PublicLayoutTrialClaimedIndexRoute =
     path: '/trial-claimed/',
     getParentRoute: () => PublicLayoutRoute,
   } as any)
+const GodmodeShellMembersIndexRoute =
+  GodmodeShellMembersIndexRouteImport.update({
+    id: '/members/',
+    path: '/members/',
+    getParentRoute: () => GodmodeShellRoute,
+  } as any)
+const GodmodeShellMembersMemberIdRoute =
+  GodmodeShellMembersMemberIdRouteImport.update({
+    id: '/members/$memberId',
+    path: '/members/$memberId',
+    getParentRoute: () => GodmodeShellRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/godmode': typeof GodmodeRouteWithChildren
@@ -78,7 +92,9 @@ export interface FileRoutesByFullPath {
   '/godmode/claims': typeof GodmodeShellClaimsRoute
   '/godmode/leads': typeof GodmodeShellLeadsRoute
   '/godmode/': typeof GodmodeShellIndexRoute
+  '/godmode/members/$memberId': typeof GodmodeShellMembersMemberIdRoute
   '/trial-claimed/': typeof PublicLayoutTrialClaimedIndexRoute
+  '/godmode/members/': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRoutesByTo {
   '/godmode': typeof GodmodeShellIndexRoute
@@ -86,8 +102,10 @@ export interface FileRoutesByTo {
   '/api/webhooks/send-wa-otp': typeof ApiWebhooksSendWaOtpRoute
   '/godmode/claims': typeof GodmodeShellClaimsRoute
   '/godmode/leads': typeof GodmodeShellLeadsRoute
+  '/godmode/members/$memberId': typeof GodmodeShellMembersMemberIdRoute
   '/': typeof PublicLayouthomeIndexRoute
   '/trial-claimed': typeof PublicLayoutTrialClaimedIndexRoute
+  '/godmode/members': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -99,8 +117,10 @@ export interface FileRoutesById {
   '/godmode/_shell/claims': typeof GodmodeShellClaimsRoute
   '/godmode/_shell/leads': typeof GodmodeShellLeadsRoute
   '/godmode/_shell/': typeof GodmodeShellIndexRoute
+  '/godmode/_shell/members/$memberId': typeof GodmodeShellMembersMemberIdRoute
   '/_public/_layout/(home)/': typeof PublicLayouthomeIndexRoute
   '/_public/_layout/trial-claimed/': typeof PublicLayoutTrialClaimedIndexRoute
+  '/godmode/_shell/members/': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -112,7 +132,9 @@ export interface FileRouteTypes {
     | '/godmode/claims'
     | '/godmode/leads'
     | '/godmode/'
+    | '/godmode/members/$memberId'
     | '/trial-claimed/'
+    | '/godmode/members/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/godmode'
@@ -120,8 +142,10 @@ export interface FileRouteTypes {
     | '/api/webhooks/send-wa-otp'
     | '/godmode/claims'
     | '/godmode/leads'
+    | '/godmode/members/$memberId'
     | '/'
     | '/trial-claimed'
+    | '/godmode/members'
   id:
     | '__root__'
     | '/godmode'
@@ -132,8 +156,10 @@ export interface FileRouteTypes {
     | '/godmode/_shell/claims'
     | '/godmode/_shell/leads'
     | '/godmode/_shell/'
+    | '/godmode/_shell/members/$memberId'
     | '/_public/_layout/(home)/'
     | '/_public/_layout/trial-claimed/'
+    | '/godmode/_shell/members/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -214,6 +240,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLayoutTrialClaimedIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
+    '/godmode/_shell/members/': {
+      id: '/godmode/_shell/members/'
+      path: '/members'
+      fullPath: '/godmode/members/'
+      preLoaderRoute: typeof GodmodeShellMembersIndexRouteImport
+      parentRoute: typeof GodmodeShellRoute
+    }
+    '/godmode/_shell/members/$memberId': {
+      id: '/godmode/_shell/members/$memberId'
+      path: '/members/$memberId'
+      fullPath: '/godmode/members/$memberId'
+      preLoaderRoute: typeof GodmodeShellMembersMemberIdRouteImport
+      parentRoute: typeof GodmodeShellRoute
+    }
   }
 }
 
@@ -221,12 +261,16 @@ interface GodmodeShellRouteChildren {
   GodmodeShellClaimsRoute: typeof GodmodeShellClaimsRoute
   GodmodeShellLeadsRoute: typeof GodmodeShellLeadsRoute
   GodmodeShellIndexRoute: typeof GodmodeShellIndexRoute
+  GodmodeShellMembersMemberIdRoute: typeof GodmodeShellMembersMemberIdRoute
+  GodmodeShellMembersIndexRoute: typeof GodmodeShellMembersIndexRoute
 }
 
 const GodmodeShellRouteChildren: GodmodeShellRouteChildren = {
   GodmodeShellClaimsRoute: GodmodeShellClaimsRoute,
   GodmodeShellLeadsRoute: GodmodeShellLeadsRoute,
   GodmodeShellIndexRoute: GodmodeShellIndexRoute,
+  GodmodeShellMembersMemberIdRoute: GodmodeShellMembersMemberIdRoute,
+  GodmodeShellMembersIndexRoute: GodmodeShellMembersIndexRoute,
 }
 
 const GodmodeShellRouteWithChildren = GodmodeShellRoute._addFileChildren(

@@ -58,12 +58,14 @@ jobs:
       # what a deploy was about to change if it then fails half way.
       - name: Plan
         if: steps.cfg.outputs.ready == 'true'
-        run: supabase db push --linked --dry-run
+        run: supabase db push --linked --dry-run --include-all
 
       # No --include-seed: seed.sql is dev data and must never reach production.
+      # --include-all: migrations that don't depend on each other are merged as
+      # separate PRs, so one can land after a newer one is already applied.
       - name: Apply migrations
         if: steps.cfg.outputs.ready == 'true'
-        run: supabase db push --linked
+        run: supabase db push --linked --include-all
 
       - name: Confirm applied
         if: steps.cfg.outputs.ready == 'true'

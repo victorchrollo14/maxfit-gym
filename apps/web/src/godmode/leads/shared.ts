@@ -7,6 +7,7 @@ export type Lead = {
   status: string
   notes: string | null
   converted_at: string | null
+  user_id: string | null
   created_at: string
 }
 
@@ -49,7 +50,7 @@ export const columnAccent: Record<string, string> = {
 }
 
 export const LEAD_FIELDS =
-  'id, name, phone, email, source, status, notes, converted_at, created_at'
+  'id, name, phone, email, source, status, notes, converted_at, user_id, created_at'
 
 export function prettyPhone(phone: string) {
   const match = /^\+91(\d{5})(\d{5})$/.exec(phone)

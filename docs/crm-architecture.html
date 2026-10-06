@@ -1,0 +1,795 @@
+<title>MaxFit CRM Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,600;112,800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#F6F4F3; --surface:#FFFFFF; --sunk:#EFECEA; --ink:#1D1A19; --ink-2:#4A4442; --muted:#7A7270;
+  --line:#E3DEDC; --accent:#C42A21; --accent-soft:#FBE9E7; --accent-ink:#9E1F18;
+  --ok:#2E7D4A; --ok-soft:#E5F3EA; --warn:#9A6212; --warn-soft:#FBF0DD; --info:#2D5F8A; --info-soft:#E6EEF6;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F0D0D; --surface:#181515; --sunk:#211D1C; --ink:#F3F0EF; --ink-2:#C9C2C0; --muted:#968D8B;
+    --line:#2D2827; --accent:#EC5147; --accent-soft:#3A1715; --accent-ink:#FF8A80;
+    --ok:#62C285; --ok-soft:#14291C; --warn:#E3A84E; --warn-soft:#2E2210; --info:#7FB2DE; --info-soft:#14222F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F0D0D; --surface:#181515; --sunk:#211D1C; --ink:#F3F0EF; --ink-2:#C9C2C0; --muted:#968D8B;
+  --line:#2D2827; --accent:#EC5147; --accent-soft:#3A1715; --accent-ink:#FF8A80;
+  --ok:#62C285; --ok-soft:#14291C; --warn:#E3A84E; --warn-soft:#2E2210; --info:#7FB2DE; --info-soft:#14222F;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;padding-inline:20px;padding-block:0 80px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:56px}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0}.toc{display:none}}
+.toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;padding-block:40px;max-height:100vh;overflow:auto}
+.toc .brand{font-family:var(--display);font-weight:800;font-stretch:112%;letter-spacing:.02em;text-transform:uppercase;font-size:15px}
+.toc .brand span{color:var(--accent)}
+.toc ol{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:2px;counter-reset:t}
+.toc a{display:flex;gap:10px;color:var(--ink-2);text-decoration:none;font-size:14.5px;padding:5px 8px;border-radius:6px}
+.toc a:hover,.toc a:focus-visible{background:var(--sunk);color:var(--ink);outline:none}
+.toc a b{font-family:var(--mono);font-weight:400;font-size:12px;color:var(--muted);padding-top:2px;min-width:18px}
+main{min-width:0;max-width:800px;padding-block:40px}
+header.top{padding-bottom:28px;border-bottom:2px solid var(--ink);margin-bottom:8px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:clamp(34px,6vw,52px);line-height:1.02;letter-spacing:-.01em;margin:10px 0 14px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:18.5px;color:var(--ink-2);max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-size:14px;color:var(--muted)}
+.meta strong{color:var(--ink);font-weight:600}
+section{padding-top:52px;scroll-margin-top:12px}
+h2{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:28px;line-height:1.15;margin:0 0 6px;display:flex;gap:14px;align-items:baseline;text-wrap:balance}
+h2 .n{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--accent);font-stretch:100%}
+.sub{color:var(--muted);margin:0 0 22px;font-size:15.5px}
+h3{font-family:var(--display);font-weight:600;font-stretch:112%;font-size:19px;margin:32px 0 10px;text-wrap:balance}
+p{margin:0 0 14px;max-width:68ch}
+ul,ol{margin:0 0 16px;padding-left:22px;max-width:68ch}
+li{margin-bottom:6px}
+li::marker{color:var(--muted)}
+code{font-family:var(--mono);font-size:.84em;background:var(--sunk);padding:1px 5px;border-radius:4px;color:var(--ink);overflow-wrap:anywhere}
+a{color:var(--accent-ink)}
+strong{font-weight:700}
+
+/* callouts */
+.call{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:14px 18px;margin:18px 0;display:grid;gap:4px}
+.call .tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;display:inline-flex;gap:8px;align-items:center}
+.call p,.call ul{margin:0}.call p+p,.call p+ul,.call ul+p{margin-top:8px}
+.call.decision{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));background:var(--accent-soft)}
+.call.decision .tag{color:var(--accent-ink)}
+.call.gap{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 35%,var(--line))}
+.call.gap .tag{color:var(--warn)}
+.call.q{background:var(--info-soft);border-color:color-mix(in srgb,var(--info) 35%,var(--line))}
+.call.q .tag{color:var(--info)}
+.id{font-family:var(--mono);font-size:11.5px;padding:1px 6px;border-radius:4px;background:var(--surface);border:1px solid currentColor}
+
+/* tables */
+.tbl{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--sunk)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td code{white-space:nowrap}
+tr.total td{font-weight:700;border-top:2px solid var(--ink)}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.pill.new{background:var(--ok-soft);color:var(--ok)}
+.pill.chg{background:var(--warn-soft);color:var(--warn)}
+.pill.keep{background:var(--sunk);color:var(--muted)}
+.pill.red{background:var(--accent-soft);color:var(--accent-ink)}
+
+/* diagrams */
+.fig{margin:18px 0 22px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:16px;overflow-x:auto}
+.fig pre.mermaid{margin:0;background:transparent;font-family:var(--body)}
+.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:10px}
+figure{margin:0}
+
+/* cards row */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:16px 0 20px}
+.card{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:16px 18px}
+.card h4{margin:0 0 6px;font-family:var(--display);font-stretch:112%;font-weight:600;font-size:16px}
+.card p{font-size:15px;color:var(--ink-2);margin:0}
+.card ul{font-size:15px;color:var(--ink-2);margin:6px 0 0;padding-left:18px}
+
+/* pause timeline */
+.tl{margin:18px 0 8px;display:grid;gap:12px}
+.tl .row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center;font-size:14px}
+.tl .lbl{color:var(--ink-2)}
+.tl .bar{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+.tl .seg{position:absolute;top:0;bottom:0;border-radius:5px}
+.tl .seg.on{background:color-mix(in srgb,var(--ok) 55%,var(--surface))}
+.tl .seg.pause{background:var(--warn)}
+.tl .seg.ext{background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--ok) 55%,var(--surface)) 0 4px,var(--surface) 4px 7px)}
+.tl .axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-left:132px}
+@media (max-width:520px){.tl .row{grid-template-columns:minmax(0,1fr)}.tl .axis{margin-left:0}}
+
+.qlist{counter-reset:q;list-style:none;padding:0;display:grid;gap:10px;max-width:none}
+.qlist li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin:0}
+.qlist li .id{justify-self:start;align-self:start;color:var(--info)}
+.qlist li.d .id{color:var(--accent-ink)}
+.qlist li.ok .id{color:var(--ok)}
+.qlist li.x .id{color:var(--muted)}
+.qlist li.x > div{color:var(--muted)}
+.call.dropped{background:var(--sunk)}
+.call.dropped .tag{color:var(--muted)}
+.call.dropped p{color:var(--muted)}
+.call.agreed{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 35%,var(--line))}
+.call.agreed .tag{color:var(--ok)}
+.qlist small{display:block;color:var(--muted);font-size:13.5px;margin-top:2px}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <div class="brand">Max<span>Fit</span> CRM</div>
+  <ol>
+    <li><a href="#today"><b>01</b>Where we are</a></li>
+    <li><a href="#rules"><b>02</b>Ground rules</a></li>
+    <li><a href="#member"><b>03</b>Adding a member</a></li>
+    <li><a href="#photo"><b>04</b>Member photos</a></li>
+    <li><a href="#membership"><b>05</b>Creating a membership</a></li>
+    <li><a href="#payments"><b>06</b>Payments &amp; dues</a></li>
+    <li><a href="#pause"><b>07</b>Pausing</a></li>
+    <li><a href="#screens"><b>08</b>What the admin sees</a></li>
+    <li><a href="#schema"><b>09</b>Schema changes</a></li>
+    <li><a href="#more"><b>10</b>Also to discuss</a></li>
+    <li><a href="#questions"><b>11</b>Decisions &amp; questions</a></li>
+    <li><a href="#build"><b>12</b>Build order</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <div class="eyebrow">Architecture · Draft 4 · decisions settled</div>
+  <h1>MaxFit CRM: how members, memberships, money and <em>pauses</em> work</h1>
+  <p class="lede">How the front desk adds a member, sells a membership, records payments and pauses a yearly plan. Each flow is checked against the current Supabase schema, and every gap is marked.</p>
+  <div class="meta"><span><strong>Updated</strong> 4 Oct 2026</span><span><strong>Scope</strong> architecture only. Implementation steps come after sign-off.</span><span><strong>Source</strong> <code>apps/backend/supabase/migrations</code> as of <code>34d728a</code></span></div>
+</header>
+
+<!-- 01 -->
+<section id="today">
+  <h2><span class="n">01</span>Where we are</h2>
+  <p class="sub">What's built, what the schema already models, and what's missing for the flows below.</p>
+
+  <div class="grid2">
+    <div class="card"><h4>Built</h4><ul>
+      <li>Landing page and free-trial form, which write to <code>leads</code></li>
+      <li>Godmode: email-OTP sign-in, dashboard stats, a leads kanban with a drawer, and a claims editor</li>
+      <li>WhatsApp delivery for Supabase phone OTP (<code>/api/webhooks/send-wa-otp</code>)</li>
+    </ul></div>
+    <div class="card"><h4>Modelled but no UI yet</h4><ul>
+      <li><code>user_profiles</code>, <code>memberships</code>, <code>membership_users</code></li>
+      <li><code>plans</code>, which this draft removes in favour of a list in code (<a href="#membership">05</a>)</li>
+      <li><code>pause_days</code>, with a no-overlap exclusion constraint</li>
+      <li><code>payments</code> (UPI / cash / card), <code>invoice_seq</code></li>
+    </ul></div>
+  </div>
+
+  <figure class="fig">
+<pre class="mermaid">
+erDiagram
+  user_profiles ||--o{ membership_users : "holds seat"
+  memberships ||--|{ membership_users : "has seats"
+  memberships ||--o{ pause_days : "paused by"
+  memberships ||--o{ payments : "paid by"
+  user_profiles ||--o{ payments : "paid_by"
+  leads }o--o| user_profiles : "converts to"
+  user_profiles {
+    uuid id PK "= auth.users.id"
+    text name
+    text phone
+    timestamptz phone_verified_at
+    text avatar
+  }
+  memberships {
+    text plan_key "from src/plans.ts"
+    numeric price
+    date start_date
+    date end_date
+    numeric discount_amount
+  }
+  pause_days {
+    date paused_from
+    date paused_to
+    date resumed_early_on
+  }
+  payments {
+    numeric amount
+    text method
+    text status
+    text invoice_number
+  }
+</pre>
+    <figcaption>The schema with <code>plans</code> moved out to code. Each membership has one or more seats (two for the Couple Pass). Pauses and payments hang off the membership, not off the person.</figcaption>
+  </figure>
+
+  <h3>Gaps found while tracing the flows</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Gap</th><th>Resolution</th><th>Covered in</th></tr></thead>
+    <tbody>
+      <tr><td><code>memberships</code> depends on the live plan</td><td><span class="pill new">resolved</span> Terms are copied onto the membership at sale, and plans move into code (D2, D5).</td><td><a href="#membership">05</a></td></tr>
+      <tr><td>The last migration dropped the pause rules</td><td><span class="pill new">resolved</span> They stay dropped. Server functions check the rules. The database keeps its constraints and one trigger that keeps <code>end_date</code> in sync (D1).</td><td><a href="#rules">02</a>, <a href="#pause">07</a></td></tr>
+      <tr><td>A member needs an <code>auth.users</code> row</td><td><span class="pill new">resolved</span> Created by a server function with the service-role key.</td><td><a href="#member">03</a></td></tr>
+      <tr><td>Phone format drift</td><td><span class="pill new">resolved</span> GoTrue stores <code>auth.users.phone</code> without the <code>+</code>; <code>leads.phone</code> has it. The auth triggers add the <code>+</code> when they copy the phone into <code>user_profiles</code> (D8).</td><td><a href="#member">03</a></td></tr>
+      <tr><td>Payments have no "paid on" date</td><td><span class="pill new">resolved</span> Add <code>paid_at</code>, defaulting to now and backdatable.</td><td><a href="#payments">06</a></td></tr>
+      <tr><td>Payments default to <code>pending</code></td><td><span class="pill new">resolved</span> <code>'pending'</code> stays in the check for a future Razorpay webhook. The default goes, and manual entries are saved as <code>'paid'</code>.</td><td><a href="#payments">06</a></td></tr>
+      <tr><td>Nothing records how a phone was verified</td><td><span class="pill keep">not needed</span> WhatsApp code or the admin's radio button. Both end with a confirmed phone, and we don't track which.</td><td><a href="#member">03</a></td></tr>
+      <tr><td>Two plan price lists</td><td><span class="pill keep">not a gap</span> The landing page and the CRM keep separate lists on purpose. The site's prices and offers change freely, and the CRM sells from <code>src/plans.ts</code> (D5).</td><td><a href="#membership">05</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="rules">
+  <h2><span class="n">02</span>Ground rules</h2>
+  <p class="sub">Every flow below follows these.</p>
+
+  <div class="grid2">
+    <div class="card"><h4>Every member can log in</h4><p>A member is a Supabase auth user with a phone number. Phone sign-up is off (<code>[auth.sms] enable_signup = false</code>), so the CRM is the only way a member account gets created, and the portal's phone-OTP login works from day one.</p></div>
+    <div class="card"><h4>Balances are never stored</h4><p>Amount paid and amount pending are always summed from <code>payments</code>. There's no <code>balance</code> column that can drift from the actual payments.</p></div>
+    <div class="card"><h4><code>end_date</code> is the real expiry</h4><p>It always holds the day the membership actually ends, pauses included. A trigger on <code>pause_days</code> recalculates it as <code>start_date + duration_days − 1 + days paused</code>, so it can't drift from the pauses. The original end can always be recalculated from the start date and duration.</p></div>
+    <div class="card"><h4>"Today" means today in IST</h4><p>Timestamps (<code>created_at</code>, <code>paid_at</code>) are <code>timestamptz</code>, stored as UTC and shown in IST. Membership and pause dates are plain <code>date</code>s: calendar days with no time or zone, inclusive on both ends. The rule is about comparing them to today, which always has to be the IST day.</p></div>
+  </div>
+
+  <div class="call gap"><span class="tag">Why "today" has to be the IST day</span>
+    <p>Between 00:00 and 05:30 IST, UTC is still on the previous day. The EC2 server runs in UTC, so <code>new Date().toISOString().slice(0, 10)</code> on 4 Oct at 1 AM IST gives <code>2026-10-03</code>. A membership ending 3 Oct would still look active, and a pause "from tomorrow" would start a day early. So:</p>
+    <ul>
+      <li>SQL: always <code>today_ist()</code>, never <code>current_date</code> or <code>now()::date</code>.</li>
+      <li>TypeScript: one helper, <code>todayIST()</code>, using <code>Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' })</code>. Never take the date from <code>new Date()</code> directly.</li>
+      <li>Date pickers send <code>YYYY-MM-DD</code> strings, never <code>Date</code> objects, which carry a timezone with them.</li>
+    </ul>
+  </div>
+
+  <h3>Where writes run</h3>
+  <p>The CRM writes <code>leads</code> straight from the browser today, and admin-claim RLS keeps that safe. The new flows break into three kinds of write:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Kind</th><th>Examples</th><th>Runs in</th></tr></thead>
+    <tbody>
+      <tr><td>Needs a secret</td><td>Create an auth user, send a WhatsApp code, sign a Cloudinary upload</td><td>TanStack Start server function (service-role key, WABA token, Cloudinary secret)</td></tr>
+      <tr><td>Several rows, or a rule that reads other rows</td><td>Membership + its seats; a pause checked against the allowance</td><td>Server function. It checks the rule in TypeScript, then writes with the service-role key.</td></tr>
+      <tr><td>Single row, simple</td><td>Edit profile notes, record a payment, change lead status</td><td>Browser → Supabase under RLS, with table constraints as the guard</td></tr>
+    </tbody>
+  </table></div>
+  <div class="call agreed"><span class="tag"><span class="id">D1</span> Agreed 4 Oct</span>
+    <p>No membership or pause functions. Server functions check the rules and do the writes. The database keeps its constraints (pause no-overlap, discount checks) and <strong>one trigger</strong> on <code>pause_days</code>: it keeps <code>end_date</code> in sync and moves any queued renewal along with it.</p>
+    <p>Accepted trade-offs. A membership and its seats are two inserts, so the server function deletes the membership if the seats fail. Two pauses saved at the same instant could both pass the allowance check, which a single front desk won't hit.</p>
+  </div>
+</section>
+
+<!-- 03 -->
+<section id="member">
+  <h2><span class="n">03</span>Adding a member</h2>
+  <p class="sub">From the Members screen, or from a lead's drawer with "Convert to member", which pre-fills the form.</p>
+
+  <h3>The form</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Field</th><th>Required</th><th>Lands in</th></tr></thead>
+    <tbody>
+      <tr><td>Name</td><td>Yes</td><td><code>user_profiles.name</code> (via auth user metadata)</td></tr>
+      <tr><td>Phone</td><td>Yes, normalised to <code>+91XXXXXXXXXX</code></td><td><code>auth.users.phone</code> → <code>user_profiles.phone</code></td></tr>
+      <tr><td>Verification</td><td>Yes: WhatsApp code <em>or</em> "verified by admin"</td><td><code>auth.users.phone_confirmed_at</code>, set by <code>phone_confirm: true</code> either way</td></tr>
+      <tr><td>Email, gender, date of birth, notes</td><td>No</td><td><code>user_profiles</code></td></tr>
+      <tr><td>Photo</td><td>No, can be added after</td><td><code>user_profiles.avatar</code> (see <a href="#photo">04</a>)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>On screen</h3>
+  <p>Both ways in open the same <strong>Add member</strong> drawer: the button on the Members page, and <strong>Convert to member</strong> in a lead's drawer.</p>
+  <div class="grid2">
+    <div class="card"><h4>The drawer</h4><ul>
+      <li>Name and phone (<code>+91</code> prefix), with email, gender, date of birth and notes under a collapsed "More details"</li>
+      <li>A banner as soon as the number is valid (Step 1 below)</li>
+      <li>"Verify phone": <em>Send WhatsApp code</em> (send, 6-digit box, check, resend timer) or <em>I've verified this number</em></li>
+      <li><strong>Create member</strong> works once the code checks out or the second option is picked</li>
+      <li>Then the member page opens with the New membership form already up. The admin closes it if they're only adding a login.</li>
+    </ul></div>
+    <div class="card"><h4>From a lead</h4><ul>
+      <li>One button, <strong>Convert to member</strong>, in the existing lead drawer</li>
+      <li>Opens the drawer with name, phone, email and notes copied from the lead. Phone stays editable in case the lead has a typo.</li>
+      <li>After saving, the drawer shows the <em>converted</em> chip and <strong>Open member page</strong>. The card moves to the Converted column, and status stays locked as today.</li>
+    </ul></div>
+  </div>
+
+  <h3>Step 1: is this person already here?</h3>
+  <p>As soon as a valid number is typed, the CRM looks it up:</p>
+  <ul>
+    <li><strong>Already a member</strong>: a red banner links to their member page, and Create member is blocked. <code>auth.users.phone</code> is unique, so a duplicate would fail anyway, but showing the existing member is friendlier. When the drawer was opened from a lead, it offers <strong>"Link lead to Priya Raman"</strong> instead, which marks the lead converted against that member without creating anyone.</li>
+    <li><strong>An open lead</strong> (when opened from the Members page): a yellow banner says the lead will be marked converted. Saving sets <code>leads.user_id</code>, <code>status = 'converted'</code> and <code>converted_at</code>. The table's check constraint already pairs those last two.</li>
+    <li><strong>Nobody</strong>: carry on.</li>
+  </ul>
+
+  <h3>Step 2a: verify by WhatsApp code</h3>
+  <p>We can't use Supabase's own phone OTP here. <code>signInWithOtp</code> + <code>verifyOtp</code> signs the browser in <em>as the member</em>, which would replace the admin's session. Instead the server runs its own short-lived code using the WhatsApp template we already send:</p>
+  <figure class="fig">
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor A as Admin (CRM)
+  participant S as Web server
+  participant DB as Supabase
+  participant W as WhatsApp
+  actor M as Member
+  A->>S: Send code to +91 98450 12345
+  S->>DB: Already a member? Too many codes this hour?
+  S->>DB: Save hash of code, expires in 10 min
+  S->>W: Authentication template with code
+  W-->>M: Your MaxFit code is 482913
+  M-->>A: Reads the code out
+  A->>S: Check code 482913
+  S->>DB: Match hash, mark verification used
+  S-->>A: Verified (verification id)
+  A->>S: Create member (details + verification id)
+  S->>DB: auth.admin.createUser(phone, phone_confirm true, name)
+  Note over DB: trigger inserts user_profiles row
+  S->>DB: Save extras, link lead
+  S-->>A: Open member page
+</pre>
+    <figcaption>The code lives in a new <code>phone_verifications</code> table. Only the hash is stored, with 5 tries and a 10-minute expiry. <code>sendWhatsAppOtp()</code> in <code>src/server/whatsapp.ts</code> is reused as is.</figcaption>
+  </figure>
+
+  <h3>Step 2b: verify by admin</h3>
+  <p>The admin has already spoken to the person on that number, or the person is standing at the desk. They pick <strong>"I've verified this number"</strong> and the server creates the user with <code>phone_confirm: true</code>. We don't record which of the two was used.</p>
+
+  <div class="call agreed"><span class="tag"><span class="id">D9</span> Agreed 4 Oct</span>
+    <p>Two ways to verify: WhatsApp code or the admin's "I've verified this number". No "Verify later". Remote sales use the second, since the admin has just spoken to them on that number.</p>
+  </div>
+
+  <div class="call agreed"><span class="tag"><span class="id">D8</span> Agreed 4 Oct</span>
+    <p>Keep the phone copy in <code>user_profiles</code>, since the browser can't read <code>auth.users</code>. <code>handle_new_user</code> and <code>handle_user_updated</code> add the <code>+</code> when GoTrue has stripped it, so <code>user_profiles.phone</code> and <code>leads.phone</code> are both E.164 and lookups by number match.</p>
+  </div>
+</section>
+
+<!-- 04 -->
+<section id="photo">
+  <h2><span class="n">04</span>Member photos</h2>
+  <p class="sub">So the front desk can match a face to a name. Stored on Cloudinary, private.</p>
+
+  <figure class="fig">
+<pre class="mermaid">
+sequenceDiagram
+  actor A as Admin (CRM)
+  participant S as Web server
+  participant C as Cloudinary
+  participant DB as Supabase
+  A->>A: Pick or take photo, crop square, resize to 800px JPEG
+  A->>S: Sign an upload for member 7f3c
+  S-->>A: signature, timestamp, public_id profile/7f3c
+  A->>C: Upload directly (browser to Cloudinary), type authenticated
+  C-->>A: public_id + version
+  A->>DB: user_profiles.avatar = v1727951234/profile/7f3c
+  Note over A,C: Later, showing it
+  A->>S: Signed URLs for these 20 members at 160px
+  S-->>A: one signed URL each
+  A->>C: GET signed URL
+  C-->>A: 160px face crop, made on first request then cached
+</pre>
+    <figcaption>The file never passes through our server, and neither do the images when they're shown. Only the small signing calls do, which keeps the Cloudinary API secret off the browser.</figcaption>
+  </figure>
+
+  <ul>
+    <li><strong>Capture</strong>: <code>&lt;input type="file" accept="image/*" capture="user"&gt;</code> opens the camera on a phone or tablet at the desk and the file picker on a laptop.</li>
+    <li><strong>Size</strong>: resized in the browser before upload, so each photo is about 100–150 KB. Two thousand members is roughly 300 MB, well inside the free tier. This is the only change made before upload.</li>
+    <li><strong>Naming</strong>: the Cloudinary <code>public_id</code> (its name for the file's path, nothing to do with visibility) is <code>profile/&lt;user_profiles.id&gt;</code>. One photo per member, and a new upload overwrites it. We store <code>v&lt;version&gt;/profile/&lt;id&gt;</code>, so a new photo busts the cache. There's no orphan cleanup to do.</li>
+    <li><strong>Two sizes, made on request</strong>: the original is stored once, and the size lives in the URL. There are only two, the same on desktop and mobile, defined once in code:
+      <ul>
+        <li><code>avatar</code>: <code>c_fill,g_face,w_160,h_160,f_auto,q_auto</code>, a square face crop shown at 80px (160px keeps it sharp on high-density screens)</li>
+        <li><code>full</code>: <code>c_limit,w_800,f_auto,q_auto</code>, the whole photo, for the member page and a tap-to-enlarge view</li>
+      </ul>
+      Cloudinary makes each the first time it's asked for and caches it. Nothing is pre-generated at upload, and the server signs only these two.</li>
+    <li><strong>Private</strong>: uploaded as type <code>authenticated</code>, so Cloudinary serves an image only from a URL our server has signed. The signature covers the size too, so the browser can't ask for the full-size original or any size the server didn't sign. When a list loads, one server call signs that page's URLs.</li>
+  </ul>
+
+  <div class="call agreed"><span class="tag"><span class="id">D10</span> Agreed 4 Oct</span>
+    <p>Photos are private (<code>authenticated</code> type, server-signed URLs), stored as <code>profile/&lt;user_profiles.id&gt;</code>, in two sizes only: <code>avatar</code> (160px face crop) and <code>full</code> (800px).</p>
+  </div>
+  <div class="call gap"><span class="tag">Limit: signed URLs don't expire</span>
+    <p>A standard signed Cloudinary URL works for as long as the photo exists, so a leaked link stays open. The protection is that nobody can build or guess a working link, or ask for other sizes. Links that expire need Cloudinary's token-based access, a paid feature, or serving photos through our own server. Uploading a new photo creates a new version, but the old file can stay in Cloudinary's cache until it's purged, so it isn't a reliable way to kill a link.</p>
+  </div>
+</section>
+
+<!-- 05 -->
+<section id="membership">
+  <h2><span class="n">05</span>Creating a membership</h2>
+  <p class="sub">From the member page: "New membership", which also handles renewals.</p>
+
+  <figure class="fig">
+<pre class="mermaid">
+flowchart TD
+  A[Member page: New membership] --> B[Pick a plan]
+  B --> C{Plan has 2 seats?}
+  C -- Couple Pass --> D[Pick or add the second member]
+  C -- single seat --> E
+  D --> E[Start date]
+  E --> F[Discount amount and reason]
+  F --> G[Review: price, discount, amount due, end date, pause days]
+  G --> H[Create membership + seats in one transaction]
+  H --> I{Payment now?}
+  I -- yes --> J[Record payment, full or part]
+  I -- later --> K[Shows on the Dues list]
+</pre>
+  </figure>
+
+  <h3>On screen</h3>
+  <p>"New membership" on the member page (and "Renew" on the current card) opens one drawer. The steps sit in order in one scroll, not a wizard, and a summary updates as you go.</p>
+  <ul>
+    <li><strong>Plan</strong>: cards from <code>src/plans.ts</code>. Picking a 2-seat plan adds a <strong>Second member</strong> field with name or last-4-digits search. Its "New" button opens the Add member drawer on top and returns here with that person filled in.</li>
+    <li><strong>Start date</strong>: today, or the day after the current membership ends. The summary shows the end date it works out.</li>
+    <li><strong>Discount</strong>: amount and reason. Offers we run show as chips that fill both in (e.g. "Festival offer −₹1,000" on Annual). No reason, no save.</li>
+    <li><strong>Summary</strong>: price, discount, amount due, dates and pause days.</li>
+    <li><strong>Payment</strong>: "Record a payment now" is ticked, with the amount due filled in. Lower it for a part payment. UPI and card need a reference, and cash doesn't. Untick it and the full amount goes to Has dues.</li>
+    <li><strong>Create membership</strong>: the server function writes the membership, its seats and the payment, and the card appears on the member page.</li>
+    <li><strong>Renew</strong> opens the same drawer with the current plan picked and the start date queued after the current end.</li>
+  </ul>
+  <div class="call agreed"><span class="tag"><span class="id">D13</span> Agreed 4 Oct</span>
+    <p>New membership and Renew share one drawer: plan, second member if needed, start date, discount with reason, live summary, optional payment.</p>
+  </div>
+
+  <h3>Start date</h3>
+  <ul>
+    <li><strong>No current membership</strong>: defaults to today.</li>
+    <li><strong>Renewal</strong> (has an active or upcoming membership): defaults to the day after its <code>end_date</code>, so the new one queues behind it. The server function works this out.</li>
+    <li>The admin can move it forward, for example "start Monday". <code>duration_days</code> is copied from the plan, and <code>end_date = start_date + duration_days − 1</code> until a pause pushes it out.</li>
+    <li>Rule: one person can't have two memberships covering the same day. Checked across every seat, so both partners on a Couple Pass are free.</li>
+  </ul>
+
+  <h3>Where plans live</h3>
+  <p>There's no <code>plans</code> table. The catalogue is a typed list in code, <code>src/plans.ts</code>, used only by the CRM. The landing page keeps its own list in <code>content.ts</code>, and the two are <strong>not kept in sync</strong>: the site can show festival prices and other offers as often as marketing wants, and the CRM sells the regular plan with a discount and a reason. Adding a plan, changing a price or taking a plan off sale in the CRM is a code change and a deploy.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Field</th><th>Example</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td><code>key</code></td><td><code>'annual'</code></td><td>Stored on the membership as <code>plan_key</code>. Never renamed, never reused for a different product.</td></tr>
+      <tr><td><code>name</code></td><td>Annual Pass</td><td>Copied as <code>plan_name</code></td></tr>
+      <tr><td><code>price</code></td><td>9999</td><td>Copied as <code>price</code></td></tr>
+      <tr><td><code>durationDays</code></td><td>365</td><td>Copied as <code>duration_days</code></td></tr>
+      <tr><td><code>pauseDaysAllowed</code></td><td>15</td><td>Copied as <code>pause_days_allowed</code></td></tr>
+      <tr><td><code>seats</code></td><td>1, or 2 for the Couple Pass</td><td>Checked at sale</td></tr>
+      <tr><td><code>onSale</code></td><td><code>true</code></td><td>Shown in the CRM's plan picker</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Plan vs membership: which one is true?</h3>
+  <p>Both, for different questions. <strong>The plan is read once, when the membership is created.</strong> Its terms are copied onto the membership. After that, nothing reads the code list to answer a question about that membership.</p>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Plan</th><th>Membership</th></tr></thead>
+    <tbody>
+      <tr><td>What it is</td><td>The list in code: what we sell today</td><td>The deal: what this person bought</td></tr>
+      <tr><td>Answers</td><td>"What does an Annual Pass cost right now?"</td><td>"What did Priya pay, how many pause days does she have, when does she expire?"</td></tr>
+      <tr><td>Read</td><td>Once, to fill the new-membership form</td><td>Every time after that</td></tr>
+      <tr><td>Copied across at sale</td><td colspan="2"><code>plan_key</code>, <code>plan_name</code>, <code>price</code>, <code>duration_days</code>, <code>pause_days_allowed</code></td></tr>
+    </tbody>
+  </table></div>
+  <p>The membership shows its own <code>plan_name</code>, so renaming or removing a plan in code never changes history. <code>plan_key</code> is for reports ("Annual Passes sold this month") and for defaulting a renewal to the same plan. Seats aren't copied: they're checked at sale, and the seat rows already record who's on the membership.</p>
+
+  <h3>The price comes from the server</h3>
+  <p>The browser sends the plan key, start date, seat holders, discount and reason, and never a price. The server function looks the plan up in <code>src/plans.ts</code>, checks the seat count and inserts the membership and its seats with the service-role key. Browser roles have no insert on <code>memberships</code> or <code>membership_users</code>, so no membership can be written with terms the code doesn't have. With no foreign key, this is also what keeps <code>plan_key</code> valid.</p>
+
+  <h3>Changing prices and running offers</h3>
+  <ul>
+    <li><strong>Price change</strong>: edit the price in <code>src/plans.ts</code> and deploy. Memberships already sold keep their copied price. Price history is the memberships grouped by <code>plan_key</code> and <code>price</code>, plus the git history of the file.</li>
+    <li><strong>Offers</strong> are never a separate plan or a price edit. They're sold as the normal plan with a discount and a reason, e.g. Annual Pass ₹9,999 − ₹1,000 "Festival offer". An offer we run often can be listed in code so the form pre-fills the amount and reason. A one-off deal is typed in by the admin.</li>
+    <li><strong>Taking a plan off sale</strong>: set <code>onSale: false</code>. It disappears from the picker, and existing memberships are untouched.</li>
+    <li><strong>Renewals</strong> default to the same <code>plan_key</code> at today's price. If that plan is off sale, the admin picks another. Loyalty pricing goes in as a discount.</li>
+  </ul>
+  <div class="call dropped"><span class="tag"><span class="id">D4</span> Dropped 4 Oct</span>
+    <p>Versioned, immutable <code>plans</code> rows with <code>replace_plan()</code>. Superseded by D5: there's no plans table to version.</p>
+  </div>
+  <div class="call agreed"><span class="tag"><span class="id">D5</span> Agreed 4 Oct</span>
+    <p>Plans live in code (<code>src/plans.ts</code>), used only by the CRM. The <code>plans</code> table goes. The landing page's list is separate and not synced. Offers are discounts with a reason, never a plan or a price edit.</p>
+  </div>
+
+  <h3>Price and discount</h3>
+  <p><code>price</code> is copied from the code list as is and <strong>can't be edited</strong> in the form. A different price is entered as a <strong>discount with a reason</strong> (e.g. "Festival offer", "Referral from Arjun"). <code>amount_due = price − discount_amount</code>. Checks keep the discount between 0 and the price, and require a reason whenever it's above 0. This way <code>price</code> always means "list price on the day it was sold", every difference has a stated reason, and total discount given can be reported, by offer.</p>
+  <div class="call agreed"><span class="tag"><span class="id">D2</span> Agreed 3 Oct · updated 4 Oct</span>
+    <p>Copy <code>plan_key</code>, <code>plan_name</code>, <code>price</code>, <code>duration_days</code> and <code>pause_days_allowed</code> onto each membership. Price changes go through the discount.</p>
+  </div>
+
+  <div class="call agreed"><span class="tag"><span class="id">D6</span> Agreed 4 Oct</span>
+    <p>The <strong>Festival Offer</strong> isn't a plan. It's sold as the Annual Pass (₹9,999) with a ₹1,000 discount, reason "Festival offer", so ₹8,999 due.</p>
+  </div>
+  <div class="call agreed"><span class="tag"><span class="id">D7</span> Agreed 4 Oct</span>
+    <p>Durations are in <strong>days</strong>: 30 / 90 / 180 / 365. A membership can start on any day, and <code>end_date = start_date + duration_days − 1</code>. A Monthly Pass from 17 Oct runs to 15 Nov, and pauses add whole days on top.</p>
+  </div>
+
+  <h3>Status lifecycle</h3>
+  <p>Status is never stored. It's computed from dates, pauses and cancellation by one view (see <a href="#schema">09</a>). Payment status is a separate field shown next to it.</p>
+  <figure class="fig">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> Upcoming: start date in the future
+  [*] --> Active: starts today
+  Upcoming --> Active: start date reached
+  Active --> Paused: pause begins
+  Paused --> Active: pause ends or resumed early
+  Active --> Expired: past end_date
+  Upcoming --> Cancelled
+  Active --> Cancelled
+  Paused --> Cancelled
+</pre>
+    <figcaption><strong>Expiring soon</strong> is a flag on Active (<code>end_date</code> within 7 days), not a separate state. Payment status (Paid, Part paid, Unpaid) is shown alongside, e.g. "Active · ₹3,999 due".</figcaption>
+  </figure>
+
+  <h3>Couple Pass</h3>
+  <ul>
+    <li>One membership, two <code>membership_users</code> rows. <code>seats: 2</code> in the code list caps it, checked by the server at sale.</li>
+    <li>Payments attach to the membership. <code>paid_by</code> records whichever partner paid each instalment.</li>
+    <li>Pauses attach to the membership, so <strong>both partners pause together</strong> (<span class="id" style="color:var(--ok)">D16</span>).</li>
+  </ul>
+
+  <h3>Buying the next plan early</h3>
+  <p>There's no upgrade flow. A member two months into a 3 Month Pass who wants the Annual buys it as a <strong>new membership</strong> from the same drawer. Its start date defaults to the day after the current one ends, so it sits on their page as <em>Upcoming</em> and becomes <em>Active</em> on its own on that day. Nothing runs to switch it over: status is computed from the dates. They keep every day they paid for, and they pay today's price, so a time-limited offer is secured by buying now. Payment can be recorded straight away.</p>
+  <div class="call agreed"><span class="tag"><span class="id">D12</span> Agreed 4 Oct</span>
+    <p>No mid-way plan changes in the CRM. The member buys the next plan now and it starts when the current one ends. If someone really must switch now (e.g. to a Couple Pass), the admin does it by hand: cancels the current membership, works out the credit themselves, and enters it as the discount on the new one with a reason. The CRM does no credit maths. The cancel drawer only shows the days left on the membership, as information.</p>
+  </div>
+</section>
+
+<!-- 06 -->
+<section id="payments">
+  <h2><span class="n">06</span>Payments &amp; dues</h2>
+  <p class="sub">All payments are taken outside the CRM (UPI, cash, card) and then recorded here by an admin. Part payments are allowed.</p>
+
+  <h3>Recording a payment</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Field</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Membership</td><td>Pre-selected from the member page. Shows amount due and pending.</td></tr>
+      <tr><td>Amount</td><td>Defaults to the pending balance. Can be less (part payment). Can't be more than the balance.</td></tr>
+      <tr><td>Method</td><td>UPI · Cash · Card (existing check constraint)</td></tr>
+      <tr><td>Reference</td><td>UPI transaction ID / card slip number. Required for UPI and card. A unique index on <code>(method, reference_id)</code> already blocks entering the same UPI payment twice.</td></tr>
+      <tr><td>Paid on</td><td><span class="pill new">new</span> <code>paid_at</code>, defaults to now and can be backdated</td></tr>
+      <tr><td>Paid by</td><td>The member, or either partner on a Couple Pass</td></tr>
+      <tr><td>Note</td><td><span class="pill new">new</span> optional</td></tr>
+    </tbody>
+  </table></div>
+  <p>Saved with <code>status = 'paid'</code> and <code>marked_by = admin</code>, and given the next receipt number from <code>invoice_seq</code> (e.g. <code>MF-2026-00042</code>).</p>
+
+  <h3>How a part-paid membership reads</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Annual Pass · Priya Raman</th><th>Date</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+      <tr><td>Price (snapshot)</td><td>1 Oct</td><td class="num">₹9,999</td></tr>
+      <tr><td>Discount: Grand opening</td><td>1 Oct</td><td class="num">− ₹1,000</td></tr>
+      <tr class="total"><td>Amount due</td><td></td><td class="num">₹8,999</td></tr>
+      <tr><td>UPI · 4523 1290 9981 · MF-2026-00042</td><td>1 Oct</td><td class="num">− ₹5,000</td></tr>
+      <tr><td>Cash · MF-2026-00057</td><td>15 Oct</td><td class="num">− ₹2,000</td></tr>
+      <tr class="total"><td>Pending <span class="pill red">Part paid</span></td><td></td><td class="num">₹1,999</td></tr>
+    </tbody>
+  </table></div>
+  <p>Paid = sum of <code>payments</code> where <code>status = 'paid'</code>. Pending = amount due − paid. Both come from the summary view, never from a stored column.</p>
+
+  <h3>Mistakes and refunds</h3>
+  <ul>
+    <li><strong>Wrong entry</strong>: payments are never edited or deleted. The admin <strong>voids</strong> one with a reason and enters it again. Proposal: add <code>'void'</code> to the status check, plus <code>void_reason</code>.</li>
+    <li><strong>Refunds</strong>: none. Cancelling ends the membership and the money stays (<span class="id" style="color:var(--ok)">D14</span>).</li>
+  </ul>
+
+  <h3>Reconciliation (later)</h3>
+  <p><code>reconciled_at</code> and the <code>payments_unreconciled_idx</code> index exist for a second check. Someone (the owner?) ticks off UPI and card entries against the bank statement, and cash against the day's drawer count. Whoever enters a payment wouldn't be the one who reconciles it.</p>
+
+  <div class="call agreed"><span class="tag"><span class="id">D14</span> Agreed 4 Oct</span>
+    <ul>
+      <li><strong>₹0 at sale is allowed.</strong> The membership shows under Has dues until paid. No minimum first instalment and no overdue date in v1.</li>
+      <li><strong>No refunds.</strong> Cancelling ends the membership and the money stays, so there are no refund rows. <code>'refunded'</code> stays in the status check, unused, for a future payment gateway.</li>
+      <li><strong>No GST on receipts for now.</strong> MaxFit has a GSTIN but isn't charging GST. Receipts are plain until that changes.</li>
+      <li><strong>Reconciliation later.</strong> <code>reconciled_at</code> and its index already exist, so turning it on needs no schema change.</li>
+      <li><strong>WhatsApp receipts later.</strong> They need an approved utility template. v1 shows the receipt number on the member page.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 07 -->
+<section id="pause">
+  <h2><span class="n">07</span>Pausing a membership</h2>
+  <p class="sub">The member calls, the admin pauses it in the CRM. Only memberships with <code>pause_days_allowed &gt; 0</code>, copied from the plan at sale: 15 days on yearly plans, 7 on six-month, none on monthly or quarterly (set in <code>src/plans.ts</code>).</p>
+
+  <figure class="fig">
+<pre class="mermaid">
+flowchart TD
+  A[Member calls: pausing 10 to 16 Nov] --> B[Admin opens membership, Pause]
+  B --> C[Pick from and to dates, sees 7 days and 15 left]
+  C --> D{Checks}
+  D -- plan has no pauses --> X[Blocked with the reason]
+  D -- over allowance --> X
+  D -- overlaps a pause --> X
+  D -- outside membership dates --> X
+  D -- ok --> E[Save pause_days row]
+  E --> F[Trigger moves end_date out by 7 days]
+  F --> G[Queued renewal, if any, moves by 7 days too]
+</pre>
+  </figure>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>Dates are inclusive. Days = <code>paused_to − paused_from + 1</code>.</li>
+    <li>The pause has to start today or later, and within the membership's <code>start_date</code> and <code>end_date</code>.</li>
+    <li>Days used across all pauses + this one ≤ the membership's <code>pause_days_allowed</code>, not the plan's. Checked by the server function before the insert (<span class="id" style="color:var(--ok)">D1</span>).</li>
+    <li>No overlap with another pause. The existing <code>pause_days_no_overlap</code> constraint already enforces this.</li>
+    <li><strong>Resume early</strong>: <code>paused_to</code> becomes yesterday and <code>resumed_early_on</code> today. Unused days go back to the balance.</li>
+    <li><strong>Cancel a future pause</strong>: delete the row. Changing the dates of a future pause = cancel + new pause.</li>
+  </ul>
+
+  <h3>Worked example</h3>
+  <p>Annual Pass, 1 Oct 2026 → 30 Sep 2027, 15 pause days.</p>
+  <div class="tl" aria-label="Pause timeline">
+    <div class="row"><span class="lbl">Booked</span><div class="bar"><span class="seg on" style="left:0;width:96%"></span></div></div>
+    <div class="row"><span class="lbl">Pause 10–16 Nov</span><div class="bar"><span class="seg on" style="left:0;width:10.5%"></span><span class="seg pause" style="left:10.5%;width:2%"></span><span class="seg on" style="left:12.5%;width:83.5%"></span><span class="seg ext" style="left:96%;width:2%"></span></div></div>
+    <div class="row"><span class="lbl">Resumed 14 Nov</span><div class="bar"><span class="seg on" style="left:0;width:10.5%"></span><span class="seg pause" style="left:10.5%;width:1.1%"></span><span class="seg on" style="left:11.6%;width:84.4%"></span><span class="seg ext" style="left:96%;width:1.1%"></span></div></div>
+    <div class="axis"><span>Oct ’26</span><span>Apr ’27</span><span>Oct ’27</span></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Event</th><th>pause_days row</th><th class="num">Days used</th><th class="num">Left</th><th class="num"><code>end_date</code></th></tr></thead>
+    <tbody>
+      <tr><td>Sold</td><td>none</td><td class="num">0</td><td class="num">15</td><td class="num">30 Sep 2027</td></tr>
+      <tr><td>Calls on 8 Nov to pause 10–16 Nov</td><td><code>10 Nov → 16 Nov</code></td><td class="num">7</td><td class="num">8</td><td class="num">7 Oct 2027</td></tr>
+      <tr><td>Comes back early on 14 Nov</td><td><code>10 Nov → 13 Nov</code>, resumed 14 Nov</td><td class="num">4</td><td class="num">11</td><td class="num">4 Oct 2027</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call gap"><span class="tag">Edge case: queued renewal</span>
+    <p>Priya renews early. The new membership starts the day after the current one ends. Then she pauses the current one, and its end now runs into the renewal. The <code>end_date</code> trigger also moves every <em>upcoming</em> membership for those seats by the same number of days, so it happens in the same transaction as the pause.</p>
+  </div>
+
+  <div class="call agreed"><span class="tag"><span class="id">D15</span> Agreed 4 Oct</span>
+    <ul>
+      <li><strong>No backdating.</strong> A pause starts today or later. A member who forgot to call doesn't get the days back.</li>
+      <li><strong>No minimum length.</strong> A single-day pause is fine.</li>
+      <li><strong>Self-pause later.</strong> Members will pause from the app or web portal once it exists, through the same server function and the same checks.</li>
+    </ul>
+  </div>
+  <div class="call agreed"><span class="tag"><span class="id">D16</span> Agreed 4 Oct</span>
+    <p>On a multi-seat plan like the Couple Pass, a pause belongs to the membership, not to a seat. Both partners pause together, and there's one <code>end_date</code> per membership.</p>
+  </div>
+</section>
+
+<!-- 08 -->
+<section id="screens">
+  <h2><span class="n">08</span>What the admin sees</h2>
+  <p class="sub">Two pages for members and memberships, plus the dashboard and leads. Memberships don't get a page of their own. Exact layouts come later.</p>
+  <div class="grid2">
+    <div class="card"><h4>Members</h4><p>One row per member: photo, name, current plan and end date, status pill and dues. Search by name or the last 4 digits of a phone number. Filter chips: All, Active, Paused, Expiring, Expired, Has dues. "Add member" opens the drawer from <a href="#member">03</a>.</p></div>
+    <div class="card"><h4>Member page</h4><p>Header with photo, name, phone and a verified chip. The current membership card shows plan, dates, days left, pause days left and paid/due, with Record payment, Pause and Renew, and Cancel under "…". Each action opens a drawer. Below it, a history of past and upcoming memberships, payments and pauses.</p></div>
+    <div class="card"><h4>Dashboard</h4><p>Today's numbers from the summary view: active, paused today, starting today, expiring this week, collected today by method, total pending. Membership reports ("Annual Passes sold this month") go here later.</p></div>
+    <div class="card"><h4>Leads</h4><p>As built, plus "Convert to member" in the drawer, which opens the Add member drawer pre-filled (<a href="#member">03</a>).</p></div>
+  </div>
+  <h3>Why memberships live on the member page</h3>
+  <ul>
+    <li>Every request starts from a person ("Priya wants to pause"), so the desk finds the member and acts on their membership card.</li>
+    <li>The members list already shows each member's current membership, so its filters cover what a memberships list would.</li>
+    <li><strong>Has dues</strong> (pending above 0, oldest first, with a WhatsApp reminder link) and <strong>Expiring</strong> (<code>end_date</code> in the next 7 days, no renewal queued) are filters on the members list, not pages of their own. The Trigger.dev reminder job reads the same Expiring query.</li>
+    <li>A queued renewal shows as "Upcoming" above the current card.</li>
+    <li>A Couple Pass shows the same card on both partners' pages, and its actions work from either.</li>
+  </ul>
+  <div class="call agreed"><span class="tag"><span class="id">D11</span> Agreed 4 Oct</span>
+    <p>No separate memberships page. Memberships are created and managed from the member page. Dues and Expiring are filters on the members list.</p>
+  </div>
+</section>
+
+<!-- 09 -->
+<section id="schema">
+  <h2><span class="n">09</span>Schema changes</h2>
+  <p class="sub">Every change the flows above need, in one place. Nothing here has been written as a migration yet.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Table</th><th>Change</th><th></th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td><code>user_profiles</code></td><td><code>handle_new_user</code> / <code>handle_user_updated</code> add the <code>+</code> to the copied phone, and existing rows are fixed in the same migration (D8)</td><td><span class="pill chg">change</span></td><td>03</td></tr>
+      <tr><td><code>user_profiles</code></td><td><code>avatar</code> holds the Cloudinary <code>v&lt;ver&gt;/&lt;public_id&gt;</code></td><td><span class="pill keep">same column</span></td><td>04</td></tr>
+      <tr><td><code>phone_verifications</code></td><td>New: <code>phone</code>, <code>code_hash</code>, <code>expires_at</code>, <code>attempts</code>, <code>verified_at</code>, <code>requested_by</code>. No RLS access; server only.</td><td><span class="pill new">new table</span></td><td>03</td></tr>
+      <tr><td><code>memberships</code></td><td><code>plan_key</code>, <code>plan_name</code>, <code>price</code>, <code>duration_days</code>, <code>pause_days_allowed</code>, all copied from the code list at sale. Checks: <code>discount_amount &lt;= price</code>, and <code>discount_reason</code> required when the discount is above 0.</td><td><span class="pill new">add</span></td><td>05</td></tr>
+      <tr><td><code>memberships</code></td><td>Drop <code>plan_id</code>, after backfilling the new columns from <code>plans</code> for any rows that exist</td><td><span class="pill red">drop</span></td><td>05</td></tr>
+      <tr><td><code>memberships</code></td><td><code>end_date</code> becomes the real expiry, kept up to date by a trigger on <code>pause_days</code> insert, update and delete (and on a <code>start_date</code> change). It also moves queued renewals for the same seats.</td><td><span class="pill chg">change</span></td><td>02, 07</td></tr>
+      <tr><td><code>memberships</code></td><td><code>cancelled_at</code>, <code>cancelled_by</code>, <code>cancel_reason</code></td><td><span class="pill new">add</span></td><td>05</td></tr>
+      <tr><td><code>payments</code></td><td><code>paid_at</code> timestamptz, <code>note</code> text, <code>void_reason</code> text</td><td><span class="pill new">add</span></td><td>06</td></tr>
+      <tr><td><code>payments</code></td><td>Drop the <code>'pending'</code> default; manual entries insert <code>'paid'</code>, and <code>'pending'</code> stays for a future webhook. Add <code>'void'</code> to the check.</td><td><span class="pill chg">change</span></td><td>06</td></tr>
+      <tr><td><code>payments</code></td><td><code>invoice_number</code> filled from <code>invoice_seq</code> on insert</td><td><span class="pill chg">change</span></td><td>06</td></tr>
+      <tr><td><code>pause_days</code></td><td>Add an optional <code>reason</code>. The allowance check lives in the server function.</td><td><span class="pill new">add</span></td><td>07</td></tr>
+      <tr><td>RLS</td><td>Drop the browser insert and update policies on <code>memberships</code>, <code>membership_users</code> and <code>pause_days</code>. Only server functions write them.</td><td><span class="pill chg">change</span></td><td>02</td></tr>
+      <tr><td><code>membership_summary</code></td><td>New view: pause days used/left, amount due, paid, pending, status. Expiry comes straight from <code>end_date</code>. <code>admin_dashboard_stats</code> drops its own expiry calculation.</td><td><span class="pill new">new view</span></td><td>05–08</td></tr>
+      <tr><td><code>plans</code></td><td>Drop the table, its RLS policies and its seed rows</td><td><span class="pill red">drop</span></td><td>05</td></tr>
+      <tr><td>claims</td><td>Remove <code>plans_admin</code> from <code>CLAIMS</code> in <code>godmode/session.ts</code> and from the seeded admin</td><td><span class="pill red">drop</span></td><td>05</td></tr>
+      <tr><td><code>src/plans.ts</code></td><td>New: the CRM's plan list (key, name, price, duration, pause days, seats, on sale). Separate from the landing page's list in <code>content.ts</code>.</td><td><span class="pill new">code</span></td><td>05</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 10 -->
+<section id="more">
+  <h2><span class="n">10</span>Also to discuss</h2>
+  <p class="sub">You asked what else belongs in the architecture. These are the topics I'd add, roughly in order of how soon the desk will hit them.</p>
+  <div class="grid2">
+    <div class="card"><h4>Check-ins / attendance</h4><p>The photo is there to know who's coming in. Do we log visits, and how: the admin taps a member, or members scan a QR at the door? A check-in during a pause or after expiry should warn the desk.</p></div>
+    <div class="card"><h4>Renewal reminders</h4><p>The Trigger.dev job is a placeholder. It reads <code>end_date</code> directly, and needs an approved WhatsApp template and a send log, so nobody gets messaged twice.</p></div>
+    <div class="card"><h4>Cancellations &amp; refunds</h4><p>Who can cancel, whether money goes back, and how it shows on the books.</p></div>
+    <div class="card"><h4>Staff roles <span class="pill new">decided</span></h4><p>Only two people use the CRM for now, both with full access: <code>admin</code> and <code>claims_admin</code> (<code>plans_admin</code> goes with the plans table). Narrower claims for front-desk staff, e.g. no voids, cancellations or large discounts, come when someone else needs access.</p></div>
+    <div class="card"><h4>Audit trail</h4><p><code>created_by</code> and <code>marked_by</code> cover creation. Edits to profiles, voids and cancellations need an <code>activity_log</code> if we want "who changed this?"</p></div>
+    <div class="card"><h4>Member portal</h4><p>What members can see once they log in: their membership, dues, receipts, pause balance, and maybe self-pause.</p></div>
+    <div class="card"><h4>Reports</h4><p>Collected per day by method (to match the cash drawer), monthly revenue, total pending, new vs renewals, lead conversion.</p></div>
+    <div class="card"><h4>Existing members <span class="pill chg">after v1</span></h4><p>About 80–100 members bought before the CRM. They're imported once the flows below are built, with their real start dates, payments and verification. Planned then.</p></div>
+    <div class="card"><h4>Other products</h4><p><code>payments.membership_id</code> is nullable. Is that for personal training, supplements or day passes? If yes, they need their own model.</p></div>
+    <div class="card"><h4>Privacy</h4><p>Photos, phone numbers and dates of birth are personal data under India's DPDP Act. Decide who can see what, how long we keep it, and what happens when a member asks to be removed.</p></div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section id="questions">
+  <h2><span class="n">11</span>Decisions &amp; questions</h2>
+  <p class="sub">Everything above that needs your call, by ID. Reply with an ID and I'll update the section.</p>
+  <ol class="qlist">
+    <li class="ok"><span class="id">D1</span><div>Rules live in server functions. The database keeps its constraints and one trigger that keeps <code>end_date</code> in sync.<small>Section 02 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D2</span><div>Copy <code>plan_key</code>, <code>plan_name</code>, <code>price</code>, <code>duration_days</code> and <code>pause_days_allowed</code> onto each membership. Price changes go through the discount.<small>Section 05 · agreed 3 Oct, updated 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D3</span><div><code>end_date</code> holds the real expiry, kept up to date by a trigger on <code>pause_days</code><small>Section 02 · agreed 3 Oct</small></div></li>
+    <li class="x"><span class="id">D4</span><div>Versioned, immutable plan rows. Superseded by D5.<small>Section 05 · dropped 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D5</span><div>Plans live in code (<code>src/plans.ts</code>) for the CRM only; the landing page's list is separate and not synced. No plans table. Offers are discounts with a reason.<small>Section 05 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D9</span><div>Add member: one drawer from the Members page and from a lead; WhatsApp code or admin-verified; no "Verify later".<small>Section 03 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D10</span><div>Photos private on Cloudinary, stored as <code>profile/&lt;user_profiles.id&gt;</code>, two sizes: avatar and full.<small>Section 04 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D11</span><div>No memberships page. Memberships live on the member page; Dues and Expiring are members-list filters.<small>Section 08 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D12</span><div>No mid-way plan changes: the next plan is queued after the current one. A rare forced switch is manual (cancel + discount with reason).<small>Section 05 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D13</span><div>New membership and Renew share one drawer with an optional payment.<small>Section 05 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D14</span><div>₹0 at sale allowed, no refunds, no GST for now; reconciliation and WhatsApp receipts later.<small>Section 06 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D15</span><div>Pauses start today or later, any length; members self-pause later from the portal.<small>Section 07 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D16</span><div>Couple Pass pauses belong to the membership; both partners pause together.<small>Section 07 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D8</span><div>Keep the phone copy in <code>user_profiles</code>; the auth triggers add the <code>+</code>.<small>Section 03 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D6</span><div>Festival Offer = Annual Pass with a ₹1,000 "Festival offer" discount, not a plan of its own.<small>Section 05 · agreed 4 Oct</small></div></li>
+    <li class="ok"><span class="id">D7</span><div>Durations are in days (30 / 90 / 180 / 365) from any start day, not calendar months.<small>Section 05 · agreed 4 Oct</small></div></li>
+  </ol>
+</section>
+
+<!-- 12 -->
+<section id="build">
+  <h2><span class="n">12</span>Build order</h2>
+  <p class="sub">Each phase is usable on its own and unblocks the next. Migrations are new files only; applied ones are never edited.</p>
+
+  <h3>Phase 1 · One migration</h3>
+  <p>Applied to prod, so check whether <code>memberships</code> has rows first. If it does, the backfill from <code>plans</code> runs before the drop.</p>
+  <ul>
+    <li><code>memberships</code>: add <code>plan_key</code>, <code>plan_name</code>, <code>price</code>, <code>duration_days</code>, <code>pause_days_allowed</code>, <code>cancelled_at</code>, <code>cancelled_by</code>, <code>cancel_reason</code>. Discount checks (at most the price, and a reason when above 0). Backfill, then drop <code>plan_id</code>.</li>
+    <li>Drop <code>plans</code>, its policies and its seed rows. Remove <code>plans_admin</code> from <code>CLAIMS</code> and the seeded admin.</li>
+    <li>The <code>end_date</code> trigger on <code>pause_days</code> (and on a <code>start_date</code> change), which also moves queued memberships for the same seats.</li>
+    <li><code>pause_days.reason</code>. <code>payments</code>: <code>paid_at</code>, <code>note</code>, <code>void_reason</code>, no status default, <code>'void'</code> in the check, <code>invoice_number</code> filled from <code>invoice_seq</code>.</li>
+    <li><code>phone_verifications</code>. The <code>+</code> in the auth triggers, plus a one-off fix for existing rows.</li>
+    <li>RLS: no browser insert or update on <code>memberships</code>, <code>membership_users</code> or <code>pause_days</code>.</li>
+    <li><code>membership_summary</code> view (status, paid, pending, pause days used and left). <code>admin_dashboard_stats</code> reads from it.</li>
+  </ul>
+
+  <h3>Phase 2 · Shared code</h3>
+  <ul>
+    <li><code>src/plans.ts</code>, the CRM plan list.</li>
+    <li><code>todayIST()</code> and the existing phone normaliser.</li>
+    <li>Cloudinary: sign an upload, and sign <code>avatar</code> / <code>full</code> URLs.</li>
+  </ul>
+
+  <h3>Phase 3 · Server functions</h3>
+  <ul>
+    <li><code>sendPhoneCode</code>, <code>checkPhoneCode</code></li>
+    <li><code>createMember</code>, which also links a lead, or links a lead to an existing member</li>
+    <li><code>createMembership</code>: seats and an optional first payment, deleting the membership if the seats fail</li>
+    <li><code>cancelMembership</code></li>
+    <li><code>addPause</code>, <code>resumePause</code>, <code>cancelPause</code>, with the allowance check</li>
+    <li><code>signAvatarUpload</code>, <code>signAvatarUrls</code></li>
+    <li>Recording and voiding a payment are single rows and stay browser writes under RLS.</li>
+  </ul>
+
+  <h3>Phase 4 · Screens</h3>
+  <ul>
+    <li>Members list with search and filters, and the Add member drawer</li>
+    <li>"Convert to member" in the lead drawer</li>
+    <li>Member page: header, photo upload, current membership card, history</li>
+    <li>Drawers: New membership / Renew, Record payment, Pause, Cancel</li>
+    <li>Dashboard numbers from the summary view</li>
+  </ul>
+
+  <h3>After v1</h3>
+  <ul>
+    <li>Import the 80–100 existing members</li>
+    <li>Renewal reminders on WhatsApp, then WhatsApp receipts</li>
+    <li>Member portal with self-pause</li>
+    <li>Reconciliation, narrower staff claims, check-ins and reports</li>
+  </ul>
+</section>
+</main>
+</div>

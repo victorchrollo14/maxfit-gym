@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Button, Spinner } from '@heroui/react'
 import { LuRefreshCw } from 'react-icons/lu'
-import { getSupabase } from '../lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import { PageHeader } from './PageHeader'
 
 type Stats = {

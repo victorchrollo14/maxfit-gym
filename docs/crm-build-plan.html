@@ -1,0 +1,338 @@
+<title>MaxFit CRM Build Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,600;112,800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#F6F4F3; --surface:#FFFFFF; --sunk:#EFECEA; --ink:#1D1A19; --ink-2:#4A4442; --muted:#7A7270;
+  --line:#E3DEDC; --accent:#C42A21; --accent-soft:#FBE9E7; --accent-ink:#9E1F18;
+  --ok:#2E7D4A; --ok-soft:#E5F3EA; --warn:#9A6212; --warn-soft:#FBF0DD; --info:#2D5F8A; --info-soft:#E6EEF6;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F0D0D; --surface:#181515; --sunk:#211D1C; --ink:#F3F0EF; --ink-2:#C9C2C0; --muted:#968D8B;
+    --line:#2D2827; --accent:#EC5147; --accent-soft:#3A1715; --accent-ink:#FF8A80;
+    --ok:#62C285; --ok-soft:#14291C; --warn:#E3A84E; --warn-soft:#2E2210; --info:#7FB2DE; --info-soft:#14222F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F0D0D; --surface:#181515; --sunk:#211D1C; --ink:#F3F0EF; --ink-2:#C9C2C0; --muted:#968D8B;
+  --line:#2D2827; --accent:#EC5147; --accent-soft:#3A1715; --accent-ink:#FF8A80;
+  --ok:#62C285; --ok-soft:#14291C; --warn:#E3A84E; --warn-soft:#2E2210; --info:#7FB2DE; --info-soft:#14222F;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;padding-inline:20px;padding-block:0 80px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:56px}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0}.toc{display:none}}
+.toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;padding-block:40px;max-height:100vh;overflow:auto}
+.toc .brand{font-family:var(--display);font-weight:800;font-stretch:112%;letter-spacing:.02em;text-transform:uppercase;font-size:15px}
+.toc .brand span{color:var(--accent)}
+.toc ol{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:2px;counter-reset:t}
+.toc a{display:flex;gap:10px;color:var(--ink-2);text-decoration:none;font-size:14.5px;padding:5px 8px;border-radius:6px}
+.toc a:hover,.toc a:focus-visible{background:var(--sunk);color:var(--ink);outline:none}
+.toc a b{font-family:var(--mono);font-weight:400;font-size:12px;color:var(--muted);padding-top:2px;min-width:18px}
+main{min-width:0;max-width:800px;padding-block:40px}
+header.top{padding-bottom:28px;border-bottom:2px solid var(--ink);margin-bottom:8px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:clamp(34px,6vw,52px);line-height:1.02;letter-spacing:-.01em;margin:10px 0 14px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:18.5px;color:var(--ink-2);max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-size:14px;color:var(--muted)}
+.meta strong{color:var(--ink);font-weight:600}
+section{padding-top:52px;scroll-margin-top:12px}
+h2{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:28px;line-height:1.15;margin:0 0 6px;display:flex;gap:14px;align-items:baseline;text-wrap:balance}
+h2 .n{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--accent);font-stretch:100%}
+.sub{color:var(--muted);margin:0 0 22px;font-size:15.5px}
+h3{font-family:var(--display);font-weight:600;font-stretch:112%;font-size:19px;margin:32px 0 10px;text-wrap:balance}
+p{margin:0 0 14px;max-width:68ch}
+ul,ol{margin:0 0 16px;padding-left:22px;max-width:68ch}
+li{margin-bottom:6px}
+li::marker{color:var(--muted)}
+code{font-family:var(--mono);font-size:.84em;background:var(--sunk);padding:1px 5px;border-radius:4px;color:var(--ink);overflow-wrap:anywhere}
+a{color:var(--accent-ink)}
+strong{font-weight:700}
+
+/* callouts */
+.call{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:14px 18px;margin:18px 0;display:grid;gap:4px}
+.call .tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;display:inline-flex;gap:8px;align-items:center}
+.call p,.call ul{margin:0}.call p+p,.call p+ul,.call ul+p{margin-top:8px}
+.call.decision{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));background:var(--accent-soft)}
+.call.decision .tag{color:var(--accent-ink)}
+.call.gap{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 35%,var(--line))}
+.call.gap .tag{color:var(--warn)}
+.call.q{background:var(--info-soft);border-color:color-mix(in srgb,var(--info) 35%,var(--line))}
+.call.q .tag{color:var(--info)}
+.id{font-family:var(--mono);font-size:11.5px;padding:1px 6px;border-radius:4px;background:var(--surface);border:1px solid currentColor}
+
+/* tables */
+.tbl{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--sunk)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td code{white-space:nowrap}
+tr.total td{font-weight:700;border-top:2px solid var(--ink)}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.pill.new{background:var(--ok-soft);color:var(--ok)}
+.pill.chg{background:var(--warn-soft);color:var(--warn)}
+.pill.keep{background:var(--sunk);color:var(--muted)}
+.pill.red{background:var(--accent-soft);color:var(--accent-ink)}
+
+/* diagrams */
+.fig{margin:18px 0 22px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:16px;overflow-x:auto}
+.fig pre.mermaid{margin:0;background:transparent;font-family:var(--body)}
+.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:10px}
+figure{margin:0}
+
+/* cards row */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:16px 0 20px}
+.card{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:16px 18px}
+.card h4{margin:0 0 6px;font-family:var(--display);font-stretch:112%;font-weight:600;font-size:16px}
+.card p{font-size:15px;color:var(--ink-2);margin:0}
+.card ul{font-size:15px;color:var(--ink-2);margin:6px 0 0;padding-left:18px}
+
+/* pause timeline */
+.tl{margin:18px 0 8px;display:grid;gap:12px}
+.tl .row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center;font-size:14px}
+.tl .lbl{color:var(--ink-2)}
+.tl .bar{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+.tl .seg{position:absolute;top:0;bottom:0;border-radius:5px}
+.tl .seg.on{background:color-mix(in srgb,var(--ok) 55%,var(--surface))}
+.tl .seg.pause{background:var(--warn)}
+.tl .seg.ext{background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--ok) 55%,var(--surface)) 0 4px,var(--surface) 4px 7px)}
+.tl .axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-left:132px}
+@media (max-width:520px){.tl .row{grid-template-columns:minmax(0,1fr)}.tl .axis{margin-left:0}}
+
+.qlist{counter-reset:q;list-style:none;padding:0;display:grid;gap:10px;max-width:none}
+.qlist li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin:0}
+.qlist li .id{justify-self:start;align-self:start;color:var(--info)}
+.qlist li.d .id{color:var(--accent-ink)}
+.qlist li.ok .id{color:var(--ok)}
+.qlist li.x .id{color:var(--muted)}
+.qlist li.x > div{color:var(--muted)}
+.call.dropped{background:var(--sunk)}
+.call.dropped .tag{color:var(--muted)}
+.call.dropped p{color:var(--muted)}
+.call.agreed{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 35%,var(--line))}
+.call.agreed .tag{color:var(--ok)}
+.qlist small{display:block;color:var(--muted);font-size:13.5px;margin-top:2px}
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.tk{list-style:none;padding:0;margin:14px 0 8px;display:grid;gap:10px;max-width:none}
+.tk li{display:grid;grid-template-columns:62px minmax(0,1fr);gap:4px 14px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin:0}
+.tk .tid{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--accent-ink);padding-top:2px}
+.tk h4{margin:0;font-family:var(--display);font-stretch:112%;font-weight:600;font-size:16.5px;line-height:1.3}
+.tk .kind{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;padding:1px 6px;border-radius:4px;margin-left:8px;vertical-align:2px}
+.kind.db{background:var(--warn-soft);color:var(--warn)}.kind.code{background:var(--info-soft);color:var(--info)}.kind.ui{background:var(--ok-soft);color:var(--ok)}.kind.ops{background:var(--sunk);color:var(--muted)}
+.tk .body{grid-column:2;font-size:15px;color:var(--ink-2)}
+.tk .body p{margin:4px 0 0;max-width:none}
+.tk .test{margin-top:8px;font-size:14px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:8px}
+.tk .test b{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-right:6px}
+.tk .dep{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:6px}
+@media (max-width:520px){.tk li{grid-template-columns:minmax(0,1fr)}.tk .body{grid-column:1}}
+.miles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:16px 0 8px}
+.mile{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 14px}
+.mile .at{font-family:var(--mono);font-size:12px;color:var(--accent-ink);font-weight:600}
+.mile p{margin:4px 0 0;font-size:14.5px;color:var(--ink-2)}
+</style>
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <div class="brand">Max<span>Fit</span> CRM</div>
+  <ol>
+    <li><a href="#how"><b>·</b>How we work</a></li>
+    <li><a href="#miles"><b>·</b>Milestones</a></li>
+    <li><a href="#p1"><b>1</b>Database</a></li>
+    <li><a href="#p2"><b>2</b>Foundations</a></li>
+    <li><a href="#p3"><b>3</b>Members</a></li>
+    <li><a href="#p4"><b>4</b>Memberships and payments</a></li>
+    <li><a href="#p5"><b>5</b>Pauses</a></li>
+    <li><a href="#p6"><b>6</b>Lists and dashboard</a></li>
+    <li><a href="#later"><b>·</b>After v1</a></li>
+  </ol>
+</nav>
+<main>
+<header class="top">
+  <div class="eyebrow">Build plan · 45 tickets · against Draft 4</div>
+  <h1>MaxFit CRM, built in <em>small</em> pieces</h1>
+  <p class="lede">The architecture turned into tickets small enough that each one is a single PR into <code>dev</code>: easy to test, easy to review, merged in order. Database first, then shared code, then the screens.</p>
+  <div class="meta"><span><strong>Updated</strong> 4 Oct 2026</span><span><strong>Design</strong> <code>docs/crm-architecture.html</code> (D1–D16)</span></div>
+</header>
+
+<section id="how">
+  <h2>How we work</h2>
+  <p class="sub">The same loop for every ticket.</p>
+  <ol>
+    <li><strong>One ticket, one branch, one PR.</strong> Branch off <code>dev</code> as <code>mf-07-membership-terms</code>, open a PR into <code>dev</code>, merge, then start the next ticket from the updated <code>dev</code>.</li>
+    <li><strong>Every PR says how to test it.</strong> The "Test" line on each ticket below goes into the PR description. <code>pnpm build</code> and <code>pnpm lint</code> pass before review.</li>
+    <li><strong>Migrations are new files only.</strong> One per database ticket, never an edit to one already applied. After merging, run <code>pnpm db:push</code> from <code>apps/backend</code> so prod has it before code that needs it.</li>
+    <li><strong>Order matters, and the "Needs" line says what.</strong> Phases run in order. Inside a phase, a ticket can start once everything it needs has merged.</li>
+  </ol>
+  <div class="call gap"><span class="tag">Testing on prod</span>
+    <p>You're testing against the live database, so test rows stay there. Leads and payments are never deleted by design. Use one clearly named test member (e.g. "Test · Victor") on your own phone for every flow, and void its payments when you're done. Run MF-01 before any migration touches prod.</p>
+  </div>
+</section>
+
+<section id="miles">
+  <h2>Milestones</h2>
+  <p class="sub">When the desk can start using each part.</p>
+  <div class="miles">
+    <div class="mile"><span class="at">after MF-14</span><p>Database matches the design. Nothing visible yet.</p></div>
+    <div class="mile"><span class="at">after MF-22</span><p>Members can be added.</p></div>
+    <div class="mile"><span class="at">after MF-27</span><p>Leads convert to members.</p></div>
+    <div class="mile"><span class="at">after MF-35</span><p>Memberships can be sold and paid for. The core desk work.</p></div>
+    <div class="mile"><span class="at">after MF-41</span><p>Pauses work. Feature-complete for v1.</p></div>
+    <div class="mile"><span class="at">after MF-45</span><p>Lists and dashboard polished.</p></div>
+  </div>
+</section>
+
+<section id="p1">
+  <h2><span class="n">Phase 1</span>Database</h2>
+  <p class="sub">One migration file per ticket. After a ticket merges into dev, apply it to prod with <code>pnpm db:push</code> before starting the next one.</p>
+  <ol class="tk">
+    <li id="mf-01"><span class="tid">MF-01</span><div><h4>Check what prod already holds<span class="kind ops">check</span></h4></div>
+      <div class="body"><p>Not a PR. Run <code>select count(*)</code> on <code>memberships</code>, <code>membership_users</code>, <code>pause_days</code> and <code>payments</code> in the SQL editor. If they are all 0, the backfills in MF-07 and MF-11 are no-ops; if not, read those rows before going further.</p><div class="test"><b>Test</b>Counts noted in the MF-07 PR description.</div></div></li>
+    <li id="mf-02"><span class="tid">MF-02</span><div><h4>Payments: "paid on" and note<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Add <code>paid_at timestamptz not null default now()</code> and <code>note text</code> to <code>payments</code>.</p><div class="test"><b>Test</b>Insert a payment in the SQL editor without <code>paid_at</code>: it gets today. Insert one with a past <code>paid_at</code>: it keeps it.</div><div class="dep">Needs MF-01</div></div></li>
+    <li id="mf-03"><span class="tid">MF-03</span><div><h4>Payments: explicit status and voids<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Drop the <code>pending</code> default on <code>status</code>. Add <code>void</code> to the status check. Add <code>void_reason text</code> with a check that a void has a reason.</p><div class="test"><b>Test</b>An insert without <code>status</code> fails. Setting <code>status = 'void'</code> without a reason fails; with one it works.</div><div class="dep">Needs MF-02</div></div></li>
+    <li id="mf-04"><span class="tid">MF-04</span><div><h4>Payments: receipt numbers<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Trigger on insert or status change: when <code>status = 'paid'</code> and <code>invoice_number</code> is empty, fill it as <code>MF-&lt;year&gt;-&lt;00042&gt;</code> from <code>invoice_seq</code>, with the year in IST.</p><div class="test"><b>Test</b>Insert two paid payments: consecutive numbers. Insert a pending one: no number until it's updated to paid.</div><div class="dep">Needs MF-03</div></div></li>
+    <li id="mf-05"><span class="tid">MF-05</span><div><h4>Phones always have the +<span class="kind db">migration</span></h4></div>
+      <div class="body"><p><code>handle_new_user</code> and <code>handle_user_updated</code> add the <code>+</code> when GoTrue strips it. Same migration fixes existing <code>user_profiles.phone</code> rows.</p><div class="test"><b>Test</b>Create a user with a phone in the dashboard: <code>user_profiles.phone</code> starts with <code>+</code>. No existing row is missing it.</div><div class="dep">Needs MF-01</div></div></li>
+    <li id="mf-06"><span class="tid">MF-06</span><div><h4>Phone verification codes table<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>New <code>phone_verifications</code>: <code>phone</code>, <code>code_hash</code>, <code>expires_at</code>, <code>attempts</code>, <code>verified_at</code>, <code>used_at</code>, <code>requested_by</code>, <code>created_at</code>. RLS on with no policies, and explicit revokes from <code>anon</code> and <code>authenticated</code>, so only the server can touch it.</p><div class="test"><b>Test</b>Selecting from it with the browser client returns an error or nothing. The SQL editor can read it.</div><div class="dep">Needs MF-01</div></div></li>
+    <li id="mf-07"><span class="tid">MF-07</span><div><h4>Memberships keep their own terms<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Add <code>plan_key</code>, <code>plan_name</code>, <code>price</code>, <code>duration_days</code>, <code>pause_days_allowed</code>. Backfill from <code>plans</code> for any rows, then make them <code>not null</code>. Checks: discount between 0 and <code>price</code>; <code>discount_reason</code> required when the discount is above 0.</p><div class="test"><b>Test</b>Insert a membership with a discount and no reason: fails. With a discount above the price: fails.</div><div class="dep">Needs MF-01</div></div></li>
+    <li id="mf-08"><span class="tid">MF-08</span><div><h4>Memberships can be cancelled<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Add <code>cancelled_at</code>, <code>cancelled_by</code>, <code>cancel_reason</code>, with a check that a cancellation has a reason.</p><div class="test"><b>Test</b>Setting <code>cancelled_at</code> without a reason fails.</div><div class="dep">Needs MF-07</div></div></li>
+    <li id="mf-09"><span class="tid">MF-09</span><div><h4>Drop the plans table<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Drop <code>memberships.plan_id</code>, then <code>plans</code> and its policies. Remove the <code>plans</code> and <code>memberships</code> inserts from <code>seed.sql</code>. Remove <code>plans_admin</code> from <code>CLAIMS</code> in <code>godmode/session.ts</code> and from the seeded admin.</p><div class="test"><b>Test</b><code>pnpm build</code> passes. The Claims page no longer lists <code>plans_admin</code>. <code>plans</code> is gone in the table editor.</div><div class="dep">Needs MF-07</div></div></li>
+    <li id="mf-10"><span class="tid">MF-10</span><div><h4>Pause reason<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Add <code>reason text</code> to <code>pause_days</code>.</p><div class="test"><b>Test</b>Column exists; inserts without it still work.</div><div class="dep">Needs MF-01</div></div></li>
+    <li id="mf-11"><span class="tid">MF-11</span><div><h4>end_date follows the pauses<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Trigger on <code>pause_days</code> insert, update and delete, and on a membership's <code>start_date</code> or <code>duration_days</code> change: <code>end_date = start_date + duration_days − 1 + days paused</code> (respecting early resumes). Backfill every row. Change <code>admin_dashboard_stats</code> to read <code>end_date</code> directly, since it currently adds pause days itself and would count them twice.</p><div class="test"><b>Test</b>Insert a 7-day pause: <code>end_date</code> moves out 7 days. Shorten it: moves back. Delete it: back to the original. Dashboard numbers unchanged.</div><div class="dep">Needs MF-07, MF-10</div></div></li>
+    <li id="mf-12"><span class="tid">MF-12</span><div><h4>Queued renewals move with a pause<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Extend the trigger: when a membership's <code>end_date</code> moves, every upcoming, uncancelled membership for the same seat holders moves by the same number of days.</p><div class="test"><b>Test</b>Two memberships back to back for one person. Pause the first for 5 days: the second starts and ends 5 days later.</div><div class="dep">Needs MF-11</div></div></li>
+    <li id="mf-13"><span class="tid">MF-13</span><div><h4>Only the server writes memberships<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Drop the browser insert, update and delete policies on <code>memberships</code>, <code>membership_users</code> and <code>pause_days</code>. Select policies stay.</p><div class="test"><b>Test</b>Inserting a membership with the browser client fails. The same insert in the SQL editor works.</div><div class="dep">Needs MF-12</div></div></li>
+    <li id="mf-14"><span class="tid">MF-14</span><div><h4>membership_summary view<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>A view (<code>security_invoker</code>, so RLS applies) with one row per membership: status (upcoming, active, paused, expired, cancelled), expiring-soon flag, days left, amount due, paid, pending, pause days used and left. Dates compared with <code>today_ist()</code>.</p><div class="test"><b>Test</b>Select from it for a few hand-made memberships and check each status and amount by hand.</div><div class="dep">Needs MF-08, MF-12</div></div></li>
+  </ol>
+</section>
+
+<section id="p2">
+  <h2><span class="n">Phase 2</span>Foundations</h2>
+  <p class="sub">Code the screens will need. Nothing visible changes yet except a test call in MF-18.</p>
+  <ol class="tk">
+    <li id="mf-15"><span class="tid">MF-15</span><div><h4>CRM plan list<span class="kind code">code</span></h4></div>
+      <div class="body"><p><code>src/plans.ts</code>: key, name, price, duration days, pause days, seats, on sale, plus the offer list (e.g. Festival offer −₹1,000 on Annual). Separate from <code>content.ts</code>.</p><div class="test"><b>Test</b><code>pnpm build</code> passes.</div></div></li>
+    <li id="mf-16"><span class="tid">MF-16</span><div><h4>IST date helpers<span class="kind code">code</span></h4></div>
+      <div class="body"><p><code>src/lib/dates.ts</code>: <code>todayIST()</code>, <code>addDays()</code> and <code>daysBetween()</code> on <code>YYYY-MM-DD</code> strings, never <code>Date</code> objects.</p><div class="test"><b>Test</b>At 1 AM IST, <code>todayIST()</code> returns today, not yesterday (try with a mocked clock).</div></div></li>
+    <li id="mf-17"><span class="tid">MF-17</span><div><h4>Server-side Supabase client<span class="kind code">code</span></h4></div>
+      <div class="body"><p><code>src/server/supabaseAdmin.ts</code> using <code>SUPABASE_SERVICE_ROLE_KEY</code>, added to <code>run.sh</code> and the env docs.</p><div class="test"><b>Test</b><code>pnpm build</code> passes; the server starts with the key set and fails clearly without it.</div></div></li>
+    <li id="mf-18"><span class="tid">MF-18</span><div><h4>Admin check for server functions<span class="kind code">code</span></h4></div>
+      <div class="body"><p>The first <code>createServerFn</code>. Middleware that reads the caller's session token, verifies it with Supabase and requires the <code>admin</code> claim. A tiny <code>whoami</code> function shown on the Dashboard proves it.</p><div class="test"><b>Test</b>Signed in as admin: Dashboard shows your email. Calling it signed out, or as a non-admin, is rejected.</div><div class="dep">Needs MF-17</div></div></li>
+    <li id="mf-19"><span class="tid">MF-19</span><div><h4>Cloudinary signing<span class="kind code">code</span></h4></div>
+      <div class="body"><p>Env vars, plus <code>signUpload(memberId)</code> and <code>signedUrl(memberId, 'avatar' | 'full')</code> with the two fixed transforms.</p><div class="test"><b>Test</b>A signed <code>full</code> URL for a test image opens; changing one character of the signature makes it fail.</div></div></li>
+  </ol>
+</section>
+
+<section id="p3">
+  <h2><span class="n">Phase 3</span>Members</h2>
+  <p class="sub">Adding members, in the order the desk will use it.</p>
+  <ol class="tk">
+    <li id="mf-20"><span class="tid">MF-20</span><div><h4>Members page, read-only<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p><code>/godmode/members</code> and a sidebar link. Lists profiles with a phone: name, phone, date added.</p><div class="test"><b>Test</b>Existing members show up; staff (email-only) don't.</div></div></li>
+    <li id="mf-21"><span class="tid">MF-21</span><div><h4>Search members<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>Search by name, or by the last 4 digits of the phone.</p><div class="test"><b>Test</b>Typing 4 digits finds the right person.</div><div class="dep">Needs MF-20</div></div></li>
+    <li id="mf-22"><span class="tid">MF-22</span><div><h4>Add member, admin-verified<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>"Add member" drawer with name and phone only, saved with "I've verified this number". <code>createMember</code> server function creates the auth user with a confirmed phone.</p><div class="test"><b>Test</b>Add a test member: appears in the list, <code>auth.users</code> shows the phone confirmed, profile phone has the <code>+</code>.</div><div class="dep">Needs MF-05, MF-18, MF-20</div></div></li>
+    <li id="mf-23"><span class="tid">MF-23</span><div><h4>Member page shell<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p><code>/godmode/members/:id</code> with name, phone, verified chip and a "No membership yet" state. List rows link here, and Add member lands here.</p><div class="test"><b>Test</b>Click a member: their page opens. Add one: you land on their page.</div><div class="dep">Needs MF-22</div></div></li>
+    <li id="mf-24"><span class="tid">MF-24</span><div><h4>Phone lookup in the drawer<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>As soon as the number is valid: "Already a member" (link, save blocked) or "Matches lead … will be marked converted". <code>createMember</code> links the lead.</p><div class="test"><b>Test</b>Type an existing member's number: blocked. Type a lead's number and save: the lead moves to Converted.</div><div class="dep">Needs MF-23</div></div></li>
+    <li id="mf-25"><span class="tid">MF-25</span><div><h4>Verify by WhatsApp code<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p><code>sendPhoneCode</code> and <code>checkPhoneCode</code> (hashed, 10 minutes, 5 tries, rate-limited) and the radio in the drawer. Save requires a checked code on this path.</p><div class="test"><b>Test</b>Send a code to your own number, enter it, save. A wrong code 5 times locks that code.</div><div class="dep">Needs MF-06, MF-24</div></div></li>
+    <li id="mf-26"><span class="tid">MF-26</span><div><h4>More details<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>Collapsed section for email, gender, date of birth and notes.</p><div class="test"><b>Test</b>Fill them in, save, see them on the member page.</div><div class="dep">Needs MF-23</div></div></li>
+    <li id="mf-27"><span class="tid">MF-27</span><div><h4>Convert a lead<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>"Convert to member" in the lead drawer opens Add member with the lead's details. Afterwards the drawer shows "converted" and "Open member page".</p><div class="test"><b>Test</b>Convert a test lead: member created, lead in Converted, button opens the member.</div><div class="dep">Needs MF-24</div></div></li>
+    <li id="mf-28"><span class="tid">MF-28</span><div><h4>Lead whose number is already a member<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>From a lead, an existing number offers "Link lead to …" instead of creating anyone.</p><div class="test"><b>Test</b>Convert a lead with a member's number: lead becomes converted against that member, no new user.</div><div class="dep">Needs MF-27</div></div></li>
+    <li id="mf-29"><span class="tid">MF-29</span><div><h4>Upload a photo<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>On the member page: pick or take a photo, resize to 800px in the browser, upload to Cloudinary as <code>profile/&lt;id&gt;</code>, save the version in <code>avatar</code>.</p><div class="test"><b>Test</b>Upload: <code>avatar</code> is set. Upload again: version changes.</div><div class="dep">Needs MF-19, MF-23</div></div></li>
+    <li id="mf-30"><span class="tid">MF-30</span><div><h4>Show photos<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p><code>signAvatarUrls</code> signs a page of URLs in one call. Avatar on list rows and the page header; tap for the full size.</p><div class="test"><b>Test</b>Photos show in the list and on the page. The URL doesn't work with its signature removed.</div><div class="dep">Needs MF-29</div></div></li>
+  </ol>
+</section>
+
+<section id="p4">
+  <h2><span class="n">Phase 4</span>Memberships and payments</h2>
+  <p class="sub">Selling, renewing and taking money, built up one piece at a time.</p>
+  <ol class="tk">
+    <li id="mf-31"><span class="tid">MF-31</span><div><h4>Sell a membership, minimal<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>New membership drawer with plan cards and start date, plus the live summary. <code>createMembership</code> creates one seat with no discount or payment. The member page shows the current membership card from <code>membership_summary</code>.</p><div class="test"><b>Test</b>Sell a Monthly Pass to a test member: the card shows plan, dates, 30 days left and the full amount due.</div><div class="dep">Needs MF-14, MF-15, MF-16, MF-23</div></div></li>
+    <li id="mf-32"><span class="tid">MF-32</span><div><h4>Discount and offers<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>Discount amount and reason, plus offer chips that fill both in.</p><div class="test"><b>Test</b>Apply "Festival offer" on Annual: ₹8,999 due. A discount without a reason won't save.</div><div class="dep">Needs MF-31</div></div></li>
+    <li id="mf-33"><span class="tid">MF-33</span><div><h4>Couple Pass<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>A 2-seat plan adds "Second member" search, and "New" opens Add member on top. Both get a seat.</p><div class="test"><b>Test</b>Sell a Couple Pass: the card appears on both partners' pages.</div><div class="dep">Needs MF-31</div></div></li>
+    <li id="mf-34"><span class="tid">MF-34</span><div><h4>First payment in the drawer<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>"Record a payment now" (ticked, amount due filled in, part payment allowed, reference needed for UPI and card). If the seats fail, the membership is deleted again.</p><div class="test"><b>Test</b>Sell with a part payment: card shows paid and pending. Untick it: full amount pending.</div><div class="dep">Needs MF-04, MF-31</div></div></li>
+    <li id="mf-35"><span class="tid">MF-35</span><div><h4>Record a payment<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>"Record payment" on the card opens a drawer; a browser insert under RLS.</p><div class="test"><b>Test</b>Pay the rest of a part-paid membership: pending goes to ₹0 and a receipt number appears.</div><div class="dep">Needs MF-34</div></div></li>
+    <li id="mf-36"><span class="tid">MF-36</span><div><h4>History on the member page<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>Past and upcoming memberships, payments and pauses, newest first.</p><div class="test"><b>Test</b>Everything sold and paid so far shows in order.</div><div class="dep">Needs MF-35</div></div></li>
+    <li id="mf-37"><span class="tid">MF-37</span><div><h4>Void a payment<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>Void from the history, with a reason. Never edited or deleted.</p><div class="test"><b>Test</b>Void a payment: it's marked void and pending goes back up.</div><div class="dep">Needs MF-36</div></div></li>
+    <li id="mf-38"><span class="tid">MF-38</span><div><h4>Renew and queue<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>"Renew" opens the drawer with the plan picked and the start date after the current end. Upcoming memberships show above the card.</p><div class="test"><b>Test</b>Renew an active member: an Upcoming membership starting the day after the current end.</div><div class="dep">Needs MF-36</div></div></li>
+    <li id="mf-39"><span class="tid">MF-39</span><div><h4>Cancel a membership<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>From "…" on the card: shows days left, asks for a reason. <code>cancelMembership</code> server function.</p><div class="test"><b>Test</b>Cancel a test membership: status Cancelled, reason saved, payments untouched.</div><div class="dep">Needs MF-08, MF-36</div></div></li>
+  </ol>
+</section>
+
+<section id="p5">
+  <h2><span class="n">Phase 5</span>Pauses</h2>
+  <p class="sub">2 tickets.</p>
+  <ol class="tk">
+    <li id="mf-40"><span class="tid">MF-40</span><div><h4>Pause a membership<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>Pause drawer and <code>addPause</code>: starts today or later, inside the membership, within the pause days left, no overlap.</p><div class="test"><b>Test</b>Pause an Annual for 7 days: end date moves 7 days. A 20-day pause is refused. Monthly can't be paused.</div><div class="dep">Needs MF-12, MF-13, MF-31</div></div></li>
+    <li id="mf-41"><span class="tid">MF-41</span><div><h4>Resume early or cancel a pause<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p><code>resumePause</code> (ends yesterday, gives the rest back) and <code>cancelPause</code> for one that hasn't started.</p><div class="test"><b>Test</b>Resume early: end date comes back in and days return. Cancel a future pause: as if it never happened.</div><div class="dep">Needs MF-40</div></div></li>
+  </ol>
+</section>
+
+<section id="p6">
+  <h2><span class="n">Phase 6</span>Lists and dashboard</h2>
+  <p class="sub">4 tickets.</p>
+  <ol class="tk">
+    <li id="mf-42"><span class="tid">MF-42</span><div><h4>Status and dues on the members list<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>Each row shows plan, end date, status pill and amount due from the summary view.</p><div class="test"><b>Test</b>Rows match each member's page.</div><div class="dep">Needs MF-14, MF-20</div></div></li>
+    <li id="mf-43"><span class="tid">MF-43</span><div><h4>Members list filters<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>Chips for All, Active, Paused, Expiring, Expired and Has dues.</p><div class="test"><b>Test</b>Each chip shows only the right members.</div><div class="dep">Needs MF-42</div></div></li>
+    <li id="mf-44"><span class="tid">MF-44</span><div><h4>Dashboard numbers<span class="kind db">migration</span></h4></div>
+      <div class="body"><p>Migration: <code>admin_dashboard_stats</code> adds starting today, expiring this week, collected today by method and total pending, from the summary view.</p><div class="test"><b>Test</b>Call it in the SQL editor and check against the members list.</div><div class="dep">Needs MF-14</div></div></li>
+    <li id="mf-45"><span class="tid">MF-45</span><div><h4>Dashboard shows them<span class="kind ui">feature</span></h4></div>
+      <div class="body"><p>The new numbers on the Dashboard.</p><div class="test"><b>Test</b>Numbers match MF-44.</div><div class="dep">Needs MF-44</div></div></li>
+  </ol>
+</section>
+
+<section id="later">
+  <h2>After v1</h2>
+  <p class="sub">Planned once the tickets above are merged. Not broken down yet.</p>
+  <ul>
+    <li>Import the 80–100 existing members, with real start dates, payments and verification</li>
+    <li>Renewal reminders on WhatsApp (Trigger.dev and an approved template), then WhatsApp receipts</li>
+    <li>Member portal with self-pause, using the same server functions</li>
+    <li>Reconciliation, narrower staff claims, check-ins, reports</li>
+  </ul>
+</section>
+</main>
+</div>

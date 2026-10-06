@@ -110,7 +110,6 @@ export type Plan = {
   /** How many people the plan covers. Drives the savings maths. */
   seats?: number
   tagline: string
-  features: string[]
   featured?: boolean
   badge?: string
 }
@@ -129,12 +128,6 @@ export const plans: Plan[] = [
     tagline: 'A full year at our festive-season rate.',
     featured: true,
     badge: 'Best value',
-    features: [
-      'Everything in the Annual Pass',
-      'Rate locked for as long as you stay a member',
-      '2 free personal-training sessions',
-      'Priority booking on group classes',
-    ],
   },
   {
     id: 'monthly',
@@ -143,12 +136,6 @@ export const plans: Plan[] = [
     strikePrice: 3999,
     period: 'month',
     tagline: 'No commitment. Cancel whenever.',
-    features: [
-      'Full gym access, all equipment',
-      'Free fitness assessment on joining',
-      'Locker and shower access',
-      'Works out to ₹23,988 a year',
-    ],
   },
   {
     id: 'quarterly',
@@ -157,12 +144,6 @@ export const plans: Plan[] = [
     strikePrice: 5999,
     period: 'quarter',
     tagline: 'A season to build the habit.',
-    features: [
-      'Full gym access, all equipment',
-      'Free fitness assessment on joining',
-      'Locker and shower access',
-      'Works out to ₹1,333 a month',
-    ],
   },
   {
     id: 'half-yearly',
@@ -171,12 +152,6 @@ export const plans: Plan[] = [
     strikePrice: 11999,
     period: 'half-year',
     tagline: 'Half a year, at half the monthly rate.',
-    features: [
-      'Full gym access, all equipment',
-      'Free fitness assessment on joining',
-      'Locker and shower access',
-      'Works out to under ₹1,000 a month',
-    ],
   },
   {
     id: 'annual',
@@ -185,12 +160,6 @@ export const plans: Plan[] = [
     strikePrice: 13999,
     period: 'year',
     tagline: 'The regular yearly membership.',
-    features: [
-      'Full gym access, all equipment',
-      'Free fitness assessment on joining',
-      'Locker and shower access',
-      'Personal training available as an add-on',
-    ],
   },
   {
     id: 'couple',
@@ -201,12 +170,6 @@ export const plans: Plan[] = [
     period: 'year',
     seats: 2,
     tagline: 'One year for two — under ₹7,500 each.',
-    features: [
-      'Everything in the Annual Pass, for two people',
-      'Free fitness assessment for both on joining',
-      'Locker and shower access',
-      'Train on your own schedule — no need to come together',
-    ],
   },
 ]
 

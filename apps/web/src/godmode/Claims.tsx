@@ -19,7 +19,7 @@ import {
   LuUndo2,
   LuX,
 } from 'react-icons/lu'
-import { getSupabase } from '../lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import { useGodmode } from './context'
 import { PageHeader } from './PageHeader'
 import { CLAIMS, activeClaims, hasClaim } from './session'

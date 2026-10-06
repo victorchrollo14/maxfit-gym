@@ -11,9 +11,9 @@ import {
   Toast,
 } from '@heroui/react'
 import { LuPlus } from 'react-icons/lu'
-import { getSupabase } from '../../lib/supabase'
-import { normalisePhone } from '../../lib/leads'
-import { useGodmode } from '../context'
+import { getSupabase } from '@/lib/supabase'
+import { normalisePhone } from '@/lib/leads'
+import { useGodmode } from '@/godmode/context'
 import { LEAD_FIELDS, SOURCES, type Lead, sourceLabel } from './shared'
 
 export function AddLead({ onAdded }: { onAdded: (lead: Lead) => void }) {

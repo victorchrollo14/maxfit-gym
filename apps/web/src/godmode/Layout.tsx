@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ComponentType } from 'react'
-import { Link, Outlet, useLocation, useNavigate } from '@tanstack/react-router'
+import { Link, Outlet, useLocation, useNavigate, useRouter } from '@tanstack/react-router'
 import {
   Button,
   Drawer,
@@ -19,8 +19,8 @@ import {
   LuTarget,
   LuUser,
 } from 'react-icons/lu'
-import { Logo } from '../components/Logo'
-import { getSupabase } from '../lib/supabase'
+import { Logo } from '@/routes/components/Logo'
+import { getSupabase } from '@/lib/supabase'
 import { GodmodeContext } from './context'
 import { hasClaim, useSession } from './session'
 import { ThemeSwitch } from './ThemeSwitch'
@@ -115,6 +115,7 @@ export function Layout() {
   const { session, loading } = useSession()
   const navigate = useNavigate()
   const location = useLocation()
+  const router = useRouter()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const isAdmin = hasClaim(session, 'admin')
@@ -123,9 +124,14 @@ export function Layout() {
 
   useEffect(() => {
     if (loading || session) return
-    const back = encodeURIComponent(location.pathname + location.searchStr)
-    navigate({ to: '/godmode/login', search: { continue: back }, replace: true })
-  }, [loading, session, navigate, location])
+    // Read, not a dependency: the redirect itself changes the location, and would fire again.
+    const { pathname, searchStr } = router.state.location
+    navigate({
+      to: '/godmode/login',
+      search: { continue: pathname + searchStr },
+      replace: true,
+    })
+  }, [loading, session, navigate, router])
 
   const items = useMemo(() => {
     const nav: NavItem[] = []

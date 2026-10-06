@@ -1,4 +1,4 @@
-import { gym } from '../content'
+import { gym } from '@/content'
 
 /** `wa.me` deep link with the first message pre-typed for the sender. */
 export function whatsappHref(message: string) {

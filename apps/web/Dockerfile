@@ -27,4 +27,5 @@ ENV NODE_ENV=production PORT=3000
 COPY --from=build /repo/apps/web/.output .output
 USER node
 EXPOSE 3000
-CMD ["node", ".output/server/index.mjs"]
+# run.sh mounts the server's secrets at /app/.env; they're never in the image.
+CMD ["node", "--env-file-if-exists=.env", ".output/server/index.mjs"]

@@ -1,9 +1,11 @@
 import { env } from './env'
 
 const GRAPH_API = 'https://graph.facebook.com/v26.0'
+const PHONE_NUMBER_ID = '1325160657353546'
+const OTP_TEMPLATE = 'login_otp'
 
 export async function sendWhatsAppOtp(to: string, otp: string) {
-  const res = await fetch(`${GRAPH_API}/${env('WHATSAPP_PHONE_NUMBER_ID')}/messages`, {
+  const res = await fetch(`${GRAPH_API}/${PHONE_NUMBER_ID}/messages`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${env('WHATSAPP_ACCESS_TOKEN')}`,
@@ -15,8 +17,8 @@ export async function sendWhatsAppOtp(to: string, otp: string) {
       to,
       type: 'template',
       template: {
-        name: env('WHATSAPP_OTP_TEMPLATE'),
-        language: { code: process.env.WHATSAPP_OTP_TEMPLATE_LANG ?? 'en' },
+        name: OTP_TEMPLATE,
+        language: { code: 'en' },
         // Authentication templates take the code twice: once for the body, once for the copy-code button.
         components: [
           { type: 'body', parameters: [{ type: 'text', text: otp }] },

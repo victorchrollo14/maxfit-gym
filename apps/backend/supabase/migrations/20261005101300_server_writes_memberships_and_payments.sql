@@ -13,6 +13,3 @@ drop policy "DELETE" on pause_days;
 
 drop policy "INSERT" on payments;
 drop policy "UPDATE" on payments;
-
-revoke all on memberships, membership_users, pause_days, payments from anon, authenticated;
-grant select on memberships, membership_users, pause_days, payments to authenticated;

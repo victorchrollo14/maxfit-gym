@@ -20,7 +20,7 @@ import {
   LuUser,
   LuUsers,
 } from 'react-icons/lu'
-import { Logo } from '@/routes/components/Logo'
+import { Logo } from './Logo'
 import { getSupabase } from '@/lib/supabase'
 import { GodmodeContext } from './context'
 import { hasClaim, useSession } from './session'

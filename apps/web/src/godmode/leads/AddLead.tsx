@@ -86,22 +86,23 @@ export function AddLead({ onAdded }: { onAdded: (lead: Lead) => void }) {
               <Modal.Heading>Add a walk-in</Modal.Heading>
             </Modal.Header>
             <Modal.Body className="flex flex-col gap-4">
-              <TextField value={name} onChange={setName} isRequired autoFocus>
+              <TextField variant="secondary" value={name} onChange={setName} isRequired autoFocus>
                 <Label>Name</Label>
                 <Input placeholder="Full name" />
               </TextField>
 
-              <TextField value={phone} onChange={setPhone} type="tel" isRequired>
+              <TextField variant="secondary" value={phone} onChange={setPhone} type="tel" isRequired>
                 <Label>Phone</Label>
                 <Input placeholder="10-digit mobile" inputMode="tel" />
               </TextField>
 
-              <TextField value={email} onChange={setEmail} type="email">
+              <TextField variant="secondary" value={email} onChange={setEmail} type="email">
                 <Label>Email</Label>
                 <Input placeholder="Optional" />
               </TextField>
 
               <Select
+                variant="secondary"
                 aria-label="Source"
                 value={source}
                 onChange={(value) => setSource(value as string)}
@@ -123,7 +124,7 @@ export function AddLead({ onAdded }: { onAdded: (lead: Lead) => void }) {
                 </Select.Popover>
               </Select>
 
-              <TextField value={notes} onChange={setNotes}>
+              <TextField variant="secondary" value={notes} onChange={setNotes}>
                 <Label>Notes</Label>
                 <TextArea placeholder="What did they ask about?" rows={3} />
               </TextField>

@@ -49,6 +49,8 @@ type Leads = { today: number; open: number }
 const METHOD_DOT: Record<string, string> = { upi: 'bg-violet-500', cash: 'bg-emerald-500', card: 'bg-sky-500' }
 
 /** Everything here is worked out in the browser from the same rows the members list reads. */
+const isTestUser = (name: string) => /^\s*test user\b/i.test(name)
+
 function summarize(rows: MemberRow[], memberships: Membership[], payments: Payment[], today: string) {
   const renewed = (row: MemberRow) => row.passes.some((m) => m.status === 'upcoming')
   const isExpiring = (row: MemberRow) =>
@@ -357,15 +359,20 @@ export function Dashboard() {
         supabase
           .from('leads')
           .select('id', { count: 'exact', head: true })
+          .not('name', 'ilike', 'test user%')
           .gte('created_at', `${today}T00:00:00+05:30`),
         supabase
           .from('leads')
           .select('id', { count: 'exact', head: true })
+          .not('name', 'ilike', 'test user%')
           .not('status', 'in', '(converted,lost)'),
       ])
-      setProfiles(members)
-      setMemberships(summary)
-      setPayments(paid)
+      const testIds = new Set(members.filter((p) => isTestUser(p.name)).map((p) => p.id))
+      const realSummary = summary.filter((m) => !(m.member_ids ?? []).some((id) => testIds.has(id)))
+      const realIds = new Set(realSummary.map((m) => m.membership_id))
+      setProfiles(members.filter((p) => !testIds.has(p.id)))
+      setMemberships(realSummary)
+      setPayments(paid.filter((p) => !testIds.has(p.paid_by) && (!p.membership_id || realIds.has(p.membership_id))))
       // The lead counts are extras: if they fail, their tiles show a dash and the rest still loads.
       if (leadsToday.error || openLeads.error) console.error('lead counts failed', leadsToday.error ?? openLeads.error)
       setLeads(

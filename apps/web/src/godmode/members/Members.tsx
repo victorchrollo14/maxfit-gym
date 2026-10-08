@@ -10,6 +10,7 @@ import {
   Spinner,
   Table,
   Toast,
+  cn,
 } from '@heroui/react'
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { LuPlus, LuRefreshCw } from 'react-icons/lu'
@@ -518,11 +519,13 @@ function Dues({ dues, current, memberId }: { dues: Membership[]; current: Member
           <span className="text-xs text-muted">
             {' '}
             · {m.plan_name},{' '}
-            {m.membership_id === current?.membership_id
-              ? 'current'
+            {m.status === 'expired'
+              ? `ended ${formatDay(m.end_date)}`
               : m.status === 'upcoming'
                 ? `from ${formatDay(m.start_date)}`
-                : formatDay(m.start_date)}
+                : m.membership_id === current?.membership_id
+                  ? 'current'
+                  : formatDay(m.start_date)}
           </span>
         </p>
       ))}
@@ -547,7 +550,15 @@ function Left({ m, today }: { m: Membership; today: string }) {
   let main: ReactNode = <Dash />
   let hint: ReactNode = null
   if (RUNNING.includes(m.status)) {
-    main = `${m.days_left} ${m.days_left === 1 ? 'day' : 'days'}`
+    const ends = m.days_left - 1
+    main =
+      m.days_left <= 7 ? (
+        <span className={cn('font-medium', m.days_left <= 3 ? 'text-danger' : 'text-warning')}>
+          {ends === 0 ? 'Expires today' : ends === 1 ? 'Expires tomorrow' : `Expires in ${ends} days`}
+        </span>
+      ) : (
+        `${m.days_left} days`
+      )
     if (m.pause_days_allowed > 0) hint = `${m.pause_days_left} pause left`
   } else if (m.status === 'upcoming') {
     const days = daysBetween(today, m.start_date)

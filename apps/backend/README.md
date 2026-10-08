@@ -88,10 +88,10 @@ terms onto the membership at sale; the landing page keeps its own list in
 
 ## Deploying
 
-`.github/workflows/supabase-migrate.yml` runs `supabase db push` against the linked
-project on every push to `main` that touches `supabase/migrations/` or `config.toml`.
-Nothing else triggers it, and runs are queued rather than cancelled — two overlapping
-pushes are how you get a half-migrated database.
+The `migrate` job in `.github/workflows/deploy.yml` runs `supabase db push` against the
+linked project on every push to `main` that touches `supabase/migrations/` or
+`config.toml`, before the app is deployed. Deploy runs are queued rather than cancelled —
+two overlapping pushes are how you get a half-migrated database.
 
 **There is no hosted project yet, so the workflow skips itself** — it checks for
 `SUPABASE_PROJECT_ID` first and exits green with a notice if it's missing, rather

@@ -37,8 +37,7 @@ export function startAnalytics() {
         defaults: '2026-01-30',
         capture_exceptions: true,
         debug: import.meta.env.DEV,
-        /* Already the default, pinned because the enquiry form takes a name
-           and a phone number — nothing typed should reach a replay. */
+        /* Already the default, pinned so nothing typed ever reaches a replay. */
         session_recording: { maskAllInputs: true },
       })
       client = posthog

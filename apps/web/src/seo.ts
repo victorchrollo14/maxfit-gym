@@ -59,7 +59,7 @@ function schema() {
       contactType: 'Membership enquiries',
       telephone: `+${gym.whatsapp}`,
       email: gym.email,
-      url: `${site}/#enquiry`,
+      url: `${site}/#visit`,
     },
     address: {
       '@type': 'PostalAddress',

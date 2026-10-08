@@ -18,7 +18,6 @@ import { Route as GodmodeShellIndexRouteImport } from './routes/godmode/_shell/i
 import { Route as GodmodeShellClaimsRouteImport } from './routes/godmode/_shell/claims'
 import { Route as GodmodeShellLeadsRouteImport } from './routes/godmode/_shell/leads'
 import { Route as PublicLayouthomeIndexRouteImport } from './routes/_public/_layout/(home)/index'
-import { Route as PublicLayoutTrialClaimedIndexRouteImport } from './routes/_public/_layout/trial-claimed/index'
 import { Route as GodmodeShellMembersIndexRouteImport } from './routes/godmode/_shell/members/index'
 import { Route as GodmodeShellMembersMemberIdRouteImport } from './routes/godmode/_shell/members/$memberId'
 
@@ -65,12 +64,6 @@ const PublicLayouthomeIndexRoute = PublicLayouthomeIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PublicLayoutRoute,
 } as any)
-const PublicLayoutTrialClaimedIndexRoute =
-  PublicLayoutTrialClaimedIndexRouteImport.update({
-    id: '/trial-claimed/',
-    path: '/trial-claimed/',
-    getParentRoute: () => PublicLayoutRoute,
-  } as any)
 const GodmodeShellMembersIndexRoute =
   GodmodeShellMembersIndexRouteImport.update({
     id: '/members/',
@@ -93,7 +86,6 @@ export interface FileRoutesByFullPath {
   '/godmode/leads': typeof GodmodeShellLeadsRoute
   '/godmode/': typeof GodmodeShellIndexRoute
   '/godmode/members/$memberId': typeof GodmodeShellMembersMemberIdRoute
-  '/trial-claimed/': typeof PublicLayoutTrialClaimedIndexRoute
   '/godmode/members/': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -104,7 +96,6 @@ export interface FileRoutesByTo {
   '/godmode/leads': typeof GodmodeShellLeadsRoute
   '/godmode/members/$memberId': typeof GodmodeShellMembersMemberIdRoute
   '/': typeof PublicLayouthomeIndexRoute
-  '/trial-claimed': typeof PublicLayoutTrialClaimedIndexRoute
   '/godmode/members': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRoutesById {
@@ -119,7 +110,6 @@ export interface FileRoutesById {
   '/godmode/_shell/': typeof GodmodeShellIndexRoute
   '/godmode/_shell/members/$memberId': typeof GodmodeShellMembersMemberIdRoute
   '/_public/_layout/(home)/': typeof PublicLayouthomeIndexRoute
-  '/_public/_layout/trial-claimed/': typeof PublicLayoutTrialClaimedIndexRoute
   '/godmode/_shell/members/': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRouteTypes {
@@ -133,7 +123,6 @@ export interface FileRouteTypes {
     | '/godmode/leads'
     | '/godmode/'
     | '/godmode/members/$memberId'
-    | '/trial-claimed/'
     | '/godmode/members/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -144,7 +133,6 @@ export interface FileRouteTypes {
     | '/godmode/leads'
     | '/godmode/members/$memberId'
     | '/'
-    | '/trial-claimed'
     | '/godmode/members'
   id:
     | '__root__'
@@ -158,7 +146,6 @@ export interface FileRouteTypes {
     | '/godmode/_shell/'
     | '/godmode/_shell/members/$memberId'
     | '/_public/_layout/(home)/'
-    | '/_public/_layout/trial-claimed/'
     | '/godmode/_shell/members/'
   fileRoutesById: FileRoutesById
 }
@@ -233,13 +220,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLayouthomeIndexRouteImport
       parentRoute: typeof PublicLayoutRoute
     }
-    '/_public/_layout/trial-claimed/': {
-      id: '/_public/_layout/trial-claimed/'
-      path: '/trial-claimed'
-      fullPath: '/trial-claimed/'
-      preLoaderRoute: typeof PublicLayoutTrialClaimedIndexRouteImport
-      parentRoute: typeof PublicLayoutRoute
-    }
     '/godmode/_shell/members/': {
       id: '/godmode/_shell/members/'
       path: '/members'
@@ -292,12 +272,10 @@ const GodmodeRouteWithChildren =
 
 interface PublicLayoutRouteChildren {
   PublicLayouthomeIndexRoute: typeof PublicLayouthomeIndexRoute
-  PublicLayoutTrialClaimedIndexRoute: typeof PublicLayoutTrialClaimedIndexRoute
 }
 
 const PublicLayoutRouteChildren: PublicLayoutRouteChildren = {
   PublicLayouthomeIndexRoute: PublicLayouthomeIndexRoute,
-  PublicLayoutTrialClaimedIndexRoute: PublicLayoutTrialClaimedIndexRoute,
 }
 
 const PublicLayoutRouteWithChildren = PublicLayoutRoute._addFileChildren(

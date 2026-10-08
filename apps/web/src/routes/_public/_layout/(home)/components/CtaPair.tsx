@@ -16,8 +16,7 @@ const layouts = {
 
 /**
  * The site's main call to action, everywhere it appears. Plans are sold in
- * person, so both buttons open a conversation rather than a form — the free
- * trial form in the hero is the one exception.
+ * person, so both buttons open a conversation rather than a form.
  */
 export function CtaPair({
   location,

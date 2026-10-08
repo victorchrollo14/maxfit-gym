@@ -67,6 +67,12 @@ sign-in currently fails with `phone_provider_disabled` even with the hook on.
 
 ## Deploying
 
+Pushes to `main` that touch `apps/web` deploy on their own: `.github/workflows/deploy.yml`
+builds the image in GitHub Actions, pushes it to `ghcr.io/<owner>/maxfit-web:<commit>`,
+and runs `./apps/web/run.sh deploy <image>` on the EC2 machine over SSH. That starts the
+new image and switches back to the previous one if `/godmode` doesn't answer. To roll back
+by hand, `./apps/web/run.sh start ghcr.io/<owner>/maxfit-web:<older commit>`.
+
 `pnpm build` produces `.output/`, a self-contained Node server (`pnpm start` runs
 it). The Dockerfile wraps that, so the same image runs on EC2, ECS or anything else
 that runs containers. Build from the repo root:

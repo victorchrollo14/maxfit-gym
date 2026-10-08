@@ -1,0 +1,163 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never two deploys at once, and never cancel one half way: a half-applied
+# migration or a container swap cut short is worse than waiting.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      migrations: ${{ steps.filter.outputs.migrations }}
+      app: ${{ steps.filter.outputs.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            migrations:
+              - 'apps/backend/supabase/migrations/**'
+              - 'apps/backend/supabase/config.toml'
+            app:
+              - 'apps/web/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/deploy.yml'
+
+  migrate:
+    needs: changes
+    if: needs.changes.outputs.migrations == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: apps/backend
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - name: Check for credentials
+        id: cfg
+        working-directory: .
+        run: |
+          if [ -z "${{ secrets.SUPABASE_PROJECT_ID }}" ]; then
+            echo "::notice::No Supabase secrets set — skipping. See apps/backend/README.md."
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.ready == 'true'
+
+      # Pinned to the version in apps/backend/package.json — this touches the
+      # production database, so it shouldn't change under us on its own.
+      - uses: supabase/setup-cli@v1
+        if: steps.cfg.outputs.ready == 'true'
+        with:
+          version: 2.114.0
+
+      - name: Link the project
+        if: steps.cfg.outputs.ready == 'true'
+        run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
+
+      # What would run, in the log, before anything runs.
+      - name: Plan
+        if: steps.cfg.outputs.ready == 'true'
+        run: supabase db push --linked --dry-run --include-all
+
+      # No --include-seed: seed.sql is dev data and must never reach production.
+      # --include-all: independent migrations merge as separate PRs, so one can
+      # land after a newer one is already applied.
+      - name: Apply migrations
+        if: steps.cfg.outputs.ready == 'true'
+        run: supabase db push --linked --include-all
+
+      - name: Confirm applied
+        if: steps.cfg.outputs.ready == 'true'
+        run: supabase migration list --linked
+
+  # Migrations go first, so the code that needs them never runs before them.
+  app:
+    needs: [changes, migrate]
+    if: >-
+      !cancelled() && needs.migrate.result != 'failure' &&
+      (needs.changes.outputs.app == 'true' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/${{ github.repository_owner }}/maxfit-web:${{ github.sha }}
+    steps:
+      - name: Check configuration
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          EC2_HOST: ${{ vars.EC2_HOST }}
+          EC2_USER: ${{ vars.EC2_USER }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+        run: |
+          missing=0
+          for v in VITE_SUPABASE_URL VITE_SUPABASE_PUBLISHABLE_KEY EC2_HOST EC2_USER EC2_SSH_KEY EC2_KNOWN_HOSTS; do
+            if [ -z "${!v}" ]; then echo "::error::$v is not set"; missing=1; fi
+          done
+          exit $missing
+
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # VITE_* values are compiled into the browser bundle, so they're build
+      # args (and public). Server secrets stay in .env on the machine.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE }}
+          build-args: |
+            VITE_SUPABASE_URL=${{ vars.VITE_SUPABASE_URL }}
+            VITE_SUPABASE_PUBLISHABLE_KEY=${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+            VITE_GOOGLE_MAPS_EMBED_KEY=${{ vars.VITE_GOOGLE_MAPS_EMBED_KEY }}
+            VITE_PUBLIC_POSTHOG_PROJECT_TOKEN=${{ vars.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN }}
+            VITE_PUBLIC_POSTHOG_HOST=${{ vars.VITE_PUBLIC_POSTHOG_HOST }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Set up SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy
+          echo "${{ secrets.EC2_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/deploy ~/.ssh/known_hosts
+
+      # The server pulls with this job's token and logs out again, so no
+      # registry credentials stay on the machine. run.sh deploy rolls back to
+      # the previous image if the new one doesn't answer.
+      - name: Deploy to EC2
+        env:
+          TARGET: ${{ vars.EC2_USER }}@${{ vars.EC2_HOST }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ssh -i ~/.ssh/deploy "$TARGET" \
+            "docker login ghcr.io -u '${{ github.actor }}' --password-stdin >/dev/null" <<< "$TOKEN"
+          ssh -i ~/.ssh/deploy "$TARGET" \
+            "cd ~/maxfit-gym && git pull -q --ff-only && ./apps/web/run.sh deploy '$IMAGE'; status=\$?; docker logout ghcr.io >/dev/null; exit \$status"

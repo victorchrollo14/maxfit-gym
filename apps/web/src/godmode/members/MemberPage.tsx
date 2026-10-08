@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Alert, Button, Chip, Spinner, Toast, cn } from '@heroui/react'
-import { LuArrowLeft, LuBadgeCheck, LuCopy, LuPencil, LuPhone, LuPlus } from 'react-icons/lu'
+import { LuArrowLeft, LuBadgeCheck, LuCopy, LuPencil, LuPhone, LuPlus, LuTrash2, LuUserPlus } from 'react-icons/lu'
 import { FaWhatsapp } from 'react-icons/fa'
 import { getSupabase } from '@/lib/supabase'
 import { daysBetween, formatDateTime, formatDay } from '@/lib/dates'
 import { formatINR } from '@/lib/format'
+import { findPlan } from '@/plans'
+import { useGodmode } from '@/godmode/context'
 import { PageHeader } from '@/godmode/PageHeader'
+import { hasClaim } from '@/godmode/session'
 import { prettyPhone, waHref } from '@/godmode/leads/shared'
+import { AddPartner } from './AddPartner'
+import { DeleteMembership } from './DeleteMembership'
 import { EditMember } from './EditMember'
 import { NewMembership } from './NewMembership'
 import { RecordPayment } from './RecordPayment'
@@ -73,6 +78,8 @@ function MembershipCard({
   memberId,
   onRecord,
   onVoid,
+  onAddPartner,
+  onDelete,
 }: {
   membership: Membership
   payments: Payment[]
@@ -80,6 +87,8 @@ function MembershipCard({
   memberId: string
   onRecord: () => void
   onVoid: (payment: Payment) => void
+  onAddPartner: () => void
+  onDelete?: () => void
 }) {
   const m = membership
   const partners = (m.member_ids ?? []).filter((id) => id !== memberId)
@@ -88,6 +97,9 @@ function MembershipCard({
   const discount = Number(m.discount_amount)
   const totalDays = daysBetween(m.start_date, m.end_date) + 1
   const tone = planTone(m.plan_key)
+  const freeSeat =
+    (m.status === 'active' || m.status === 'paused' || m.status === 'upcoming') &&
+    (m.member_ids?.length ?? 0) < (findPlan(m.plan_key)?.seats ?? 1)
 
   return (
     <article
@@ -109,6 +121,18 @@ function MembershipCard({
               >
                 <LuCopy className="size-3.5" />
               </Button>
+              {onDelete && (
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="ghost"
+                  aria-label="Delete membership"
+                  className="size-7 min-w-7 text-muted hover:text-danger"
+                  onPress={onDelete}
+                >
+                  <LuTrash2 className="size-3.5" />
+                </Button>
+              )}
             </div>
             <p className="text-sm text-muted">
               {formatDay(m.start_date)} – {formatDay(m.end_date)}
@@ -129,6 +153,15 @@ function MembershipCard({
       </div>
 
       <div className="p-4">
+      {freeSeat && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed border-border px-3 py-2">
+          <p className="text-sm text-muted">No partner added yet.</p>
+          <Button size="sm" variant="secondary" onPress={onAddPartner}>
+            <LuUserPlus className="size-4" />
+            Add partner
+          </Button>
+        </div>
+      )}
       {partners.length > 0 && (
         <p className="mb-4 text-sm text-muted">
           With{' '}
@@ -229,6 +262,8 @@ function MembershipCard({
 
 export function MemberPage({ memberId, sell }: { memberId: string; sell?: boolean }) {
   const navigate = useNavigate()
+  const { session } = useGodmode()
+  const canDelete = hasClaim(session, 'membership_delete')
   const [profile, setProfile] = useState<Profile | null>(null)
   const [memberships, setMemberships] = useState<Membership[]>([])
   const [payments, setPayments] = useState<Payment[]>([])
@@ -238,6 +273,8 @@ export function MemberPage({ memberId, sell }: { memberId: string; sell?: boolea
   const [editing, setEditing] = useState(false)
   const [paying, setPaying] = useState<Membership | null>(null)
   const [voiding, setVoiding] = useState<Payment | null>(null)
+  const [deleting, setDeleting] = useState<Membership | null>(null)
+  const [partnering, setPartnering] = useState<Membership | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -305,6 +342,8 @@ export function MemberPage({ memberId, sell }: { memberId: string; sell?: boolea
       ...list.filter((m) => m.status === 'cancelled'),
     ]
   }, [memberships])
+  const current = sorted.filter((m) => m.status !== 'expired' && m.status !== 'cancelled')
+  const past = sorted.filter((m) => m.status === 'expired' || m.status === 'cancelled')
   const dues = sorted.filter((m) => m.status !== 'cancelled' && m.amount_pending > 0)
   const dueTotal = dues.reduce((sum, m) => sum + Number(m.amount_pending), 0)
   const allNames = useMemo(() => {
@@ -331,6 +370,19 @@ export function MemberPage({ memberId, sell }: { memberId: string; sell?: boolea
   }
 
   const lastPlan = sorted.find((m) => m.status !== 'cancelled')?.plan_key
+  const card = (m: Membership) => (
+    <MembershipCard
+      key={m.membership_id}
+      membership={m}
+      payments={payments.filter((p) => p.membership_id === m.membership_id)}
+      names={allNames}
+      memberId={profile.id}
+      onRecord={() => setPaying(m)}
+      onVoid={setVoiding}
+      onAddPartner={() => setPartnering(m)}
+      onDelete={canDelete ? () => setDeleting(m) : undefined}
+    />
+  )
   const payers = (paying?.member_ids ?? [profile.id]).map((id) => ({
     id,
     name: allNames.get(id) ?? 'Member',
@@ -400,7 +452,7 @@ export function MemberPage({ memberId, sell }: { memberId: string; sell?: boolea
         </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="eyebrow text-xs text-muted">Memberships</h2>
+          <h2 className="text-lg font-semibold">Current membership</h2>
           {dues.length > 0 && (
             <Alert status="warning">
               <Alert.Indicator />
@@ -412,24 +464,26 @@ export function MemberPage({ memberId, sell }: { memberId: string; sell?: boolea
               </Alert.Content>
             </Alert>
           )}
-          {sorted.length === 0 ? (
+          {current.length === 0 ? (
             <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted">
-              No membership yet.
+              {past.length === 0 ? 'No membership yet.' : 'No current membership.'}
             </p>
           ) : (
-            sorted.map((m) => (
-              <MembershipCard
-                key={m.membership_id}
-                membership={m}
-                payments={payments.filter((p) => p.membership_id === m.membership_id)}
-                names={allNames}
-                memberId={profile.id}
-                onRecord={() => setPaying(m)}
-                onVoid={setVoiding}
-              />
-            ))
+            current.map(card)
           )}
         </section>
+
+        {past.length > 0 && (
+          <section className="mt-2 flex flex-col gap-3 border-t border-border pt-6">
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              Past memberships
+              <Chip size="sm" variant="soft">
+                {past.length}
+              </Chip>
+            </h2>
+            {past.map(card)}
+          </section>
+        )}
       </div>
 
       <EditMember
@@ -469,6 +523,25 @@ export function MemberPage({ memberId, sell }: { memberId: string; sell?: boolea
         onClose={() => setVoiding(null)}
         onVoided={() => {
           setVoiding(null)
+          load()
+        }}
+      />
+
+      <AddPartner
+        membership={partnering}
+        onClose={() => setPartnering(null)}
+        onAdded={() => {
+          setPartnering(null)
+          load()
+        }}
+      />
+
+      <DeleteMembership
+        membership={deleting}
+        payments={payments.filter((p) => p.membership_id === deleting?.membership_id)}
+        onClose={() => setDeleting(null)}
+        onDeleted={() => {
+          setDeleting(null)
           load()
         }}
       />

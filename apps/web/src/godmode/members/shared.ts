@@ -180,6 +180,13 @@ export function loadMembers() {
   )
 }
 
+export type Person = { id: string; name: string; phone?: string | null }
+
+export async function loadPerson(id: string) {
+  const { data } = await getSupabase().from('user_profiles').select('id, name, phone').eq('id', id).single()
+  return data as Person | null
+}
+
 export function loadMembershipSummary() {
   return fetchAll<Membership>((from, to) =>
     getSupabase().from('membership_summary').select('*').order('membership_id').range(from, to),

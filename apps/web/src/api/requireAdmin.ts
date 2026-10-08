@@ -17,8 +17,9 @@ export const requireAdmin = createMiddleware({ type: 'function' })
     if (!token) throw new Error('Not signed in')
 
     const { data, error } = await adminSupabase().auth.getClaims(token)
-    if (error || data?.claims.app_metadata?.admin !== true) {
+    const claims = (data?.claims.app_metadata ?? {}) as Record<string, unknown>
+    if (error || !data || claims.admin !== true) {
       throw new Error('Not allowed')
     }
-    return next({ context: { adminId: data.claims.sub } })
+    return next({ context: { adminId: data.claims.sub, claims } })
   })

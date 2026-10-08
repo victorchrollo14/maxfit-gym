@@ -1,19 +1,6 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-  type FormEvent,
-} from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import {
-  Accordion,
-  FieldError,
-  Form,
-  Input,
-  Label,
-  TextField,
-} from '@heroui/react'
+import { useEffect, useRef, useState } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import { Accordion } from '@heroui/react'
 import {
   FaDumbbell,
   FaEnvelope,
@@ -30,7 +17,7 @@ import { LuMenu, LuX } from 'react-icons/lu'
 import { MdFitnessCenter } from 'react-icons/md'
 import { TbBarbell, TbJumpRope, TbStretching, TbTreadmill } from 'react-icons/tb'
 
-import { Cta, ctaClasses } from '@/routes/components/Cta'
+import { Cta } from '@/routes/components/Cta'
 import { CtaPair } from './components/CtaPair'
 import { HeroBackdrop } from '@/routes/components/HeroBackdrop'
 import { Logo } from '@/routes/components/Logo'
@@ -52,11 +39,9 @@ import {
   videos,
   type Plan,
 } from '@/content'
-import { capture, ctaTracker, type CtaAction } from '@/lib/analytics'
+import { ctaTracker, type CtaAction } from '@/lib/analytics'
 import { formatINR, formatList } from '@/lib/format'
-import { createLead, normalisePhone } from '@/lib/leads'
 import { telHref, whatsappHref } from '@/lib/links'
-import { markTrialClaimed } from '@/lib/trialClaim'
 
 const waHref = whatsappHref(
   `Hi ${gym.name}, I'd like to know more about membership.`,
@@ -261,7 +246,7 @@ function Hero() {
 
       {/* Top padding clears the fixed header (~68px mobile, ~66px desktop) on
           top of the hero's own spacing — the header no longer takes up flow. */}
-      <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pt-28 pb-16 sm:pt-36 sm:pb-24 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16">
+      <div className="relative mx-auto max-w-6xl px-5 pt-28 pb-16 sm:pt-36 sm:pb-24">
         {/* min-w-0: grid items default to min-width:auto, so the marquee's
             w-max track below would otherwise stretch this column to its full
             unclipped width. */}
@@ -282,6 +267,10 @@ function Hero() {
             {gym.intro}
           </p>
 
+          <div className="mt-8 flex">
+            <CtaPair location="hero" />
+          </div>
+
           <div className="relative mt-9 overflow-hidden border-y border-border py-4 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
             <div className="flex w-max animate-marquee motion-reduce:animate-none">
               {[0, 1].map((copy) => (
@@ -301,108 +290,8 @@ function Hero() {
           </div>
         </div>
 
-        {/* Lead capture sits in the hero, as on the reference offers page. */}
-        <div
-          id="enquiry"
-          className="scroll-mt-24 rounded-2xl border border-border bg-surface/80 p-6 shadow-2xl backdrop-blur sm:p-7"
-        >
-          <h2 className="display text-xl sm:text-2xl">
-            Claim your <span className="text-accent">free trial</span>
-          </h2>
-          <p className="mt-2 mb-6 text-sm text-muted text-pretty">
-            One session on us. No card details, no obligation — we'll call you back
-            within minutes to book your walk-in.
-          </p>
-          <EnquiryForm />
-        </div>
       </div>
     </section>
-  )
-}
-
-type Status = 'idle' | 'sending' | 'failed'
-
-function EnquiryForm() {
-  const [status, setStatus] = useState<Status>('idle')
-  const [error, setError] = useState<ReactNode>(null)
-  const navigate = useNavigate()
-  const track = ctaTracker('enquiry_form_error')
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const data = new FormData(e.currentTarget)
-    const name = String(data.get('name') ?? '')
-    const phone = String(data.get('phone') ?? '')
-
-    if (!normalisePhone(phone)) {
-      setError("That doesn't look like a mobile number — 10 digits, please.")
-      setStatus('failed')
-      capture('trial_form_failed', { reason: 'invalid_phone' })
-      return
-    }
-
-    setStatus('sending')
-    setError(null)
-
-    try {
-      await createLead({ name, phone })
-    } catch (err) {
-      console.error('Lead submission failed', err)
-      setError(
-        <>
-          Something went wrong on our side. Call us on{' '}
-          <a
-            href={telHref}
-            onClick={() => track('call')}
-            className="underline underline-offset-4"
-          >
-            {gym.phone}
-          </a>{' '}
-          and we'll sort it out.
-        </>,
-      )
-      setStatus('failed')
-      capture('trial_form_failed', { reason: 'request_failed' })
-      return
-    }
-
-    capture('trial_claimed')
-    markTrialClaimed()
-    navigate({ to: '/trial-claimed' })
-  }
-
-  return (
-    <Form onSubmit={handleSubmit} className="grid gap-4">
-      <TextField name="name" isRequired className="w-full">
-        <Label className="eyebrow text-muted">Name</Label>
-        <Input placeholder="Your full name" autoComplete="name" />
-        <FieldError />
-      </TextField>
-
-      <TextField name="phone" type="tel" isRequired className="w-full">
-        <Label className="eyebrow text-muted">Phone</Label>
-        <Input placeholder="10-digit mobile" inputMode="tel" autoComplete="tel" />
-        <FieldError />
-      </TextField>
-
-      {error && (
-        <p role="alert" className="text-sm text-pretty text-danger">
-          {error}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={status === 'sending'}
-        className={`${ctaClasses('lg')} mt-2 w-full disabled:opacity-60`}
-      >
-        {status === 'sending' ? 'Sending…' : 'Claim free trial'}
-      </button>
-
-      <p className="text-center text-xs text-muted">
-        We'll only use this to contact you about your membership.
-      </p>
-    </Form>
   )
 }
 
@@ -941,7 +830,6 @@ const columns = [
       { href: '#visit', label: 'Location' },
       { href: '#visit', label: 'Opening hours' },
       { href: '#faq', label: 'FAQ' },
-      { href: '#enquiry', label: 'Free trial' },
     ],
   },
 ]

@@ -24,6 +24,6 @@ export const isSupabaseConfigured = Boolean(url && publishableKey)
 
 if (import.meta.env.DEV && !isSupabaseConfigured) {
   console.warn(
-    'Supabase env vars missing — the free-trial form will fail. Copy apps/web/.env.example to .env.local.',
+    'Supabase env vars missing — sign-in and the CRM will fail. Copy apps/web/.env.example to .env.local.',
   )
 }

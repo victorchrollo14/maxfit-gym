@@ -75,13 +75,6 @@ export const gym = {
   foundedYear: 2026, // TODO
 } as const
 
-/** One block of text for the clipboard, on the trial-claimed page. */
-export const fullAddress = [
-  `${gym.name.toUpperCase()} Gym`,
-  gym.address.line1,
-  gym.address.line2,
-].join('\n')
-
 /** Term a plan is bought for, and how many months it covers. */
 export const periodMonths = {
   month: 1,
@@ -187,7 +180,7 @@ const festivalPrice = plans
 
 export const seo = {
   title: `Strength & Conditioning Gym in K.R. Puram, Bengaluru — ${gym.name}`,
-  description: `Strength & conditioning gym on Kithaganur Main Rd, K.R. Puram, by ${gym.landmark}. Festival Offer year pass ₹${festivalPrice}. Free trial, open every day.`,
+  description: `Strength & conditioning gym on Kithaganur Main Rd, K.R. Puram, by ${gym.landmark}. Festival Offer year pass ₹${festivalPrice}. Open every day.`,
   /* Link previews get the offer first — a shared link is read as an ad. */
   ogDescription: `Proper racks, real coaching, no waiting at peak hour. Festival Offer annual pass ₹${festivalPrice}. Kithaganur Main Rd, K.R. Puram.`,
   image: {

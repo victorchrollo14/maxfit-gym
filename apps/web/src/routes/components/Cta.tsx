@@ -39,7 +39,7 @@ export function Cta({
   tone?: keyof typeof tones
   className?: string
   /** For same-page anchors that also need to dismiss something, e.g. the
-      mobile menu closing as it jumps to the enquiry form. */
+      mobile menu closing as it jumps to a section. */
   onClick?: () => void
   /** Opens in a new tab — for links that leave the site, e.g. WhatsApp. */
   external?: boolean

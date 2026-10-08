@@ -413,6 +413,7 @@ function Pricing() {
           Questions about lock-in and freezing?
         </a>
       </p>
+      <p className="mt-2 text-center text-xs text-muted">No refunds once a plan is paid for.</p>
     </Section>
   )
 }

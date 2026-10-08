@@ -267,7 +267,7 @@ function Hero() {
             {gym.intro}
           </p>
 
-          <div className="mt-8 flex">
+          <div className="mt-8 sm:flex">
             <CtaPair location="hero" />
           </div>
 

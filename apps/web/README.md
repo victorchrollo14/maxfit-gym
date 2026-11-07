@@ -1,4 +1,7 @@
-# web — landing page, member portal, CRM
+# web — CRM and API (app.maxfitbangalore.in)
+
+The landing page is a separate static site in [`apps/site`](../site/README.md). `/`
+here redirects to `/godmode`.
 
 ## Running it
 
@@ -7,10 +10,8 @@ cp .env.example .env.local     # then fill in VITE_SUPABASE_PUBLISHABLE_KEY
 pnpm dev
 ```
 
-The free-trial form writes to the `leads` table with the Supabase client, so it needs
-a database to talk to. `cd ../backend && pnpm db:start` prints both env values; see
-[apps/backend/README.md](../backend/README.md). Without them the site still renders —
-the form is the only thing that fails, loudly, in the console.
+The CRM needs a database to talk to. `cd ../backend && pnpm db:start` prints both env
+values; see [apps/backend/README.md](../backend/README.md).
 
 ## API routes
 
@@ -75,9 +76,7 @@ that runs containers. Build from the repo root:
 docker build -f apps/web/Dockerfile -t maxfit-web \
   --build-arg VITE_SUPABASE_URL=... \
   --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=... \
-  --build-arg VITE_PUBLIC_POSTHOG_PROJECT_TOKEN=... \
-  --build-arg VITE_PUBLIC_POSTHOG_HOST=... \
-  --build-arg VITE_GOOGLE_MAPS_EMBED_KEY=... .
+  .
 
 docker run -d --restart unless-stopped -p 3000:3000 --env-file web.env maxfit-web
 ```
@@ -90,8 +89,7 @@ nginx with Let's Encrypt in front of port 3000.
 
 ### Server rendering
 
-Pages are server-rendered, except `/trial-claimed` (its gate reads
-`sessionStorage`) and everything under `/godmode` (signed-in only, session in
-`localStorage`). Those are `ssr: false` and render in the browser. Anything else that
-touches `window`, `document` or storage has to do it in an effect or an event
-handler, not while rendering.
+Everything under `/godmode` is `ssr: false` (signed-in only, session in
+`localStorage`), so it renders in the browser. Anything server-rendered that touches
+`window`, `document` or storage has to do it in an effect or an event handler, not
+while rendering.

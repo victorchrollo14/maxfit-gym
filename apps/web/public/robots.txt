@@ -1,5 +1,2 @@
 User-agent: *
-Allow: /
-Disallow: /godmode
-
-Sitemap: https://maxfitbangalore.in/sitemap.xml
+Disallow: /

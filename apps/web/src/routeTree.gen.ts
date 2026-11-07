@@ -9,25 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as GodmodeRouteImport } from './routes/godmode'
-import { Route as PublicLayoutRouteImport } from './routes/_public/_layout'
 import { Route as GodmodeShellRouteImport } from './routes/godmode/_shell'
 import { Route as GodmodeLoginRouteImport } from './routes/godmode/login'
 import { Route as ApiWebhooksSendWaOtpRouteImport } from './routes/api/webhooks/send-wa-otp'
 import { Route as GodmodeShellIndexRouteImport } from './routes/godmode/_shell/index'
 import { Route as GodmodeShellClaimsRouteImport } from './routes/godmode/_shell/claims'
 import { Route as GodmodeShellLeadsRouteImport } from './routes/godmode/_shell/leads'
-import { Route as PublicLayouthomeIndexRouteImport } from './routes/_public/_layout/(home)/index'
 import { Route as GodmodeShellMembersIndexRouteImport } from './routes/godmode/_shell/members/index'
 import { Route as GodmodeShellMembersMemberIdRouteImport } from './routes/godmode/_shell/members/$memberId'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GodmodeRoute = GodmodeRouteImport.update({
   id: '/godmode',
   path: '/godmode',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PublicLayoutRoute = PublicLayoutRouteImport.update({
-  id: '/_public/_layout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GodmodeShellRoute = GodmodeShellRouteImport.update({
@@ -59,11 +59,6 @@ const GodmodeShellLeadsRoute = GodmodeShellLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => GodmodeShellRoute,
 } as any)
-const PublicLayouthomeIndexRoute = PublicLayouthomeIndexRouteImport.update({
-  id: '/(home)/',
-  path: '/',
-  getParentRoute: () => PublicLayoutRoute,
-} as any)
 const GodmodeShellMembersIndexRoute =
   GodmodeShellMembersIndexRouteImport.update({
     id: '/members/',
@@ -78,8 +73,8 @@ const GodmodeShellMembersMemberIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/godmode': typeof GodmodeRouteWithChildren
-  '/': typeof PublicLayouthomeIndexRoute
   '/godmode/login': typeof GodmodeLoginRoute
   '/api/webhooks/send-wa-otp': typeof ApiWebhooksSendWaOtpRoute
   '/godmode/claims': typeof GodmodeShellClaimsRoute
@@ -89,19 +84,19 @@ export interface FileRoutesByFullPath {
   '/godmode/members/': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/godmode': typeof GodmodeShellIndexRoute
   '/godmode/login': typeof GodmodeLoginRoute
   '/api/webhooks/send-wa-otp': typeof ApiWebhooksSendWaOtpRoute
   '/godmode/claims': typeof GodmodeShellClaimsRoute
   '/godmode/leads': typeof GodmodeShellLeadsRoute
   '/godmode/members/$memberId': typeof GodmodeShellMembersMemberIdRoute
-  '/': typeof PublicLayouthomeIndexRoute
   '/godmode/members': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/godmode': typeof GodmodeRouteWithChildren
-  '/_public/_layout': typeof PublicLayoutRouteWithChildren
   '/godmode/_shell': typeof GodmodeShellRouteWithChildren
   '/godmode/login': typeof GodmodeLoginRoute
   '/api/webhooks/send-wa-otp': typeof ApiWebhooksSendWaOtpRoute
@@ -109,14 +104,13 @@ export interface FileRoutesById {
   '/godmode/_shell/leads': typeof GodmodeShellLeadsRoute
   '/godmode/_shell/': typeof GodmodeShellIndexRoute
   '/godmode/_shell/members/$memberId': typeof GodmodeShellMembersMemberIdRoute
-  '/_public/_layout/(home)/': typeof PublicLayouthomeIndexRoute
   '/godmode/_shell/members/': typeof GodmodeShellMembersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/godmode'
     | '/'
+    | '/godmode'
     | '/godmode/login'
     | '/api/webhooks/send-wa-otp'
     | '/godmode/claims'
@@ -126,18 +120,18 @@ export interface FileRouteTypes {
     | '/godmode/members/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/godmode'
     | '/godmode/login'
     | '/api/webhooks/send-wa-otp'
     | '/godmode/claims'
     | '/godmode/leads'
     | '/godmode/members/$memberId'
-    | '/'
     | '/godmode/members'
   id:
     | '__root__'
+    | '/'
     | '/godmode'
-    | '/_public/_layout'
     | '/godmode/_shell'
     | '/godmode/login'
     | '/api/webhooks/send-wa-otp'
@@ -145,30 +139,29 @@ export interface FileRouteTypes {
     | '/godmode/_shell/leads'
     | '/godmode/_shell/'
     | '/godmode/_shell/members/$memberId'
-    | '/_public/_layout/(home)/'
     | '/godmode/_shell/members/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   GodmodeRoute: typeof GodmodeRouteWithChildren
-  PublicLayoutRoute: typeof PublicLayoutRouteWithChildren
   ApiWebhooksSendWaOtpRoute: typeof ApiWebhooksSendWaOtpRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/godmode': {
       id: '/godmode'
       path: '/godmode'
       fullPath: '/godmode'
       preLoaderRoute: typeof GodmodeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_public/_layout': {
-      id: '/_public/_layout'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof PublicLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/godmode/_shell': {
@@ -212,13 +205,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/godmode/leads'
       preLoaderRoute: typeof GodmodeShellLeadsRouteImport
       parentRoute: typeof GodmodeShellRoute
-    }
-    '/_public/_layout/(home)/': {
-      id: '/_public/_layout/(home)/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof PublicLayouthomeIndexRouteImport
-      parentRoute: typeof PublicLayoutRoute
     }
     '/godmode/_shell/members/': {
       id: '/godmode/_shell/members/'
@@ -270,21 +256,9 @@ const GodmodeRouteChildren: GodmodeRouteChildren = {
 const GodmodeRouteWithChildren =
   GodmodeRoute._addFileChildren(GodmodeRouteChildren)
 
-interface PublicLayoutRouteChildren {
-  PublicLayouthomeIndexRoute: typeof PublicLayouthomeIndexRoute
-}
-
-const PublicLayoutRouteChildren: PublicLayoutRouteChildren = {
-  PublicLayouthomeIndexRoute: PublicLayouthomeIndexRoute,
-}
-
-const PublicLayoutRouteWithChildren = PublicLayoutRoute._addFileChildren(
-  PublicLayoutRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   GodmodeRoute: GodmodeRouteWithChildren,
-  PublicLayoutRoute: PublicLayoutRouteWithChildren,
   ApiWebhooksSendWaOtpRoute: ApiWebhooksSendWaOtpRoute,
 }
 export const routeTree = rootRouteImport

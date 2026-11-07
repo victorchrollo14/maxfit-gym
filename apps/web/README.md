@@ -67,6 +67,17 @@ sign-in currently fails with `phone_provider_disabled` even with the hook on.
 
 ## Deploying
 
+Every push to `main` deploys on its own (`.github/workflows/deploy.yml`):
+
+1. **Deploy backend** applies any new Supabase migrations.
+2. **Build web image** builds this Dockerfile and pushes it to
+   `ghcr.io/victorchrollo14/maxfit-web`, tagged with the commit.
+3. **Deploy web to EC2** SSHes in and runs `docker compose pull && docker compose up -d`
+   in `~/maxfit-gym/apps/web` (see [`compose.yml`](compose.yml)), then checks
+   `/godmode` answers. It needs the `EC2_SSH_KEY` secret.
+
+To roll back, run `TAG=<older commit sha> docker compose up -d` there.
+
 `pnpm build` produces `.output/`, a self-contained Node server (`pnpm start` runs
 it). The Dockerfile wraps that, so the same image runs on EC2, ECS or anything else
 that runs containers. Build from the repo root:

@@ -52,9 +52,6 @@ importers:
       '@tanstack/react-start':
         specifier: ^1.169.4
         version: 1.169.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rolldown@1.2.9)(vite@8.2.0(@types/node@24.13.3)(jiti@2.7.0))
-      posthog-js:
-        specifier: ^1.418.10
-        version: 1.418.10
       react:
         specifier: ^19.2.8
         version: 19.2.8

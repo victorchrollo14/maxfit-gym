@@ -29,8 +29,8 @@ pnpm db:reset     # re-apply migrations + seed; the one you'll use constantly
 | Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 | Mailpit (catches outbound mail) | `http://127.0.0.1:54324` |
 
-The publishable key it prints goes in `apps/web` as `VITE_SUPABASE_PUBLISHABLE_KEY`.
-Local keys are the same on every machine and are not secret. `db:start` also prints a
+To point the CRM at the local stack, put the URL and publishable key it prints in
+`apps/web/src/config.ts` (don't commit that). Local keys are the same on every machine and are not secret. `db:start` also prints a
 legacy `anon` JWT — that still works, but the publishable key is the current one.
 
 Other scripts: `pnpm db:diff` (does the running DB match the migrations?),
@@ -115,11 +115,10 @@ want a required reviewer on schema changes, or at repository level if not.
 | `SUPABASE_PROJECT_ID` | the project ref, e.g. `abcdefghijklmnop` |
 | `SUPABASE_DB_PASSWORD` | the database password from step 1 |
 
-**3. Point the web app at it.** Pass `VITE_SUPABASE_URL` and
-`VITE_SUPABASE_PUBLISHABLE_KEY` (Project Settings → API keys) as build args when
-building the web image — see [apps/web/README.md](../web/README.md#deploying). Both
-are public and end up in the browser bundle; RLS is what keeps the publishable key
-harmless. The secret / service-role key is never a `VITE_` variable.
+**3. Point the web app at it.** Put the project URL and publishable key (Project
+Settings → API keys) in `apps/web/src/config.ts`. Both are public and end up in the
+browser bundle; RLS is what keeps the publishable key harmless. The secret /
+service-role key never goes there.
 
 **What the workflow deliberately does not do:**
 
@@ -136,7 +135,7 @@ pushing anything that touches a table with real data in it.
 ## Don't get this wrong
 
 **The service-role key never reaches the browser.** It lives in the web server's
-runtime env only, never as a `VITE_` variable. The web app gets the publishable key and is fenced in by RLS.
+runtime env only, never in `src/config.ts`. The web app gets the publishable key and is fenced in by RLS.
 
 Roles ride in the JWT via `auth.users.raw_app_meta_data`, which only the
 service-role key can write.

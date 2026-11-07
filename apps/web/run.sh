@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # Usage: ./run.sh build | start | stop | logs
-# Values come from apps/web/.env (or the file in $ENV_FILE). The VITE_* ones are
-# compiled into the browser bundle at build; the rest are read by the server at
-# start from the same file, mounted read-only. Edit it and restart to apply;
-# only VITE_* changes need a rebuild. `start` runs it in the background and
-# Docker restarts it after a crash or reboot; starting again replaces it.
+# The server's secrets come from apps/web/.env (or the file in $ENV_FILE),
+# mounted read-only at start. Edit it and restart to apply. `start` runs it in
+# the background and Docker restarts it after a crash or reboot; starting again
+# replaces it.
 set -euo pipefail
 
 IMAGE=maxfit-web
@@ -12,13 +11,6 @@ CONTAINER=maxfit-web
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 ENV_FILE="$(realpath "${ENV_FILE:-$ROOT/apps/web/.env}")"
 
-BUILD_VARS=(
-  VITE_SUPABASE_URL
-  VITE_SUPABASE_PUBLISHABLE_KEY
-  VITE_GOOGLE_MAPS_EMBED_KEY
-  VITE_PUBLIC_POSTHOG_PROJECT_TOKEN
-  VITE_PUBLIC_POSTHOG_HOST
-)
 RUNTIME_VARS=(
   SUPABASE_SECRET_KEY
   SEND_SMS_HOOK_SECRETS
@@ -46,11 +38,7 @@ warn_unset() {
 
 case "${1:-}" in
   build)
-    load_env
-    warn_unset "${BUILD_VARS[@]}"
-    args=()
-    for v in "${BUILD_VARS[@]}"; do args+=(--build-arg "$v"); done
-    docker build -f "$ROOT/apps/web/Dockerfile" -t "$IMAGE" "${args[@]}" "$ROOT"
+    docker build -f "$ROOT/apps/web/Dockerfile" -t "$IMAGE" "$ROOT"
     ;;
   start)
     load_env

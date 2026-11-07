@@ -1,0 +1,11 @@
+# On the server: docker compose pull && docker compose up -d
+# Roll back with TAG=<older commit sha> docker compose up -d
+services:
+  web:
+    image: ghcr.io/victorchrollo14/maxfit-web:${TAG:-latest}
+    container_name: maxfit-web
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - ./.env:/app/.env:ro

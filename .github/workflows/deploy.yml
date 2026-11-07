@@ -1,0 +1,99 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never two at once, and never cancel one half way through a migration.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/victorchrollo14/maxfit-web
+  AWS_REGION: ap-south-1
+  INSTANCE_ID: i-08611dfa9f7b85795
+
+jobs:
+  deploy-backend:
+    name: Deploy backend (Supabase migrations)
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: apps/backend
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.114.0
+      - run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
+      # No --include-seed: seed.sql is dev data. --include-all: separate PRs can
+      # land a migration older than one already applied.
+      - run: supabase db push --linked --include-all
+
+  build-web:
+    name: Build web image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # After the backend, so new code never runs against the old schema.
+  deploy-web:
+    name: Deploy web to EC2
+    needs: [deploy-backend, build-web]
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Runs on the server through Systems Manager, so no SSH key or open port.
+      - name: Pull the image and restart
+        run: |
+          script="cd ~/maxfit-gym && git pull -q --ff-only && docker pull -q $IMAGE:$GITHUB_SHA && IMAGE=$IMAGE:$GITHUB_SHA ./apps/web/run.sh start"
+          id=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment "deploy $GITHUB_SHA" \
+            --parameters "$(jq -n --arg c "runuser -l ubuntu -c '$script'" '{commands: [$c]}')" \
+            --query Command.CommandId --output text)
+          for _ in $(seq 120); do
+            status=$(aws ssm get-command-invocation --command-id "$id" --instance-id "$INSTANCE_ID" \
+              --query Status --output text 2>/dev/null || echo Pending)
+            case "$status" in Pending|InProgress|Delayed) sleep 5 ;; *) break ;; esac
+          done
+          aws ssm get-command-invocation --command-id "$id" --instance-id "$INSTANCE_ID" \
+            --query '[StandardOutputContent, StandardErrorContent]' --output text
+          echo "status: $status"
+          test "$status" = Success
+
+      - name: Check it's up
+        run: curl -fsS -o /dev/null --retry 10 --retry-all-errors --retry-delay 3 https://app.maxfitbangalore.in/godmode

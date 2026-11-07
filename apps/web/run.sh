@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Usage: ./run.sh build | start | stop | logs
+# Usage: ./run.sh build | start | stop | logs   (IMAGE=... start runs that image)
 # The server's secrets come from apps/web/.env (or the file in $ENV_FILE),
 # mounted read-only at start. Edit it and restart to apply. `start` runs it in
 # the background and Docker restarts it after a crash or reboot; starting again
 # replaces it.
 set -euo pipefail
 
-IMAGE=maxfit-web
+IMAGE="${IMAGE:-maxfit-web}"
 CONTAINER=maxfit-web
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 ENV_FILE="$(realpath "${ENV_FILE:-$ROOT/apps/web/.env}")"

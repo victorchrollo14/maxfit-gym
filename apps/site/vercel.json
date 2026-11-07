@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ../../pnpm-lock.yaml",
+  "redirects": [
+    { "source": "/godmode", "destination": "https://app.maxfitbangalore.in/godmode", "permanent": false },
+    { "source": "/godmode/:path*", "destination": "https://app.maxfitbangalore.in/godmode/:path*", "permanent": false },
+    { "source": "/trial-claimed", "destination": "/", "permanent": true }
+  ]
+}

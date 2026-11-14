@@ -16,7 +16,9 @@ export const PLANS: CrmPlan[] = [
   { key: 'monthly', name: 'Monthly Pass', price: 1999, durationDays: 30, pauseDaysAllowed: 0, seats: 1, onSale: true },
   { key: 'quarterly', name: '3 Month Pass', price: 3999, durationDays: 90, pauseDaysAllowed: 0, seats: 1, onSale: true },
   { key: 'half_yearly', name: '6 Month Pass', price: 5999, durationDays: 180, pauseDaysAllowed: 7, seats: 1, onSale: true },
-  { key: 'annual', name: 'Annual Pass', price: 9999, durationDays: 365, pauseDaysAllowed: 15, seats: 1, onSale: true },
+  { key: 'annual', name: 'Annual Pass', price: 8999, durationDays: 365, pauseDaysAllowed: 15, seats: 1, onSale: true },
+  { key: 'couple_quarterly', name: 'Couple 3 Month Pass', price: 6999, durationDays: 90, pauseDaysAllowed: 0, seats: 2, onSale: true },
+  { key: 'couple_half_yearly', name: 'Couple 6 Month Pass', price: 11999, durationDays: 180, pauseDaysAllowed: 7, seats: 2, onSale: true },
   { key: 'couple', name: 'Couple Pass', price: 14999, durationDays: 365, pauseDaysAllowed: 15, seats: 2, onSale: true },
 ]
 

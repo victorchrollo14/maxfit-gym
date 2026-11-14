@@ -93,6 +93,8 @@ const PLAN_TONES: Record<string, { bar: string; tint: string; text: string }> = 
   half_yearly: { bar: 'bg-amber-500', tint: 'bg-amber-500/10', text: 'text-amber-700 dark:text-amber-300' },
   annual: { bar: 'bg-emerald-500', tint: 'bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-300' },
   couple: { bar: 'bg-rose-500', tint: 'bg-rose-500/10', text: 'text-rose-700 dark:text-rose-300' },
+  couple_quarterly: { bar: 'bg-pink-500', tint: 'bg-pink-500/10', text: 'text-pink-700 dark:text-pink-300' },
+  couple_half_yearly: { bar: 'bg-fuchsia-500', tint: 'bg-fuchsia-500/10', text: 'text-fuchsia-700 dark:text-fuchsia-300' },
 }
 
 export function planTone(planKey: string) {

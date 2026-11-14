@@ -1,3 +1,5 @@
+import { GOOGLE_MAPS_EMBED_KEY, POSTHOG_HOST, POSTHOG_TOKEN } from './config.js'
+
 const header = document.querySelector('[data-header]')
 const menuButton = document.querySelector('[data-menu-button]')
 const sheet = document.getElementById('mobile-nav')
@@ -59,11 +61,10 @@ if (map) {
     frame.removeAttribute('tabindex')
     cover.remove()
   }
-  const key = import.meta.env.VITE_GOOGLE_MAPS_EMBED_KEY
-  if (key) {
+  if (GOOGLE_MAPS_EMBED_KEY) {
     const query =
       'MAXFIT GYM, Site No A, Kithaganur Main Rd, Krishnarajapuram, Kithiganur, Bengaluru, Karnataka 560036'
-    frame.src = `https://www.google.com/maps/embed/v1/place?key=${key}&q=${encodeURIComponent(query)}&zoom=18`
+    frame.src = `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_EMBED_KEY}&q=${encodeURIComponent(query)}&zoom=18`
     activate()
   } else {
     cover.addEventListener('click', activate)
@@ -74,16 +75,14 @@ for (const el of document.querySelectorAll('[data-year]')) {
   el.textContent = String(new Date().getFullYear())
 }
 
-const token = import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN
-const host = import.meta.env.VITE_PUBLIC_POSTHOG_HOST
 let posthog = null
 const queued = []
 
-if (token && host) {
+if (import.meta.env.PROD) {
   import('posthog-js')
     .then(({ default: client }) => {
-      client.init(token, {
-        api_host: host,
+      client.init(POSTHOG_TOKEN, {
+        api_host: POSTHOG_HOST,
         defaults: '2026-01-30',
         capture_exceptions: true,
         session_recording: { maskAllInputs: true },
@@ -96,7 +95,7 @@ if (token && host) {
 
 function capture(name, properties) {
   if (posthog) posthog.capture(name, properties)
-  else if (token && host) queued.push([name, properties])
+  else if (import.meta.env.PROD) queued.push([name, properties])
 }
 
 function actionOf(href) {

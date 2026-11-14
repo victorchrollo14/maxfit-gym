@@ -13,7 +13,5 @@ Icons live in the `<svg>` sprite at the top of `<body>`; use one with
 `<svg class="size-4"><use href="#i-phone"></use></svg>`. Theme colours, fonts
 and the `btn` classes are in `src/style.css`.
 
-Build-time variables (set them in Vercel; all optional, all public):
-
-- `VITE_PUBLIC_POSTHOG_PROJECT_TOKEN`, `VITE_PUBLIC_POSTHOG_HOST` — analytics
-- `VITE_GOOGLE_MAPS_EMBED_KEY` — labelled map pin; without it the map uses the keyless embed
+The PostHog token and the optional Google Maps embed key are in `src/config.js`.
+PostHog only loads in production builds.

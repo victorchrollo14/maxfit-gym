@@ -6,12 +6,12 @@ here redirects to `/godmode`.
 ## Running it
 
 ```sh
-cp .env.example .env.local     # then fill in VITE_SUPABASE_PUBLISHABLE_KEY
+cp .env.example .env.local     # then fill in the server secrets
 pnpm dev
 ```
 
-The CRM needs a database to talk to. `cd ../backend && pnpm db:start` prints both env
-values; see [apps/backend/README.md](../backend/README.md).
+The Supabase URL and publishable key are in [`src/config.ts`](src/config.ts) and point
+at production. The publishable key is public by design; RLS is what protects the data.
 
 ## API routes
 
@@ -27,8 +27,7 @@ export const Route = createFileRoute('/api/hello')({
 ```
 
 Server-only code (anything touching secrets) goes in `src/server/`. Read secrets
-from `process.env` there. Variables without the `VITE_` prefix never reach the
-browser.
+from `process.env` there.
 
 | Route | What it does |
 |---|---|
@@ -73,16 +72,11 @@ it). The Dockerfile wraps that, so the same image runs on EC2, ECS or anything e
 that runs containers. Build from the repo root:
 
 ```sh
-docker build -f apps/web/Dockerfile -t maxfit-web \
-  --build-arg VITE_SUPABASE_URL=... \
-  --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=... \
-  .
-
+docker build -f apps/web/Dockerfile -t maxfit-web .
 docker run -d --restart unless-stopped -p 3000:3000 --env-file web.env maxfit-web
 ```
 
-`VITE_*` values are compiled into the browser bundle, so they're build args.
-Server-only secrets go in `--env-file` at run time and never enter the image.
+Server secrets go in `--env-file` at run time and never enter the image.
 
 Hosted Supabase only calls **HTTPS** hooks, and the site needs it anyway: put Caddy or
 nginx with Let's Encrypt in front of port 3000.
